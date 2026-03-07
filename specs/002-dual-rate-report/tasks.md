@@ -21,7 +21,7 @@
 - [ ] T001 Create `src/cz_tax_wizard/calculators/dual_rate.py` with module docstring and empty public surface
 - [ ] T002 [P] Create `tests/unit/test_cnb_daily.py` with module docstring and import stubs
 - [ ] T003 [P] Create `tests/unit/test_calculators/test_dual_rate.py` with module docstring and import stubs
-- [ ] T004 [P] Create `tests/fixtures/text/cnb_daily_sample.txt` with a real CNB daily rate response for a known date (e.g. 2024-02-29) for use in offline tests
+- [ ] T004 [P] Create `tests/fixtures/text/cnb_daily_20240229.txt` with a real CNB daily rate response for 2024-02-29 (a known weekday) for use in offline tests
 
 ---
 
@@ -51,7 +51,7 @@
 - [ ] T011 [US1] Implement `format_dual_rate_section(report: DualRateReport) -> str` in `src/cz_tax_wizard/reporter.py`: render RSU interleaved table (columns: date, qty, income USD, annual-avg CZK, daily rate, daily CZK) and ESPP interleaved table (columns: period, purchase date, gain USD, annual-avg CZK, daily rate, daily CZK); mark dates where `needs_annotation=True` with asterisk; docstring
 - [ ] T012 [US1] Extend `format_dual_rate_section` in `src/cz_tax_wizard/reporter.py` to append: (a) footnote block listing each `*` substitution (event date → effective date used), (b) `TOTALS SUMMARY` table comparing all tax rows (§6 RSU, §6 ESPP, §6 stock total, §6 row 31, §8 row 321, §8 row 323) under both methods
 - [ ] T013 [US1] Implement annual-average-unavailable path in `format_dual_rate_section` in `src/cz_tax_wizard/reporter.py`: when `report.is_annual_avg_available is False`, prepend prominent warning and omit the annual-average column entirely (single-column daily-rate layout with no N/A cells)
-- [ ] T014 [US1] Wire dual-rate path in `src/cz_tax_wizard/cli.py`: after extracting all events, build `daily_rate_cache = {}`, call `fetch_cnb_usd_daily` for each unique date across RSU, ESPP, and dividend events; handle network failure with exit code 4 and descriptive error; call `compute_dual_rate_report()`; call `format_dual_rate_section()` and print to stdout; print `CNB Daily Rates: fetched per transaction date` line to stderr
+- [ ] T014 [US1] Wire dual-rate path in `src/cz_tax_wizard/cli.py`: after extracting all events, build `daily_rate_cache = {}`, call `fetch_cnb_usd_daily` for each unique date across RSU, ESPP, and dividend events; handle network failure with exit code 4 and descriptive error; call `compute_dual_rate_report()`; call `format_dual_rate_section()` and print to stdout; print `CNB Daily Rates: fetched per transaction date (source: https://www.cnb.cz/...)` to stderr after the annual-rate line (matching contracts/cli.md processing log format)
 
 **Checkpoint**: Full dual-rate comparison renders correctly end-to-end. User Story 1 is independently verifiable with `pytest tests/integration/test_full_run.py`.
 
@@ -64,7 +64,7 @@
 **Independent Test**: `pytest tests/unit/test_cnb_daily.py` passes with all assertions against known CNB rates from `tests/fixtures/text/cnb_daily_sample.txt`, without any live network calls.
 
 - [ ] T015 [US2] Write unit tests for `fetch_cnb_usd_daily` with pre-populated fixture in `tests/unit/test_cnb_daily.py`: mock HTTP response using `cnb_daily_sample.txt`, assert returned rate matches expected Decimal value for a known weekday date
-- [ ] T016 [US2] Write unit tests for holiday/weekend fallback in `tests/unit/test_cnb_daily.py`: mock first response with missing USD row (simulating weekend), mock second response with valid rate, assert `DailyRateEntry.effective_date` is the fallback date and `needs_annotation` logic is correct
+- [ ] T016 [US2] Write unit tests for holiday/weekend fallback in `tests/unit/test_cnb_daily.py`: mock first response with missing USD row (simulating weekend), mock second response with valid rate, assert `DailyRateEntry.effective_date` is the prior business day; then construct a `DualRateEventRow` from that entry and assert `needs_annotation is True`
 - [ ] T017 [US2] Write unit tests for in-memory cache deduplication in `tests/unit/test_cnb_daily.py`: call `fetch_cnb_usd_daily` twice with the same date, assert HTTP is invoked only once (second call returns cached entry)
 - [ ] T018 [P] [US2] Write unit tests for `compute_dual_rate_report` in `tests/unit/test_calculators/test_dual_rate.py`: construct minimal fixture RSU + ESPP events with known USD amounts and known cache entries; assert `annual_avg_czk`, `daily_czk`, and all aggregate totals match expected values; assert `total_stock_annual_czk` invariant
 - [ ] T019 [P] [US2] Write unit tests for `DualRateReport` invariant enforcement in `tests/unit/test_calculators/test_dual_rate.py`: assert `ValueError` raised when `total_stock_annual_czk != total_rsu_annual_czk + total_espp_annual_czk`; assert `annual_avg_rate is None` when `is_annual_avg_available is False`
@@ -81,7 +81,7 @@
 
 - [ ] T020 [US3] Add §38 ZDP method labels to the dual-rate section header in `src/cz_tax_wizard/reporter.py`: render `Rate method (§38 ZDP): annual average vs. per-transaction daily rate` below the section separator (or appropriate single-method variant when annual avg unavailable); docstring updated
 - [ ] T021 [US3] Add legal basis footer to the totals summary in `src/cz_tax_wizard/reporter.py`: render the two-line method explanation (`Annual avg: one CNB rate...` / `Daily rate: CNB rate on each transaction date...`) followed by `No recommendation is made. Consult a qualified Czech tax advisor.`
-- [ ] T022 [US3] Add `CNB Daily Rates: fetched per transaction date (source: https://www.cnb.cz/...)` to the processing log in `src/cz_tax_wizard/cli.py` (printed to stderr after the annual-rate line), matching the format specified in `contracts/cli.md`
+- [ ] T022 [US3] Verify `src/cz_tax_wizard/cli.py` stderr processing log matches `contracts/cli.md` exactly: confirm the `CNB Daily Rates` line appears after the annual-rate line; adjust wording if needed (covered by T014 but may need minor tuning for exact format match)
 
 **Checkpoint**: `pytest tests/` passes; stdout output includes §38 ZDP references and neutral disclaimer exactly as specified in `contracts/cli.md`.
 

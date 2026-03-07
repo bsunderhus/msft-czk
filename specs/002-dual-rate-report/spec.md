@@ -76,7 +76,7 @@ The report includes a brief explanatory note stating which CNB rate method each 
 ### Functional Requirements
 
 - **FR-001**: The report MUST present each stock income event in an interleaved table where each row shows the event date, USD amount, annual-average CZK amount, per-transaction daily CNB rate, and daily-rate CZK amount side by side. A totals section at the end of the report MUST summarise all tax-relevant rows for each method.
-- **FR-002**: Each transaction in the daily-rate section MUST display the specific CNB rate applied and the date it corresponds to.
+- **FR-002**: Each interleaved table row MUST display the specific CNB daily rate applied to that event and the CNB effective date it corresponds to (which may differ from the event date when a fallback was used).
 - **FR-003**: When a transaction date has no published CNB rate (weekend or public holiday), the tool MUST use the most recent prior business day's rate, mark the date cell with an asterisk (e.g., `25.03.2024*`), and include a footnote below the table identifying the actual date used.
 - **FR-004**: The tool MUST fetch per-transaction daily rates from the official CNB data source, using the same authoritative source already used for annual average rates.
 - **FR-005**: Both calculation sections MUST produce totals for all tax-relevant rows (§6 income, §8 foreign income, §8 foreign tax paid) so the user can directly compare figures for filing.
