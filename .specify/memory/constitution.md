@@ -1,50 +1,115 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+==================
+Version change: N/A (initial) → 1.0.0
+Modified principles: N/A (initial constitution)
+Added sections:
+  - Core Principles (I–V)
+  - Legal Compliance & Data Standards
+  - Development Workflow
+  - Governance
+Templates reviewed:
+  - .specify/templates/plan-template.md       ✅ aligned (Constitution Check section present)
+  - .specify/templates/spec-template.md       ✅ aligned (no conflicts with principles)
+  - .specify/templates/tasks-template.md      ✅ aligned (documentation tasks covered under Polish phase)
+  - .specify/templates/commands/ (commands)   ✅ no command files found — nothing to update
+Follow-up TODOs: none — all placeholders resolved.
+-->
+
+# CZ Tax Wizard Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Documentation-First
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All public-facing code — functions, classes, modules, CLI commands, and APIs — MUST include
+clear, accurate documentation before a feature is considered complete. Documentation MUST
+describe purpose, parameters, return values, raised errors, and any domain-specific tax
+context relevant to the implementation.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale**: Tax analysis tools are used by non-experts making legally and financially
+consequential decisions. Undocumented code cannot be audited, trusted, or safely extended.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Tax Accuracy
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+All tax calculations, form mappings, and regulatory interpretations MUST be traceable to
+a specific Czech tax regulation, official guidance, or publicly available tax authority
+source (e.g., Finanční správa ČR). Any ambiguity in interpretation MUST be surfaced
+explicitly to the user — never silently defaulted.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale**: Incorrect tax advice can result in penalties, back-taxes, or legal liability
+for users. Accuracy is non-negotiable and traceability is the mechanism that enforces it.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Data Privacy & Security
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Personally identifiable information (PII) and financial data MUST NOT be logged, persisted,
+or transmitted beyond the minimum necessary for the analysis task. No user data MUST be
+stored without explicit user consent and clear disclosure of purpose and retention period.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale**: Tax data is among the most sensitive categories of personal information.
+Handling it carelessly violates user trust and Czech/EU data protection law (GDPR, ZOOÚ).
+
+### IV. Testability
+
+Every tax calculation, data transformation, and form-mapping rule MUST be independently
+testable with deterministic inputs and outputs. Business logic MUST be decoupled from I/O,
+UI, and external service calls to permit unit testing without side effects.
+
+**Rationale**: Tax rules change annually. Isolated, tested logic enables safe updates and
+regression detection when regulations are amended.
+
+### V. Simplicity & Transparency
+
+The simplest correct solution MUST be preferred over clever or over-engineered alternatives.
+Analysis results presented to users MUST be explainable: every computed value MUST be
+accompanied by the reasoning or rule that produced it. Complexity MUST be justified against
+a concrete requirement — YAGNI applies.
+
+**Rationale**: Users relying on tax guidance must be able to understand and verify outputs.
+Opaque computations erode trust and make auditability impossible.
+
+## Legal Compliance & Data Standards
+
+Czech tax law and EU regulations impose non-negotiable constraints on this toolkit:
+
+- Tax year scope MUST be clearly stated for every analysis (e.g., "Tax Year 2025").
+- All monetary amounts MUST be handled in CZK (Czech Koruna) unless the user's scenario
+  explicitly involves foreign income, in which case the applicable exchange rate source
+  (e.g., Czech National Bank — ČNB) MUST be cited.
+- The toolkit MUST NOT provide legal advice. Outputs MUST be clearly labeled as informational
+  estimates. Users MUST be directed to a qualified tax advisor for final filing decisions.
+- GDPR Article 5 principles (purpose limitation, data minimisation, storage limitation)
+  MUST be respected in any feature that handles user-supplied financial or personal data.
+
+## Development Workflow
+
+- Features MUST NOT be merged without documentation (see Principle I).
+- Tax rule references MUST be included as inline comments or linked docs at the point of
+  implementation, not only in external design documents.
+- Any change to a tax calculation MUST be accompanied by updated or new tests (see
+  Principle IV) before the PR is approved.
+- Breaking changes to public APIs or CLI interfaces MUST increment the MAJOR version and
+  include a migration note in the changelog.
+- All code review checklists MUST include a "Tax Accuracy" gate that verifies regulatory
+  citations are present and correct.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all informal conventions and prior undocumented practices.
+Amendments require:
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+1. A written proposal describing the changed principle and motivation.
+2. Review and approval by at least one domain stakeholder (tax or engineering lead).
+3. A migration plan if existing features are affected.
+4. Version increment per the policy below and update of `LAST_AMENDED_DATE`.
+
+**Versioning policy**:
+- MAJOR: Removal or redefinition of a principle, or backward-incompatible governance change.
+- MINOR: New principle or section added, or materially expanded guidance.
+- PATCH: Clarifications, wording fixes, or non-semantic refinements.
+
+All PRs and code reviews MUST verify compliance with the five Core Principles above.
+Complexity exceptions MUST be documented in the plan's Complexity Tracking table before
+implementation begins.
+
+**Version**: 1.0.0 | **Ratified**: 2026-03-07 | **Last Amended**: 2026-03-07
