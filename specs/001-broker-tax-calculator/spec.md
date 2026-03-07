@@ -19,19 +19,19 @@ deferred as a future enhancement.
 ### Session 2026-03-07
 
 - Q: Does the employer provide RSU and ESPP income in the Potvrzeni, or must the employee self-calculate and self-declare it? → A: The employer provides only base salary in the Potvrzeni (MFin 5460). The employee MUST calculate RSU vesting income and ESPP discount income from broker statements and self-declare them as additional paragraph 6 rows in the DPFDP7 employer income table.
-- Q: Should the tool also parse the Potvrzeni PDF to read the base salary automatically, or does the user enter it manually? → A: The tool accepts the Potvrzeni PDF as an input, reads the base salary automatically, and outputs the complete paragraph 6 picture: base salary + RSU income + ESPP income = total row 31.
+- Q: Should the tool also parse the Potvrzeni PDF to read the base salary automatically, or does the user enter it manually? → A: The Potvrzeni (MFin 5460) is image/vector-based and yields zero extractable text. The user supplies the base salary manually via `--base-salary <CZK>`. The tool outputs the complete paragraph 6 picture: base salary + RSU income + ESPP income = total row 31.
 - Q: Where does AI-based PDF extraction processing happen? → A: All processing is strictly local. No PDF content, personal data, or financial figures are sent to any external service or API.
 - Q: What is the output format? → A: CLI tool — structured text report printed to the console, with all form row values clearly labeled and ready to copy into the tax declaration.
 - Q: How does the tool obtain the CNB annual average exchange rate? → A: The tool automatically fetches the official CNB annual average rate from the CNB public website (no personal data transmitted). If the rate is not yet published or the user prefers manual control, a `--cnb-rate` CLI flag overrides the auto-fetch. The tool always prints the rate used and its source.
 - Q: How does the user specify which tax year to process? → A: User passes `--year 2024` as a required CLI flag. The tool validates that all provided PDFs contain dates within that year and warns on any outliers.
 - Q: Should Fidelity ESPP account dividends be included in §8 foreign income (row 321)? → A: Yes — dividends from both Morgan Stanley and Fidelity are included in row 321, aggregated in USD then converted to CZK, and itemized by broker in the output so the user can verify each amount independently.
-- Q: Is the `--potvrzeni` argument mandatory? → A: Either `--potvrzeni <path>` or `--base-salary <CZK>` must be provided — they are mutually exclusive. The §6 summary is always produced; `--base-salary` allows the user to supply the base salary directly without the PDF.
+- Q: Is the `--potvrzeni` argument mandatory? → A: `--base-salary <CZK>` is the sole required base salary input. The `--potvrzeni` option has been removed because the 2024 Potvrzeni (MFin 5460) is entirely image/vector-based and pdfplumber extracts zero text from it, making automatic parsing impractical. The §6 summary is always produced.
 - Q: Should AI be used for PDF data extraction? → A: No. The primary extraction method is deterministic structured text parsing against the known Morgan Stanley and Fidelity PDF layouts. AI-based extraction is explicitly out of scope for this feature and deferred as a future enhancement. The tool must fail loudly with a specific error if a PDF layout does not match the expected format.
 - Q: What is the maximum acceptable execution time for a full run? → A: 30 seconds for a full run (up to 5 PDFs plus Potvrzeni) on a standard laptop.
 - Q: SC-001 references the filed 2024 declaration values (row 321 = 10,748 CZK, Morgan Stanley only), but the Q2 clarification requires including Fidelity dividends too — which governs? → A: Tax accuracy governs. SC-001 is updated to reference the corrected full total (Morgan Stanley + Fidelity dividends combined), with a note that the sample 2024 declaration under-reported §8 by omitting Fidelity ESPP account dividends.
 - Q: What rounding method is used for USD → CZK conversion? → A: Round half-up to the nearest whole CZK (standard arithmetic rounding: 0.5 rounds up). This applies to all intermediate and final converted amounts.
-- Q: How are multiple broker PDFs passed on the CLI, and how does the tool know which broker each file belongs to? → A: Broker PDFs are passed as positional arguments after all named flags (e.g., `cz-tax-wizard --year 2024 --potvrzeni cert.pdf ms-q1.pdf ms-q2.pdf fidelity.pdf`). The tool auto-detects the broker type from each PDF's content; no per-file type flag is required.
-- Q: Should RSU/ESPP output be shown when `--potvrzeni` is omitted? → A: The tool requires either `--potvrzeni <path>` OR `--base-salary <value>` — one of the two is always mandatory. This ensures the base salary is always available and the complete §6 summary (base + RSU + ESPP = row 31) is always produced. `--potvrzeni` and `--base-salary` are mutually exclusive.
+- Q: How are multiple broker PDFs passed on the CLI, and how does the tool know which broker each file belongs to? → A: Broker PDFs are passed as positional arguments after all named flags (e.g., `cz-tax-wizard --year 2024 --base-salary 2246694 ms-q1.pdf ms-q2.pdf fidelity.pdf`). The tool auto-detects the broker type from each PDF's content; no per-file type flag is required.
+- Q: Should RSU/ESPP output be shown when `--potvrzeni` is omitted? → A: `--base-salary <value>` is always mandatory (no `--potvrzeni` alternative). This ensures the base salary is always available and the complete §6 summary (base + RSU + ESPP = row 31) is always produced.
 - Q: Should the tool confirm the detected broker type for each PDF? → A: Yes — the tool MUST print the detected broker type and account number for each positional PDF argument before extracting data (e.g., `[Morgan Stanley Q1 2024] ms-q1.pdf`), so the user can confirm auto-detection was correct.
 - Q: How does the tool determine which broker PDF is RSU (Morgan Stanley) and which is ESPP (Fidelity)? → A: The tool detects broker identity by searching the PDF text content for the broker name (e.g., "Morgan Stanley" or "Fidelity" in the document header or footer). Income type classification follows from a fixed mapping: Morgan Stanley → RSU vesting rules + dividend extraction; Fidelity → ESPP purchase rules + dividend extraction. This mapping is hardcoded against the known statement formats from the verified sample PDFs.
 - Q: Does the missing-quarter warning (FR-015) apply to all broker PDFs or only Morgan Stanley? → A: Morgan Stanley only. Morgan Stanley publishes quarterly statements (4 per year); the tool warns if fewer than 4 distinct quarterly periods are detected across all Morgan Stanley PDFs. Fidelity provides a single year-end consolidated report covering the full year, so no quarter check applies to Fidelity.
@@ -88,30 +88,29 @@ employee must calculate these amounts from broker statements and enter them as a
 rows in the paragraph 6 employer income table of the DPFDP7 form, alongside the base
 salary row from the Potvrzeni.
 
-The tool accepts the Potvrzeni PDF and broker PDFs as command-line arguments. It reads the
-base salary from the Potvrzeni automatically, calculates from broker statements:
+The tool accepts the base salary via `--base-salary <CZK>` (read manually from the printed
+Potvrzeni row 1 labeled "Uhrn zuctovanych prijmu ze zavisle cinnosti") and broker PDFs as
+positional arguments. It calculates from broker statements:
 - RSU income: full FMV at each vesting date multiplied by shares vested, converted to CZK
 - ESPP income: discount amount (FMV minus purchase price, times shares) per offering
   period, converted to CZK
 
 It prints to the console the complete paragraph 6 breakdown ready to copy into the form:
-base salary (from Potvrzeni) + RSU income + ESPP income = total row 31.
+base salary (from --base-salary) + RSU income + ESPP income = total row 31.
 
 **Why this priority**: This is P1 — mandatory self-declaration. Without these amounts, the
 declared paragraph 6 income is understated. Any Czech tax resident receiving RSU or ESPP
 income from a foreign parent company MUST self-declare this income.
 
-**Independent Test**: User runs the tool with the 2024 Potvrzeni PDF plus all Morgan
-Stanley and Fidelity PDFs. Console shows base salary 2,246,694 CZK from Potvrzeni, RSU
-income ~665,603 CZK, ESPP income ~19,199 CZK, and total paragraph 6 = 2,931,496 CZK,
-matching the declared value in the sample declaration.
+**Independent Test**: User runs the tool with `--base-salary 2246694` plus all Morgan
+Stanley and Fidelity PDFs. Console shows base salary 2,246,694 CZK, RSU income ~665,603
+CZK, ESPP income ~19,199 CZK, and total paragraph 6 = 2,931,496 CZK, matching the
+declared value in the sample declaration.
 
 **Acceptance Scenarios**:
 
-1. **Given** `--potvrzeni <path>` passed as a CLI argument, **When** the tool processes
-   it, **Then** it extracts the base salary amount and employer tax ID (DIC) automatically.
-   **Given** `--base-salary <CZK>` passed instead, **When** the tool runs, **Then** it
-   uses that value directly and omits the employer tax ID from output.
+1. **Given** `--base-salary <CZK>` passed as a CLI argument, **When** the tool runs,
+   **Then** it uses that value as the base salary and omits the employer tax ID from output.
 
 2. **Given** Morgan Stanley quarterly statements, **When** the tool processes them,
    **Then** it identifies all Share Deposit transactions as RSU vesting events, calculates
@@ -124,9 +123,9 @@ matching the declared value in the sample declaration.
    additional paragraph 6 row. Employee payroll contributions are NOT income.
 
 4. **Given** all inputs processed, **When** the tool prints the paragraph 6 summary,
-   **Then** it displays: base salary (source: Potvrzeni) + RSU income (source: Morgan
-   Stanley) + ESPP income (source: Fidelity) = total row 31, with each line traceable
-   to its source document.
+   **Then** it displays: base salary (source: manual --base-salary) + RSU income (source:
+   Morgan Stanley) + ESPP income (source: Fidelity) = total row 31, with each line
+   traceable to its source document.
 
 5. **Given** a vesting event where shares were deposited at a specific price, **When** the
    tool processes the event, **Then** it uses the deposit price shown in the broker
@@ -185,8 +184,6 @@ as CLI arguments. Console output shows rows 324-330 all matching the declared va
   reinvestment as the taxable amount, not the net amount after.
 - What happens when an RSU vests in multiple tranches on the same date? The tool MUST sum
   all tranches for that date and report the combined income as one line item per date.
-- What happens when the Potvrzeni cannot be parsed? The tool MUST exit with a specific
-  error message instructing the user to re-run with `--base-salary <CZK>` instead.
 - What happens when a positional PDF argument cannot be identified as either Morgan Stanley
   or Fidelity? The tool MUST report a specific error naming the unrecognized file and MUST
   NOT attempt to extract data from it.
@@ -195,18 +192,15 @@ as CLI arguments. Console output shows rows 324-330 all matching the declared va
 
 ### Functional Requirements
 
-- **FR-001**: The tool MUST require exactly one of two mutually exclusive base salary
-  inputs: `--potvrzeni <path>` (PDF of the employer's Potvrzeni o zdanitelnych prijmech,
-  MFin 5460) or `--base-salary <CZK>` (manually supplied integer value in CZK). When
-  `--potvrzeni` is provided, the tool MUST extract the base salary amount and employer
-  tax ID (DIC) automatically from the PDF. When `--base-salary` is provided, the tool
-  MUST use that value directly. If neither or both are provided, the tool MUST exit with
-  a clear usage error. The complete §6 summary is always computed and printed.
+- **FR-001**: The tool MUST require `--base-salary <CZK>` (manually supplied integer value
+  in CZK, read from row 1 of the printed Potvrzeni o zdanitelnych prijmech, MFin 5460).
+  If this flag is not provided, the tool MUST exit with a clear usage error. The complete
+  §6 summary is always computed and printed.
 
 - **FR-002**: The tool MUST accept a required `--year <YYYY>` CLI flag specifying the tax
   year to process. Broker statement PDFs (Morgan Stanley quarterly statements and/or
   Fidelity year-end reports) are passed as one or more positional arguments after all
-  named flags (e.g., `cz-tax-wizard --year 2024 --potvrzeni cert.pdf ms-q1.pdf fidelity.pdf`).
+  named flags (e.g., `cz-tax-wizard --year 2024 --base-salary 2246694 ms-q1.pdf fidelity.pdf`).
   The tool MUST auto-detect the broker type for each PDF from its content and MUST
   validate that all provided PDFs contain dates within the specified year, warning on
   any outliers.
@@ -266,12 +260,8 @@ as CLI arguments. Console output shows rows 324-330 all matching the declared va
   NOT income and MUST NOT be included.
 
 - **FR-011**: The tool MUST print a complete paragraph 6 summary: base salary (from
-  Potvrzeni) + RSU income (from Morgan Stanley) + ESPP income (from Fidelity) = total
-  row 31, with each component traced to its source file.
-
-- **FR-012**: If the Potvrzeni PDF cannot be parsed, the tool MUST exit with a specific
-  error message instructing the user to supply the base salary manually via
-  `--base-salary <CZK>` instead.
+  --base-salary) + RSU income (from Morgan Stanley) + ESPP income (from Fidelity) = total
+  row 31, with each component traced to its source.
 
 - **FR-013**: All PDF processing and data extraction MUST happen locally on the user's
   machine. No document content, personal data, or financial figures may be transmitted
@@ -292,10 +282,10 @@ as CLI arguments. Console output shows rows 324-330 all matching the declared va
 
 ### Key Entities
 
-- **EmployerCertificate**: The Potvrzeni o zdanitelnych prijmech (MFin 5460) from the
-  employer. Attributes: employer name, employer tax ID (DIC), tax year, base salary
-  amount (CZK), tax withheld (CZK). Contains only employer-reported base salary — no
-  stock compensation income.
+- **EmployerCertificate**: The base salary as declared by the employer in the Potvrzeni o
+  zdanitelnych prijmech (MFin 5460). Attributes: tax year, base salary amount (CZK).
+  Always sourced from the `--base-salary` flag (manually read from the printed Potvrzeni
+  row 1). Contains only employer-reported base salary — no stock compensation income.
 
 - **BrokerStatement**: A single PDF from a broker. Attributes: broker name (Morgan Stanley
   or Fidelity), account number, statement period (start and end dates), source country,
@@ -336,9 +326,9 @@ as CLI arguments. Console output shows rows 324-330 all matching the declared va
   declaration filed by the user omitted Fidelity ESPP account dividends from §8; the
   tool's output will differ from that filing and represent the tax-accurate figure.
 
-- **SC-002**: Given the 2024 Potvrzeni and broker PDFs, the tool prints a paragraph 6
-  total (base + RSU + ESPP) that matches the declared row 31 value (2,931,496 CZK) within
-  plus or minus 1 CZK.
+- **SC-002**: Given `--base-salary 2246694` and the 2024 broker PDFs, the tool prints a
+  paragraph 6 total (base + RSU + ESPP) that matches the declared row 31 value
+  (2,931,496 CZK) within plus or minus 1 CZK.
 
 - **SC-003**: A user with no prior knowledge of the Czech tax form can run the tool from
   the command line and obtain all values needed for both paragraph 6 additional rows and
@@ -353,8 +343,9 @@ as CLI arguments. Console output shows rows 324-330 all matching the declared va
 - **SC-006**: The tool never silently produces a zero or blank result — if extraction
   fails for any input, it prints a specific and actionable error message to stderr.
 
-- **SC-007**: A full run processing up to 5 PDFs (4 quarterly broker statements plus
-  Potvrzeni) completes in under 30 seconds on a standard laptop.
+- **SC-007**: A full run processing up to 5 broker PDFs (4 quarterly Morgan Stanley
+  statements plus 1 Fidelity annual report) completes in under 30 seconds on a standard
+  laptop.
 
 ## Assumptions
 
@@ -362,7 +353,9 @@ as CLI arguments. Console output shows rows 324-330 all matching the declared va
   with the Czech DPFDP7 form structure.
 - The employer provides a Potvrzeni o zdanitelnych prijmech (MFin 5460) covering only
   the base salary. RSU and ESPP income are entirely absent from this certificate and must
-  be self-declared by the employee as additional paragraph 6 rows.
+  be self-declared by the employee as additional paragraph 6 rows. The 2024 Potvrzeni is
+  image/vector-based and yields no extractable text; the user reads the base salary from
+  the printed form and supplies it via `--base-salary <CZK>`.
 - The source country of income is the United States (US) and the applicable
   double-taxation treaty method is the credit method (metoda zapoctu), as demonstrated
   in the sample 2024 declaration. All dividend and stock income is denominated in USD;
