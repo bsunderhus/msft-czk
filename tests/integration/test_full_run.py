@@ -92,7 +92,8 @@ class TestHappyPath:
                 *(str(p) for p in ALL_PDFS),
             ],
         )
-        assert "TOTAL PARAGRAPH 6 ROW 31" in result.output
+        # §6 row 31 total now appears in the dual-rate TOTALS SUMMARY
+        assert "§6 row 31 total" in result.output
 
     def test_disclaimer_present(self):
         runner = CliRunner()
@@ -106,6 +107,46 @@ class TestHappyPath:
             ],
         )
         assert "DISCLAIMER" in result.output
+
+    def test_dual_rate_section_present(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "DUAL RATE COMPARISON" in result.output
+        assert "TOTALS SUMMARY" in result.output
+
+    def test_paragraph38_zdp_reference_present(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "§38 ZDP" in result.output
+
+    def test_no_recommendation_disclaimer_present(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "No recommendation is made" in result.output
 
 
 @pytest.mark.integration

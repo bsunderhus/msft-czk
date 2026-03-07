@@ -31,14 +31,16 @@ from pathlib import Path
 import click
 import pdfplumber
 
+from cz_tax_wizard.calculators.dual_rate import compute_dual_rate_report
 from cz_tax_wizard.calculators.paragraph6 import compute_paragraph6
 from cz_tax_wizard.calculators.priloha3 import compute_rows_321_323, compute_rows_324_330
-from cz_tax_wizard.cnb import CNB_URL, fetch_cnb_usd_annual
+from cz_tax_wizard.cnb import CNB_DAILY_URL_TEMPLATE, CNB_URL, fetch_cnb_usd_annual, fetch_cnb_usd_daily
 from cz_tax_wizard.extractors.base import detect_broker
 from cz_tax_wizard.extractors.fidelity import FidelityExtractor
 from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
 from cz_tax_wizard.models import EmployerCertificate, TaxYearSummary
 from cz_tax_wizard.reporter import (
+    format_dual_rate_section,
     format_foreign_income_section,
     format_header,
     format_paragraph6_section,
@@ -182,7 +184,12 @@ def main(
             )
             sys.exit(4)
 
-    click.echo(f"\nCNB Rate: {cnb_rate} CZK/USD  (source: {cnb_rate_source})\n", err=True)
+    click.echo(f"\nCNB Annual Rate: {cnb_rate} CZK/USD  (source: {cnb_rate_source})", err=True)
+    click.echo(
+        f"CNB Daily Rates: fetched per transaction date  "
+        f"(source: {CNB_DAILY_URL_TEMPLATE.format(date='DD.MM.YYYY')})\n",
+        err=True,
+    )
 
     # Emit accumulated warnings to stderr
     for warning in warnings:
@@ -216,6 +223,37 @@ def main(
             row_57=row57,
         )
 
+    # --- Fetch per-transaction daily CNB rates ---
+    # §38 ZDP — daily rate method: one network request per unique event date.
+    # The cache deduplicates requests within this run.
+    daily_rate_cache: dict = {}
+    unique_dates = {
+        *[e.date for e in all_rsu],
+        *[e.purchase_date for e in all_espp],
+        *[d.date for d in all_dividends],
+    }
+    for event_date in sorted(unique_dates):
+        try:
+            fetch_cnb_usd_daily(event_date, daily_rate_cache)
+        except Exception:
+            click.echo(
+                f"ERROR: Could not fetch CNB daily rate for "
+                f"{event_date.strftime('%d.%m.%Y')}. "
+                "Check network connectivity or use --cnb-rate to skip daily-rate section.",
+                err=True,
+            )
+            sys.exit(4)
+
+    # --- Dual-rate comparison report ---
+    dual_report = compute_dual_rate_report(
+        stock=stock,
+        dividend_events=all_dividends,
+        cnb_annual_rate=cnb_rate,
+        daily_rate_cache=daily_rate_cache,
+        base_salary_czk=base_salary,
+        tax_year=year,
+    )
+
     # --- Assemble in-memory aggregate for traceability ---
     _summary = TaxYearSummary(
         tax_year=year,
@@ -230,7 +268,7 @@ def main(
     # --- Print report to stdout ---
     click.echo(format_header(year))
     click.echo("")
-    click.echo(format_paragraph6_section(employer, stock, cnb_rate))
+    click.echo(format_dual_rate_section(dual_report))
     click.echo("")
     click.echo(format_foreign_income_section(foreign_income))
 

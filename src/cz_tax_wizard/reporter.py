@@ -13,6 +13,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from cz_tax_wizard.models import (
+    DualRateReport,
     EmployerCertificate,
     ForeignIncomeReport,
     Priloha3Computation,
@@ -231,9 +232,255 @@ def format_priloha3_credit_section(computation: Priloha3Computation) -> str:
     return "\n".join(lines)
 
 
+def format_dual_rate_section(report: DualRateReport) -> str:
+    """Render the dual exchange rate comparison section.
+
+    When both methods are available, renders:
+      1. Section header with §38 ZDP method labels
+      2. RSU interleaved table (annual-avg CZK and daily-rate CZK per event)
+      3. ESPP interleaved table
+      4. Footnote block for weekend/holiday date substitutions
+      5. TOTALS SUMMARY comparing §6 and §8 rows under both methods
+      6. Legal basis footer and neutral disclaimer
+
+    When the annual average is unavailable (``report.is_annual_avg_available``
+    is ``False``), the annual-average column is omitted entirely and a
+    prominent warning is prepended.
+
+    Regulatory reference: §38 ZDP (Zákon č. 586/1992 Sb.) — annual average
+    vs. per-transaction daily rate; no method recommendation is made.
+
+    Args:
+        report: ``DualRateReport`` produced by ``compute_dual_rate_report``.
+
+    Returns:
+        Formatted comparison section string.
+    """
+    lines: list[str] = []
+    dual = report.is_annual_avg_available
+
+    # --- Warning when annual average unavailable ---
+    if not dual:
+        lines.append(
+            "⚠ WARNING: CNB annual average rate for "
+            f"{report.tax_year} is not yet published."
+        )
+        lines.append(
+            "  Only the per-transaction daily rate section is shown below."
+        )
+        lines.append(
+            "  Re-run after the annual average is published to compare both methods."
+        )
+        lines.append("")
+
+    # --- Section header ---
+    lines.append(_SEP_NARROW)
+    if dual:
+        lines.append("DUAL RATE COMPARISON — §6 STOCK INCOME")
+        lines.append(
+            "Rate method (§38 ZDP): annual average vs. per-transaction daily rate"
+        )
+    else:
+        lines.append("DAILY RATE ONLY — §6 STOCK INCOME")
+        lines.append("Rate method (§38 ZDP): per-transaction daily rate")
+    lines.append(_SEP_NARROW)
+    lines.append("")
+
+    # Collect footnotes for annotated dates
+    footnotes: list[str] = []
+
+    # --- RSU table ---
+    if report.rsu_rows:
+        lines.append("RSU EVENTS")
+        if dual:
+            lines.append(
+                f"  {'Date':<14}  {'Qty':<6}  {'Income (USD)':>12}  "
+                f"{'Annual Avg CZK':>14}  {'Daily Rate':>10}  {'Daily CZK':>10}"
+            )
+            lines.append(f"  {'-'*14}  {'-'*6}  {'-'*12}  {'-'*14}  {'-'*10}  {'-'*10}")
+        else:
+            lines.append(
+                f"  {'Date':<14}  {'Qty':<6}  {'Income (USD)':>12}  "
+                f"{'Daily Rate':>10}  {'Daily CZK':>10}"
+            )
+            lines.append(f"  {'-'*14}  {'-'*6}  {'-'*12}  {'-'*10}  {'-'*10}")
+
+        for row in report.rsu_rows:
+            date_label = (
+                f"{row.event_date}*" if row.needs_annotation else str(row.event_date)
+            )
+            if row.needs_annotation:
+                footnotes.append(
+                    f"  * {row.event_date}: no CNB rate published — "
+                    f"rate from {row.daily_rate_entry.effective_date} used."
+                )
+            qty_label = _qty_from_description(row.description)
+            if dual:
+                lines.append(
+                    f"  {date_label:<14}  {qty_label:<6}  "
+                    f"${row.income_usd:>11.2f}  "
+                    f"{row.annual_avg_czk:>13,} CZK  "
+                    f"{row.daily_rate_entry.rate:>10}  "
+                    f"{row.daily_czk:>9,} CZK"
+                )
+            else:
+                lines.append(
+                    f"  {date_label:<14}  {qty_label:<6}  "
+                    f"${row.income_usd:>11.2f}  "
+                    f"{row.daily_rate_entry.rate:>10}  "
+                    f"{row.daily_czk:>9,} CZK"
+                )
+        lines.append("")
+
+    # --- ESPP table ---
+    if report.espp_rows:
+        lines.append("ESPP EVENTS")
+        if dual:
+            lines.append(
+                f"  {'Purchase Date':<14}  {'Gain (USD)':>12}  "
+                f"{'Annual Avg CZK':>14}  {'Daily Rate':>10}  {'Daily CZK':>10}"
+            )
+            lines.append(f"  {'-'*14}  {'-'*12}  {'-'*14}  {'-'*10}  {'-'*10}")
+        else:
+            lines.append(
+                f"  {'Purchase Date':<14}  {'Gain (USD)':>12}  "
+                f"{'Daily Rate':>10}  {'Daily CZK':>10}"
+            )
+            lines.append(f"  {'-'*14}  {'-'*12}  {'-'*10}  {'-'*10}")
+
+        for row in report.espp_rows:
+            date_label = (
+                f"{row.event_date}*" if row.needs_annotation else str(row.event_date)
+            )
+            if row.needs_annotation:
+                footnotes.append(
+                    f"  * {row.event_date}: no CNB rate published — "
+                    f"rate from {row.daily_rate_entry.effective_date} used."
+                )
+            if dual:
+                lines.append(
+                    f"  {date_label:<14}  "
+                    f"${row.income_usd:>11.2f}  "
+                    f"{row.annual_avg_czk:>13,} CZK  "
+                    f"{row.daily_rate_entry.rate:>10}  "
+                    f"{row.daily_czk:>9,} CZK"
+                )
+            else:
+                lines.append(
+                    f"  {date_label:<14}  "
+                    f"${row.income_usd:>11.2f}  "
+                    f"{row.daily_rate_entry.rate:>10}  "
+                    f"{row.daily_czk:>9,} CZK"
+                )
+        lines.append("")
+
+    # --- Footnotes ---
+    if footnotes:
+        seen = set()
+        for note in footnotes:
+            if note not in seen:
+                lines.append(note)
+                seen.add(note)
+        lines.append("")
+
+    # --- Totals summary ---
+    lines.append(_SEP_NARROW)
+    if dual:
+        lines.append(
+            f"TOTALS SUMMARY (§38 ZDP — two legally permitted methods)"
+        )
+        lines.append(_SEP_NARROW)
+        lines.append("")
+        col1 = "Annual Avg Method"
+        col2 = "Daily Rate Method"
+        lines.append(f"  {'Row':<38}  {col1:>18}  {col2:>18}")
+        lines.append(f"  {'-'*38}  {'-'*18}  {'-'*18}")
+        lines.append(
+            f"  {'RSU income (extra §6)':<38}  "
+            f"{report.total_rsu_annual_czk:>15,} CZK  "
+            f"{report.total_rsu_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'ESPP income (extra §6)':<38}  "
+            f"{report.total_espp_annual_czk:>15,} CZK  "
+            f"{report.total_espp_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'§6 stock total':<38}  "
+            f"{report.total_stock_annual_czk:>15,} CZK  "
+            f"{report.total_stock_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'§6 row 31 total':<38}  "
+            f"{report.paragraph6_annual_czk:>15,} CZK  "
+            f"{report.paragraph6_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'§8 row 321 (foreign income)':<38}  "
+            f"{report.row321_annual_czk:>15,} CZK  "
+            f"{report.row321_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'§8 row 323 (foreign tax paid)':<38}  "
+            f"{report.row323_annual_czk:>15,} CZK  "
+            f"{report.row323_daily_czk:>15,} CZK"
+        )
+    else:
+        lines.append(
+            "TOTALS SUMMARY (§38 ZDP — daily rate method only)"
+        )
+        lines.append(_SEP_NARROW)
+        lines.append("")
+        lines.append(f"  {'Row':<38}  {'Daily Rate Method':>18}")
+        lines.append(f"  {'-'*38}  {'-'*18}")
+        lines.append(
+            f"  {'RSU income (extra §6)':<38}  {report.total_rsu_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'ESPP income (extra §6)':<38}  {report.total_espp_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'§6 stock total':<38}  {report.total_stock_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'§6 row 31 total':<38}  {report.paragraph6_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'§8 row 321 (foreign income)':<38}  {report.row321_daily_czk:>15,} CZK"
+        )
+        lines.append(
+            f"  {'§8 row 323 (foreign tax paid)':<38}  {report.row323_daily_czk:>15,} CZK"
+        )
+
+    lines.append("")
+    lines.append(f"  Legal basis: §38 ZDP (Zákon č. 586/1992 Sb.)")
+    if dual:
+        lines.append(
+            "  — Annual avg: one CNB rate for all transactions in the tax year"
+        )
+    lines.append(
+        "  — Daily rate: CNB rate on each transaction date "
+        "(or nearest prior business day)"
+    )
+    lines.append(
+        "  No recommendation is made. Consult a qualified Czech tax advisor."
+    )
+    lines.append("")
+    lines.append(_DISCLAIMER)
+
+    return "\n".join(lines)
+
+
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
+
+def _qty_from_description(description: str) -> str:
+    """Extract the share quantity prefix from a DualRateEventRow description."""
+    # Description format: "8 shares × $407.72" → "8"
+    parts = description.split()
+    return parts[0] if parts else ""
 
 
 def _broker_label(broker: str) -> str:

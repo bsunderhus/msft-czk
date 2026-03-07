@@ -305,6 +305,162 @@ class Priloha3Computation:
 
 
 @dataclass(frozen=True)
+class DailyRateEntry:
+    """Result of a single CNB per-date USD/CZK exchange rate lookup.
+
+    The ``effective_date`` may differ from the *requested* date when the
+    requested date falls on a weekend or Czech public holiday and the fetcher
+    falls back to the most recent prior business day.
+
+    Regulatory reference: §38 ZDP (Zákon č. 586/1992 Sb.) — taxpayers may
+    convert foreign-currency income using the CNB rate on the transaction date.
+
+    Fields:
+        effective_date: The CNB calendar date that produced this rate.  Always
+            ≤ the requested event date.
+        rate: CNB USD/CZK exchange rate for ``effective_date``
+            (e.g. ``Decimal("23.150")``).
+    """
+
+    effective_date: date
+    rate: Decimal
+
+    def __post_init__(self) -> None:
+        if self.rate <= 0:
+            raise ValueError(f"rate must be positive, got {self.rate}")
+
+
+@dataclass(frozen=True)
+class DualRateEventRow:
+    """One row of the interleaved dual-rate comparison table.
+
+    Represents a single stock income event (RSU vesting or ESPP purchase)
+    with CZK amounts computed under both legally permitted rate methods.
+
+    Regulatory reference: §38 ZDP — annual average rate vs. per-transaction
+    daily rate; both methods are shown neutrally without recommendation.
+
+    Fields:
+        event_date: The date the income event occurred (vesting date for RSU,
+            purchase date for ESPP).
+        event_type: ``"rsu"`` or ``"espp"``.
+        description: Human-readable event label (e.g. ``"8 shares × $407.72"``).
+        income_usd: USD income amount for this event.
+        annual_avg_rate: CNB annual average rate for the tax year (same for all rows).
+        annual_avg_czk: ``income_usd × annual_avg_rate`` rounded half-up.  ``0``
+            when the annual average is unavailable.
+        daily_rate_entry: Resolved CNB daily rate entry (effective date + rate).
+        daily_czk: ``income_usd × daily_rate_entry.rate`` rounded half-up.
+        needs_annotation: ``True`` when ``daily_rate_entry.effective_date`` differs
+            from ``event_date`` (fallback was applied; row is marked with ``*``).
+    """
+
+    event_date: date
+    event_type: str
+    description: str
+    income_usd: Decimal
+    annual_avg_rate: Decimal
+    annual_avg_czk: int
+    daily_rate_entry: DailyRateEntry
+    daily_czk: int
+    needs_annotation: bool
+
+    def __post_init__(self) -> None:
+        if self.event_type not in {"rsu", "espp"}:
+            raise ValueError(f"event_type must be 'rsu' or 'espp', got {self.event_type!r}")
+        if self.income_usd <= 0:
+            raise ValueError(f"income_usd must be positive, got {self.income_usd}")
+        expected_annotation = self.daily_rate_entry.effective_date != self.event_date
+        if self.needs_annotation != expected_annotation:
+            raise ValueError(
+                f"needs_annotation {self.needs_annotation} does not match "
+                f"effective_date != event_date ({expected_annotation})"
+            )
+
+
+@dataclass(frozen=True)
+class DualRateReport:
+    """Full dual-rate comparison report for a single tax year.
+
+    Output of ``compute_dual_rate_report()``.  Contains per-event rows with
+    CZK amounts under both rate methods plus aggregated totals for all
+    tax-relevant rows.
+
+    When ``is_annual_avg_available`` is ``False`` (tax year not yet closed),
+    ``annual_avg_rate`` is ``None`` and all ``*_annual_czk`` fields are ``0``.
+
+    Regulatory reference: §38 ZDP — mixing methods within a tax year is not
+    permitted; both methods are presented neutrally for the taxpayer to choose.
+
+    Fields:
+        tax_year: Calendar year of the tax declaration.
+        is_annual_avg_available: ``False`` when the CNB annual average for
+            ``tax_year`` has not yet been published.
+        annual_avg_rate: CNB annual average rate, or ``None``.
+        rsu_rows: Per-event rows for RSU vesting events, sorted by date.
+        espp_rows: Per-event rows for ESPP purchase events, sorted by date.
+        total_rsu_annual_czk: Sum of RSU ``annual_avg_czk`` across all rows.
+        total_rsu_daily_czk: Sum of RSU ``daily_czk`` across all rows.
+        total_espp_annual_czk: Sum of ESPP ``annual_avg_czk`` across all rows.
+        total_espp_daily_czk: Sum of ESPP ``daily_czk`` across all rows.
+        total_stock_annual_czk: RSU + ESPP under annual method.
+        total_stock_daily_czk: RSU + ESPP under daily method.
+        base_salary_czk: Gross base salary in whole CZK (same under both methods).
+        paragraph6_annual_czk: ``base_salary_czk + total_stock_annual_czk``.
+        paragraph6_daily_czk: ``base_salary_czk + total_stock_daily_czk``.
+        row321_annual_czk: §8 foreign income total under annual method.
+        row321_daily_czk: §8 foreign income total under daily method.
+        row323_annual_czk: §8 foreign tax paid total under annual method.
+        row323_daily_czk: §8 foreign tax paid total under daily method.
+    """
+
+    tax_year: int
+    is_annual_avg_available: bool
+    annual_avg_rate: Decimal | None
+
+    rsu_rows: tuple[DualRateEventRow, ...]
+    espp_rows: tuple[DualRateEventRow, ...]
+
+    total_rsu_annual_czk: int
+    total_rsu_daily_czk: int
+    total_espp_annual_czk: int
+    total_espp_daily_czk: int
+    total_stock_annual_czk: int
+    total_stock_daily_czk: int
+
+    base_salary_czk: int
+    paragraph6_annual_czk: int
+    paragraph6_daily_czk: int
+
+    row321_annual_czk: int
+    row321_daily_czk: int
+    row323_annual_czk: int
+    row323_daily_czk: int
+
+    def __post_init__(self) -> None:
+        if self.total_stock_annual_czk != self.total_rsu_annual_czk + self.total_espp_annual_czk:
+            raise ValueError(
+                "total_stock_annual_czk must equal total_rsu_annual_czk + total_espp_annual_czk"
+            )
+        if self.total_stock_daily_czk != self.total_rsu_daily_czk + self.total_espp_daily_czk:
+            raise ValueError(
+                "total_stock_daily_czk must equal total_rsu_daily_czk + total_espp_daily_czk"
+            )
+        if self.paragraph6_annual_czk != self.base_salary_czk + self.total_stock_annual_czk:
+            raise ValueError(
+                "paragraph6_annual_czk must equal base_salary_czk + total_stock_annual_czk"
+            )
+        if self.paragraph6_daily_czk != self.base_salary_czk + self.total_stock_daily_czk:
+            raise ValueError(
+                "paragraph6_daily_czk must equal base_salary_czk + total_stock_daily_czk"
+            )
+        if not self.is_annual_avg_available and self.annual_avg_rate is not None:
+            raise ValueError(
+                "annual_avg_rate must be None when is_annual_avg_available is False"
+            )
+
+
+@dataclass(frozen=True)
 class TaxYearSummary:
     """Complete output picture for a single tax year run.
 
