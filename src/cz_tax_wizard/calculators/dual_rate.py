@@ -34,6 +34,7 @@ def compute_dual_rate_report(
     daily_rate_cache: dict[date, DailyRateEntry],
     base_salary_czk: int,
     tax_year: int,
+    base_salary_provided: bool = True,
 ) -> DualRateReport:
     """Compute §6 and §8 income under both CNB rate methods for comparison.
 
@@ -62,7 +63,12 @@ def compute_dual_rate_report(
             ``DailyRateEntry`` (effective date + rate). Must be pre-populated
             for every unique date across RSU, ESPP, and dividend events.
         base_salary_czk: Gross base salary in whole CZK (from ``--base-salary``).
+            ``0`` when ``base_salary_provided`` is ``False``.
         tax_year: Calendar year of the tax declaration.
+        base_salary_provided: ``True`` when the user supplied a positive
+            ``--base-salary`` value.  ``False`` when omitted or passed as ``0``.
+            Propagated to ``DualRateReport`` so the reporter can display a notice
+            reminding the user to add the §6 base salary before filing.
 
     Returns:
         ``DualRateReport`` with per-event rows and aggregated totals under
@@ -207,6 +213,7 @@ def compute_dual_rate_report(
         total_stock_annual_czk=total_rsu_annual_czk + total_espp_annual_czk,
         total_stock_daily_czk=total_rsu_daily_czk + total_espp_daily_czk,
         base_salary_czk=base_salary_czk,
+        base_salary_provided=base_salary_provided,
         paragraph6_annual_czk=base_salary_czk + total_rsu_annual_czk + total_espp_annual_czk,
         paragraph6_daily_czk=base_salary_czk + total_rsu_daily_czk + total_espp_daily_czk,
         row321_annual_czk=row321_annual_czk,

@@ -370,3 +370,33 @@ class TestBrokerDualRateRows:
 
         combined_usd = Decimal("100.00") + Decimal("200.00")
         assert report.row321_annual_czk == to_czk(combined_usd, _ANNUAL_RATE)
+
+
+class TestBaseSalaryProvided:
+    """base_salary_provided is propagated from compute_dual_rate_report to DualRateReport."""
+
+    def test_base_salary_provided_true_by_default(self) -> None:
+        """Default call (no base_salary_provided arg) sets base_salary_provided=True."""
+        stock = _make_stock([], [])
+        report = compute_dual_rate_report(stock, [], _ANNUAL_RATE, {}, 2_000_000, 2024)
+        assert report.base_salary_provided is True
+
+    def test_base_salary_provided_false_when_salary_absent(self) -> None:
+        """Passing base_salary_provided=False propagates to the report."""
+        stock = _make_stock([], [])
+        report = compute_dual_rate_report(
+            stock, [], _ANNUAL_RATE, {}, 0, 2024, base_salary_provided=False
+        )
+        assert report.base_salary_provided is False
+
+    def test_paragraph6_totals_with_zero_salary(self) -> None:
+        """When base_salary_czk=0, paragraph6 totals equal stock income only."""
+        rsu = _rsu(_DATE_A, "8", "407.72")
+        stock = _make_stock([rsu], [])
+        cache = _cache((_DATE_A, _DAILY_RATE_A, None))
+        report = compute_dual_rate_report(
+            stock, [], _ANNUAL_RATE, cache, 0, 2024, base_salary_provided=False
+        )
+        assert report.base_salary_czk == 0
+        assert report.paragraph6_annual_czk == report.total_stock_annual_czk
+        assert report.paragraph6_daily_czk == report.total_stock_daily_czk

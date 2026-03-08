@@ -261,3 +261,95 @@ class TestMissingQuarterWarning:
             ],
         )
         assert "Only 2 Morgan Stanley quarter(s) detected" in result.stderr
+
+
+# ---------------------------------------------------------------------------
+# Optional base salary tests (feature 009)
+# ---------------------------------------------------------------------------
+
+_MS_MINIMAL_TEXT = (
+    "Morgan Stanley Smith Barney LLC\n"
+    "Account Number: MS05003017\n"
+    "For the Period January 1 (cid:151) March 31, 2024"
+)
+
+
+def _invoke_no_base_salary(tmp_path, extra_args=None):
+    """Helper: invoke CLI with a minimal MS PDF and no --base-salary."""
+    fake_pdf = tmp_path / "ms.pdf"
+    fake_pdf.write_bytes(b"%PDF-1.4\n")
+    runner = CliRunner()
+    args = ["--year", "2024", "--cnb-rate", "23.28", str(fake_pdf)]
+    if extra_args:
+        args = extra_args + [str(fake_pdf)]
+    with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+        mock_pdf.open.return_value.__enter__.return_value.pages = [
+            type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
+        ]
+        return runner.invoke(main, args)
+
+
+class TestNoBaseSalary:
+    """FR-001/FR-002/FR-004: omitting or zero-ing --base-salary produces exit 0."""
+
+    def test_exit_code_zero_when_base_salary_omitted(self, tmp_path):
+        result = _invoke_no_base_salary(tmp_path)
+        assert result.exit_code == 0, f"Expected 0, got {result.exit_code}:\n{result.output}"
+
+    def test_exit_code_zero_when_base_salary_is_zero(self, tmp_path):
+        fake_pdf = tmp_path / "ms.pdf"
+        fake_pdf.write_bytes(b"%PDF-1.4\n")
+        runner = CliRunner()
+        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+            mock_pdf.open.return_value.__enter__.return_value.pages = [
+                type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
+            ]
+            result = runner.invoke(
+                main,
+                ["--year", "2024", "--cnb-rate", "23.28", "--base-salary", "0", str(fake_pdf)],
+            )
+        assert result.exit_code == 0, f"Expected 0, got {result.exit_code}:\n{result.output}"
+
+    def test_output_contains_employment_income_total(self, tmp_path):
+        result = _invoke_no_base_salary(tmp_path)
+        assert "Employment income total" in result.output
+
+    def test_output_contains_totals_summary(self, tmp_path):
+        result = _invoke_no_base_salary(tmp_path)
+        assert "TOTALS SUMMARY" in result.output
+
+
+class TestBaseSalaryNotice:
+    """FR-003/FR-006: notice appears when base salary is absent; absent when provided."""
+
+    def test_notice_present_when_base_salary_omitted(self, tmp_path):
+        result = _invoke_no_base_salary(tmp_path)
+        assert "base salary not provided" in result.output
+
+    def test_notice_present_when_base_salary_zero(self, tmp_path):
+        fake_pdf = tmp_path / "ms.pdf"
+        fake_pdf.write_bytes(b"%PDF-1.4\n")
+        runner = CliRunner()
+        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+            mock_pdf.open.return_value.__enter__.return_value.pages = [
+                type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
+            ]
+            result = runner.invoke(
+                main,
+                ["--year", "2024", "--cnb-rate", "23.28", "--base-salary", "0", str(fake_pdf)],
+            )
+        assert "base salary not provided" in result.output
+
+    def test_notice_absent_when_base_salary_provided(self, tmp_path):
+        fake_pdf = tmp_path / "ms.pdf"
+        fake_pdf.write_bytes(b"%PDF-1.4\n")
+        runner = CliRunner()
+        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+            mock_pdf.open.return_value.__enter__.return_value.pages = [
+                type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
+            ]
+            result = runner.invoke(
+                main,
+                ["--year", "2024", "--cnb-rate", "23.28", "--base-salary", "2246694", str(fake_pdf)],
+            )
+        assert "base salary not provided" not in result.output

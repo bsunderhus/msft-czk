@@ -147,6 +147,11 @@ def format_dual_rate_section(report: DualRateReport) -> str:
     is ``False``), the annual-average column is omitted entirely and a
     prominent warning is prepended.
 
+    When ``report.base_salary_provided`` is ``False`` (``--base-salary`` was
+    omitted or passed as ``0``), a notice is appended immediately after the
+    "Employment income total" row reminding the user that the total represents
+    stock income only and that the §6 base salary must be added before filing.
+
     ESPP table layout (two lines per event):
       Line 1: date, ``shares sh × ($fmv − $price) = disc%``, discount USD
       Line 2: indented CZK conversion — ``Annual avg: N CZK | Daily (rate): N CZK``
@@ -345,6 +350,11 @@ def format_dual_rate_section(report: DualRateReport) -> str:
         report.paragraph6_annual_czk,
         report.paragraph6_daily_czk,
     ))
+    if not report.base_salary_provided:
+        lines.append(
+            "  (base salary not provided — total is stock income only; "
+            "add §6 base salary before filing)"
+        )
 
     # Dividends block
     lines.append("")

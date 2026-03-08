@@ -29,17 +29,26 @@ class EmployerCertificate:
     Contains only employer-reported base salary — RSU and ESPP income are absent
     from this certificate and must be self-declared as additional §6 rows.
 
+    When ``--base-salary`` is omitted or explicitly passed as ``0``, the CLI sets
+    ``base_salary_czk = 0`` and ``base_salary_provided = False``.  This allows the
+    tool to produce stock-income totals before the employer certificate is available,
+    with a prominent notice reminding the user to add the §6 base salary before filing.
+
     Fields:
         tax_year: Calendar year of the tax declaration (e.g. 2024).
         base_salary_czk: Gross base salary in whole CZK (e.g. 2_246_694).
+            ``0`` when ``base_salary_provided`` is ``False``.
+        base_salary_provided: ``True`` when the user supplied a positive
+            ``--base-salary`` value; ``False`` when omitted or passed as ``0``.
     """
 
     tax_year: int
     base_salary_czk: int
+    base_salary_provided: bool = True
 
     def __post_init__(self) -> None:
-        if self.base_salary_czk <= 0:
-            raise ValueError(f"base_salary_czk must be positive, got {self.base_salary_czk}")
+        if self.base_salary_czk < 0:
+            raise ValueError(f"base_salary_czk must be non-negative, got {self.base_salary_czk}")
         if not (2010 <= self.tax_year <= 2100):
             raise ValueError(f"tax_year {self.tax_year} is out of expected range 2010–2100")
 
@@ -371,6 +380,11 @@ class DualRateReport:
         total_stock_annual_czk: RSU + ESPP under annual method.
         total_stock_daily_czk: RSU + ESPP under daily method.
         base_salary_czk: Gross base salary in whole CZK (same under both methods).
+            ``0`` when ``base_salary_provided`` is ``False``.
+        base_salary_provided: ``True`` when the user supplied a positive
+            ``--base-salary`` value; ``False`` when omitted or passed as ``0``.
+            When ``False``, ``paragraph6_*_czk`` equals stock income only and the
+            reporter renders a notice reminding the user to add base salary before filing.
         paragraph6_annual_czk: ``base_salary_czk + total_stock_annual_czk``.
         paragraph6_daily_czk: ``base_salary_czk + total_stock_daily_czk``.
         row321_annual_czk: Foreign income total under annual method (single conversion
@@ -402,6 +416,7 @@ class DualRateReport:
     total_stock_daily_czk: int
 
     base_salary_czk: int
+    base_salary_provided: bool
     paragraph6_annual_czk: int
     paragraph6_daily_czk: int
 
