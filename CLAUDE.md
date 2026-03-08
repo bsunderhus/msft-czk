@@ -12,6 +12,8 @@ Auto-generated from all feature plans. Last updated: 2026-03-07
 - Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib) — all unchanged (007-output-redesign)
 - N/A — in-memory only, no new persistence (007-output-redesign)
 - Python 3.11+ + click 8+ (CLI), pdfplumber 0.11+, decimal (stdlib) (008-remove-deprecated-cli)
+- Python 3.11+ + click 8+, pdfplumber 0.11+ (unchanged), decimal (stdlib) (009-optional-base-salary)
+- N/A — in-memory only; no persistence (009-optional-base-salary)
 
 - **001-broker-tax-calculator**: Python 3.11+, pdfplumber 0.11+ (PDF extraction), click 8+ (CLI), urllib (CNB fetch), decimal (monetary arithmetic), pytest
 
@@ -44,9 +46,9 @@ ruff check .                  # lint
 - Calculators are pure functions; no I/O side effects
 
 ## Recent Changes
+- 009-optional-base-salary: Added Python 3.11+ + click 8+, pdfplumber 0.11+ (unchanged), decimal (stdlib)
 - 008-remove-deprecated-cli: Added Python 3.11+ + click 8+ (CLI), pdfplumber 0.11+, decimal (stdlib)
 - 007-output-redesign: Added Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib) — all unchanged
-- 006-fidelity-espp-periodic: Added Python 3.11+ + pdfplumber 0.11+ (PDF text extraction), click 8+ (CLI), decimal (stdlib)
 
 
 <!-- MANUAL ADDITIONS START -->
