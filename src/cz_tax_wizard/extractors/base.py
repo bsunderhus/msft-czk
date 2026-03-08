@@ -53,8 +53,9 @@ class BrokerAdapter(Protocol):
 
     Implementations:
         MorganStanleyExtractor: Quarterly statements — RSU vesting + dividends.
+        FidelityESPPPeriodicAdapter: ESPP period reports — ESPP purchases + dividends (§6/§8).
         FidelityExtractor: Annual ESPP report — ESPP purchases + dividends.
-        FidelityRSUAdapter: Period reports — RSU vesting + dividends (§6/§8).
+        FidelityRSUAdapter: RSU period reports — RSU vesting + dividends (§6/§8).
     """
 
     def can_handle(self, text: str) -> bool:

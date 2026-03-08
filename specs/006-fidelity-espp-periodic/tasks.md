@@ -24,9 +24,9 @@ in place before the new adapter can be registered or tested.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T001 Add `"fidelity_espp_periodic"` to `BrokerStatement.__post_init__` allowlist and update `BrokerStatement.broker` and `BrokerDividendSummary.broker` docstrings in `src/cz_tax_wizard/models.py`
-- [ ] T002 Add `and "STOCK PLAN SERVICES REPORT" not in text` guard to `FidelityExtractor.can_handle()` in `src/cz_tax_wizard/extractors/fidelity.py`
-- [ ] T003 [P] Update `BrokerAdapter` docstring in `src/cz_tax_wizard/extractors/base.py` to list `FidelityESPPPeriodicAdapter` as a fourth registered adapter
+- [X] T001 Add `"fidelity_espp_periodic"` to `BrokerStatement.__post_init__` allowlist and update `BrokerStatement.broker` and `BrokerDividendSummary.broker` docstrings in `src/cz_tax_wizard/models.py`
+- [X] T002 Add `and "STOCK PLAN SERVICES REPORT" not in text` guard to `FidelityExtractor.can_handle()` in `src/cz_tax_wizard/extractors/fidelity.py`
+- [X] T003 [P] Update `BrokerAdapter` docstring in `src/cz_tax_wizard/extractors/base.py` to list `FidelityESPPPeriodicAdapter` as a fourth registered adapter
 
 **Checkpoint**: Foundation ready — `fidelity_espp_periodic` is a valid broker string and `FidelityExtractor` will no longer misroute ESPP periodic PDFs.
 
@@ -44,11 +44,11 @@ and that each event carries its real purchase date.
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Create `src/cz_tax_wizard/extractors/fidelity_espp_periodic.py` with `FidelityESPPPeriodicAdapter` class implementing `can_handle()` (detects `"STOCK PLAN SERVICES REPORT"` AND `"Employee Stock Purchase"`) and `extract()` covering period-date parsing, account/participant extraction, and ESPP purchase row extraction using `_RE_ESPP_ROW` (reused from `FidelityExtractor`); set `broker="fidelity_espp_periodic"`, `periodicity="periodic"`
-- [ ] T005 [US1] Register `FidelityESPPPeriodicAdapter()` in the `ADAPTERS` list in `src/cz_tax_wizard/cli.py` (position: after `MorganStanleyExtractor`, before `FidelityExtractor`); add loading-line display branch for `broker == "fidelity_espp_periodic"`
-- [ ] T006 [US1] Add FR-006 mutual-exclusion check in `src/cz_tax_wizard/cli.py`: after aggregating results, exit 1 with error message if both `"fidelity_espp_annual"` and `"fidelity_espp_periodic"` are in `brokers_present`
-- [ ] T007 [US1] Add ESPP purchase deduplication in `src/cz_tax_wizard/cli.py`: after assembling `all_espp`, deduplicate by key `(offering_period_start, offering_period_end, purchase_date)` when any result has `broker == "fidelity_espp_periodic"`
-- [ ] T008 [US1] Implement `_find_coverage_gaps(covered, year_start, year_end)` pure helper function in `src/cz_tax_wizard/cli.py` and add FR-007 coverage gap warning block that calls it after loading all ESPP periodic results
+- [X] T004 [US1] Create `src/cz_tax_wizard/extractors/fidelity_espp_periodic.py` with `FidelityESPPPeriodicAdapter` class implementing `can_handle()` (detects `"STOCK PLAN SERVICES REPORT"` AND `"Employee Stock Purchase"`) and `extract()` covering period-date parsing, account/participant extraction, and ESPP purchase row extraction using `_RE_ESPP_ROW` (reused from `FidelityExtractor`); set `broker="fidelity_espp_periodic"`, `periodicity="periodic"`
+- [X] T005 [US1] Register `FidelityESPPPeriodicAdapter()` in the `ADAPTERS` list in `src/cz_tax_wizard/cli.py` (position: after `MorganStanleyExtractor`, before `FidelityExtractor`); add loading-line display branch for `broker == "fidelity_espp_periodic"`
+- [X] T006 [US1] Add FR-006 mutual-exclusion check in `src/cz_tax_wizard/cli.py`: after aggregating results, exit 1 with error message if both `"fidelity_espp_annual"` and `"fidelity_espp_periodic"` are in `brokers_present`
+- [X] T007 [US1] Add ESPP purchase deduplication in `src/cz_tax_wizard/cli.py`: after assembling `all_espp`, deduplicate by key `(offering_period_start, offering_period_end, purchase_date)` when any result has `broker == "fidelity_espp_periodic"`
+- [X] T008 [US1] Implement `_find_coverage_gaps(covered, year_start, year_end)` pure helper function in `src/cz_tax_wizard/cli.py` and add FR-007 coverage gap warning block that calls it after loading all ESPP periodic results
 
 **Checkpoint**: US1 fully functional. The CLI can process ESPP periodic PDFs, extract purchase events once, enforce mutual exclusion with the annual report, and warn about year coverage gaps.
 
@@ -66,9 +66,9 @@ overlapping PDFs do not double-count dividends.
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Add dividend + withholding extraction to `FidelityESPPPeriodicAdapter.extract()` in `src/cz_tax_wizard/extractors/fidelity_espp_periodic.py`: parse `_RE_DIVIDEND` and `_RE_WITHHOLDING` / `_RE_WITHHOLDING_ADJ` rows; compute net withholding (Σ negative − Σ positive adjustments); distribute proportionally across dividend events (same pattern as `FidelityRSUAdapter`)
-- [ ] T010 [US2] Add dividend deduplication in `src/cz_tax_wizard/cli.py`: after assembling `all_dividends`, deduplicate by key `(date, gross_usd)` when any result has `broker == "fidelity_espp_periodic"`
-- [ ] T011 [P] [US2] Add `"fidelity_espp_periodic": "Fidelity (ESPP / Periodic)"` entry to the `_broker_label()` dict in `src/cz_tax_wizard/reporter.py`
+- [X] T009 [US2] Add dividend + withholding extraction to `FidelityESPPPeriodicAdapter.extract()` in `src/cz_tax_wizard/extractors/fidelity_espp_periodic.py`: parse `_RE_DIVIDEND` and `_RE_WITHHOLDING` / `_RE_WITHHOLDING_ADJ` rows; compute net withholding (Σ negative − Σ positive adjustments); distribute proportionally across dividend events (same pattern as `FidelityRSUAdapter`)
+- [X] T010 [US2] Add dividend deduplication in `src/cz_tax_wizard/cli.py`: after assembling `all_dividends`, deduplicate by key `(date, gross_usd)` when any result has `broker == "fidelity_espp_periodic"`
+- [X] T011 [P] [US2] Add `"fidelity_espp_periodic": "Fidelity (ESPP / Periodic)"` entry to the `_broker_label()` dict in `src/cz_tax_wizard/reporter.py`
 
 **Checkpoint**: US1 + US2 both functional. All ESPP periodic income (purchases + dividends + withholding) extracted correctly with deduplication.
 
@@ -78,12 +78,12 @@ overlapping PDFs do not double-count dividends.
 
 **Purpose**: Fixtures, tests, docstring completeness, and full suite validation.
 
-- [ ] T012 [P] Extract text from the July 2024 ESPP periodic PDF (contains Q2 2024 ESPP purchase settlement) and write to `tests/fixtures/text/fidelity_espp_periodic_purchase.txt`
-- [ ] T013 [P] Extract text from the March 2024 ESPP periodic PDF (contains MSFT + FDRXX dividends, no purchase) and write to `tests/fixtures/text/fidelity_espp_periodic_dividends.txt`
-- [ ] T014 [P] Write unit tests for `FidelityESPPPeriodicAdapter` in `tests/unit/test_extractors/test_fidelity_espp_periodic.py` covering: `can_handle()` true/false cases, ESPP purchase extraction, dividend extraction, proportional withholding, zero-purchase period, `broker == "fidelity_espp_periodic"` assertion; also unit-test `_find_coverage_gaps()` from `src/cz_tax_wizard/cli.py` in isolation (full year covered, partial coverage, no coverage, overlapping ranges)
-- [ ] T015 [P] Write integration tests in `tests/integration/test_fidelity_espp_periodic_full_run.py` (skip-if-absent pattern): ESPP totals match 2024 ($824.70), dividend totals match 2024 ($216.17 / $31.49), dedup across overlapping PDFs, rejection of combined annual + periodic
-- [ ] T016 Verify all module and public-function docstrings are present in `src/cz_tax_wizard/extractors/fidelity_espp_periodic.py` (Constitution Principle I); add §6 ZDP citation on ESPP discount extraction and §8 ZDP on dividend extraction; also add docstring to `_find_coverage_gaps()` in `src/cz_tax_wizard/cli.py` describing parameters, return value, and purpose
-- [ ] T017 Run full test suite (`pytest`) and linter (`ruff check .`); fix any failures before marking complete
+- [X] T012 [P] Extract text from the July 2024 ESPP periodic PDF (contains Q2 2024 ESPP purchase settlement) and write to `tests/fixtures/text/fidelity_espp_periodic_purchase.txt`
+- [X] T013 [P] Extract text from the March 2024 ESPP periodic PDF (contains MSFT + FDRXX dividends, no purchase) and write to `tests/fixtures/text/fidelity_espp_periodic_dividends.txt`
+- [X] T014 [P] Write unit tests for `FidelityESPPPeriodicAdapter` in `tests/unit/test_extractors/test_fidelity_espp_periodic.py` covering: `can_handle()` true/false cases, ESPP purchase extraction, dividend extraction, proportional withholding, zero-purchase period, `broker == "fidelity_espp_periodic"` assertion; also unit-test `_find_coverage_gaps()` from `src/cz_tax_wizard/cli.py` in isolation (full year covered, partial coverage, no coverage, overlapping ranges)
+- [X] T015 [P] Write integration tests in `tests/integration/test_fidelity_espp_periodic_full_run.py` (skip-if-absent pattern): ESPP totals match 2024 ($824.70), dividend totals match 2024 ($216.17 / $31.49), dedup across overlapping PDFs, rejection of combined annual + periodic
+- [X] T016 Verify all module and public-function docstrings are present in `src/cz_tax_wizard/extractors/fidelity_espp_periodic.py` (Constitution Principle I); add §6 ZDP citation on ESPP discount extraction and §8 ZDP on dividend extraction; also add docstring to `_find_coverage_gaps()` in `src/cz_tax_wizard/cli.py` describing parameters, return value, and purpose
+- [X] T017 Run full test suite (`pytest`) and linter (`ruff check .`); fix any failures before marking complete
 
 ---
 

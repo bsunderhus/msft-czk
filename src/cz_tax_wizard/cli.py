@@ -25,6 +25,7 @@ Regulatory references:
 from __future__ import annotations
 
 import sys
+from datetime import date, timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -36,6 +37,7 @@ from cz_tax_wizard.calculators.paragraph6 import compute_paragraph6
 from cz_tax_wizard.calculators.priloha3 import compute_rows_321_323, compute_rows_324_330
 from cz_tax_wizard.cnb import CNB_DAILY_URL_TEMPLATE, CNB_URL, fetch_cnb_usd_annual, fetch_cnb_usd_daily
 from cz_tax_wizard.extractors.fidelity import FidelityExtractor
+from cz_tax_wizard.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
 from cz_tax_wizard.extractors.fidelity_rsu import FidelityRSUAdapter
 from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
 from cz_tax_wizard.models import EmployerCertificate, TaxYearSummary
@@ -45,6 +47,66 @@ from cz_tax_wizard.reporter import (
     format_header,
     format_priloha3_credit_section,
 )
+
+
+def _find_coverage_gaps(
+    covered: list[tuple[date, date]],
+    year_start: date,
+    year_end: date,
+) -> list[tuple[date, date]]:
+    """Return date ranges within [year_start, year_end] not covered by any period.
+
+    Merges overlapping or adjacent coverage ranges and identifies sub-ranges of
+    the full year that are not covered by at least one periodic report. Used to
+    implement FR-007 (coverage gap warning for ESPP periodic reports).
+
+    Args:
+        covered: List of (period_start, period_end) pairs from loaded PDFs.
+            Both endpoints are inclusive calendar dates. May be unsorted and
+            may contain overlapping or adjacent ranges.
+        year_start: First day of the target tax year (e.g. date(2024, 1, 1)).
+        year_end: Last day of the target tax year (e.g. date(2024, 12, 31)).
+
+    Returns:
+        List of (gap_start, gap_end) pairs (both inclusive) representing
+        uncovered date ranges within [year_start, year_end]. Empty list if the
+        full year is covered. Adjacent periods (e.g. Jan 1–31 and Feb 1–28)
+        are treated as contiguous — no gap is reported between them.
+    """
+    if not covered:
+        return [(year_start, year_end)]
+
+    # Work in units of "first uncovered day" (cursor is always inclusive start
+    # of the uncovered region). Advance cursor to range_end + 1 day after each
+    # covered range so that adjacent periods merge without false-positive gaps.
+    _ONE_DAY = timedelta(days=1)
+
+    # Sort and merge overlapping/adjacent ranges (using inclusive endpoints)
+    sorted_ranges = sorted(covered)
+    merged: list[tuple[date, date]] = [sorted_ranges[0]]
+    for start, end in sorted_ranges[1:]:
+        prev_start, prev_end = merged[-1]
+        # Ranges overlap or are adjacent (start ≤ prev_end + 1 day)
+        if start <= prev_end + _ONE_DAY:
+            merged[-1] = (prev_start, max(prev_end, end))
+        else:
+            merged.append((start, end))
+
+    # Find gaps within [year_start, year_end]
+    gaps: list[tuple[date, date]] = []
+    cursor = year_start  # first day not yet confirmed covered
+    for range_start, range_end in merged:
+        if range_start > year_end:
+            break
+        if cursor < range_start:
+            # Gap from cursor to the day before this range starts
+            gaps.append((cursor, range_start - _ONE_DAY))
+        cursor = max(cursor, range_end + _ONE_DAY)
+
+    if cursor <= year_end:
+        gaps.append((cursor, year_end))
+
+    return gaps
 
 
 @click.command()
@@ -99,7 +161,12 @@ def main(
         sys.exit(1)
 
     # --- Adapter registry (FR-002) ---
-    ADAPTERS = [MorganStanleyExtractor(), FidelityExtractor(), FidelityRSUAdapter()]
+    ADAPTERS = [
+        MorganStanleyExtractor(),
+        FidelityESPPPeriodicAdapter(),
+        FidelityExtractor(),
+        FidelityRSUAdapter(),
+    ]
 
     all_results = []
     ms_quarter_count = 0
@@ -154,6 +221,15 @@ def main(
                 f"  ✓ [Fidelity (ESPP / Annual) {period.period_end.year}] {pdf_path.name}",
                 err=True,
             )
+        elif broker == "fidelity_espp_periodic":
+            period_label = (
+                f"{period.period_start.strftime('%b')}–"
+                f"{period.period_end.strftime('%b %Y')}"
+            )
+            click.echo(
+                f"  ✓ [Fidelity (ESPP / Periodic) {period_label}] {pdf_path.name}",
+                err=True,
+            )
         elif broker == "fidelity_rsu_periodic":
             period_label = (
                 f"{period.period_start.strftime('%b')}–"
@@ -179,6 +255,17 @@ def main(
 
     # --- Cross-PDF validations (FR-010, FR-011, FR-012) ---
     brokers_present = {r.statement.broker for r in all_results}
+
+    # FR-006: Reject combined use of annual and periodic ESPP reports
+    # (would double-count §6 ESPP income and §8 dividend income)
+    if "fidelity_espp_annual" in brokers_present and "fidelity_espp_periodic" in brokers_present:
+        click.echo(
+            "ERROR: Fidelity ESPP annual and Fidelity ESPP periodic reports cannot be "
+            "combined in the same run — this would double-count §6 ESPP income and "
+            "§8 dividend income.",
+            err=True,
+        )
+        sys.exit(1)
 
     # FR-012: Reject multi-RSU-broker invocations
     if "morgan_stanley_rsu_quarterly" in brokers_present and "fidelity_rsu_periodic" in brokers_present:
@@ -226,6 +313,17 @@ def main(
             f"for {year}. Dividend and RSU data may be incomplete."
         )
 
+    # FR-007: Warn about uncovered date ranges within the tax year
+    espp_periodic_results = [r for r in all_results if r.statement.broker == "fidelity_espp_periodic"]
+    if espp_periodic_results:
+        covered = [(r.statement.period_start, r.statement.period_end) for r in espp_periodic_results]
+        gaps = _find_coverage_gaps(covered, date(year, 1, 1), date(year, 12, 31))
+        for gap_start, gap_end in gaps:
+            warnings.append(
+                f"⚠ WARNING: Fidelity ESPP periodic reports do not cover "
+                f"{gap_start}–{gap_end}. Events in this range may be missing."
+            )
+
     # --- Fetch or use CNB rate ---
     if cnb_rate_override is not None:
         cnb_rate = Decimal(str(cnb_rate_override))
@@ -257,6 +355,50 @@ def main(
     all_dividends = [d for r in all_results for d in r.dividends]
     all_rsu = [e for r in all_results for e in r.rsu_events]
     all_espp = [e for r in all_results for e in r.espp_events]
+
+    # FR-003: Deduplicate ESPP purchases across overlapping ESPP periodic reports
+    # Key: (offering_period_start, offering_period_end, purchase_date)
+    if any(r.statement.broker == "fidelity_espp_periodic" for r in all_results):
+        seen_purchases: set[tuple] = set()
+        deduped_espp = []
+        for e in all_espp:
+            key = (e.offering_period_start, e.offering_period_end, e.purchase_date)
+            if key not in seen_purchases:
+                seen_purchases.add(key)
+                deduped_espp.append(e)
+        all_espp = deduped_espp
+
+    # FR-004: Deduplicate dividends across overlapping ESPP periodic reports
+    # Key: (date, gross_usd) — practical approximation; security name not in model
+    if any(r.statement.broker == "fidelity_espp_periodic" for r in all_results):
+        seen_dividends: set[tuple] = set()
+        deduped_dividends = []
+        for d in all_dividends:
+            key = (d.date, d.gross_usd)
+            if key not in seen_dividends:
+                seen_dividends.add(key)
+                deduped_dividends.append(d)
+        all_dividends = deduped_dividends
+
+    # Filter events to the declared tax year — events from other years are excluded
+    # (e.g. a Q4 prior-year ESPP purchase settled in a January periodic report).
+    out_of_year_espp = [e for e in all_espp if e.purchase_date.year != year]
+    all_espp = [e for e in all_espp if e.purchase_date.year == year]
+    for e in out_of_year_espp:
+        click.echo(
+            f"⚠ WARNING: ESPP purchase {e.purchase_date} (offering "
+            f"{e.offering_period_start}–{e.offering_period_end}) is outside "
+            f"tax year {year} — excluded.",
+            err=True,
+        )
+    out_of_year_divs = [d for d in all_dividends if d.date.year != year]
+    all_dividends = [d for d in all_dividends if d.date.year == year]
+    for d in out_of_year_divs:
+        click.echo(
+            f"⚠ WARNING: Dividend {d.date} (${d.gross_usd}) is outside "
+            f"tax year {year} — excluded.",
+            err=True,
+        )
 
     # --- §6 Computation ---
     employer = EmployerCertificate(tax_year=year, base_salary_czk=base_salary)

@@ -52,7 +52,8 @@ class BrokerStatement:
 
     Fields:
         broker: Canonical broker identifier — ``"morgan_stanley_rsu_quarterly"``,
-            ``"fidelity_espp_annual"`` (ESPP), or ``"fidelity_rsu_periodic"`` (RSU period reports).
+            ``"fidelity_espp_annual"`` (ESPP annual), ``"fidelity_espp_periodic"``
+            (ESPP period reports), or ``"fidelity_rsu_periodic"`` (RSU period reports).
         account_number: Broker-assigned account number (e.g. ``"MS05003017"``).
         period_start: First date of the statement period.
         period_end: Last date of the statement period (quarter-end, year-end,
@@ -77,6 +78,7 @@ class BrokerStatement:
         if self.broker not in {
             "morgan_stanley_rsu_quarterly",
             "fidelity_espp_annual",
+            "fidelity_espp_periodic",
             "fidelity_rsu_periodic",
         }:
             raise ValueError(f"Unknown broker: {self.broker!r}")
@@ -208,7 +210,8 @@ class BrokerDividendSummary:
     """Aggregated dividend totals for one broker, used in per-broker breakdown output.
 
     Fields:
-        broker: ``"morgan_stanley_rsu_quarterly"`` or ``"fidelity_espp_annual"``.
+        broker: ``"morgan_stanley_rsu_quarterly"``, ``"fidelity_espp_annual"``,
+            ``"fidelity_espp_periodic"``, or ``"fidelity_rsu_periodic"``.
         total_gross_usd: Sum of all gross dividends for this broker (USD).
         total_withholding_usd: Sum of all US withholding tax for this broker (USD).
         event_count: Number of individual DividendEvent records aggregated.
