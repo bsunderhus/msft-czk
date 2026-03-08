@@ -37,6 +37,7 @@ ruff check .                  # lint
 - Calculators are pure functions; no I/O side effects
 
 ## Recent Changes
+- 003-fidelity-rsu: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 002-dual-rate-report: Added Python 3.11+ + pdfplumber 0.11+ (unchanged), click 8+ (unchanged), urllib (stdlib, unchanged), decimal (stdlib, unchanged)
 
 - 001-broker-tax-calculator: Added Python 3.11+ + pdfplumber 0.11+ (PDF text extraction), click 8+ (CLI), httpx or

@@ -9,8 +9,8 @@
 
 ### Session 2026-03-07
 
-- Q: What should the tool do when only the year-end report is provided (no period reports)? → A: Error — at least one period report is required. The year-end report is a verification/supplementary document; period reports are the primary data source for RSU vesting events. (The year-end cost basis would be insufficient if shares were sold in the same year they vested.)
-- Q: When only period reports are provided (no year-end), should the tool communicate anything about dividend accuracy? → A: Yes — include a soft note in the output: "Dividends aggregated from period reports — provide the year-end report for authoritative totals."
+- ~~Q: What should the tool do when only the year-end report is provided (no period reports)? → A: Error — at least one period report is required. The year-end report is a verification/supplementary document; period reports are the primary data source for RSU vesting events. (The year-end cost basis would be insufficient if shares were sold in the same year they vested.)~~ *(Superseded by Session 2026-03-08 — year-end report dropped entirely from scope; year-end PDFs are treated as unrecognised documents, exit code 3.)*
+- ~~Q: When only period reports are provided (no year-end), should the tool communicate anything about dividend accuracy? → A: Yes — include a soft note in the output: "Dividends aggregated from period reports — provide the year-end report for authoritative totals."~~ *(Superseded by Session 2026-03-08.)*
 
 ### Session 2026-03-07 (continued)
 
@@ -125,4 +125,4 @@ All user-visible output uses the pattern `<Broker Name> (<Type>)`:
 - The Fidelity RSU period report starts with `"STOCK PLAN SERVICES REPORT"` on page 1 line 1 and does not contain `"Fidelity Stock Plan Services LLC"` anywhere in the document.
 - The Fidelity period report format (layout, section headings, column order) is stable across reporting periods.
 - Only the vesting date and the vesting-day price per share are needed for Czech §6 reporting; no sell events or capital-gains calculations are in scope for this feature.
-- The ticker symbol (e.g., MSFT) is present in the period report's activity section alongside each vesting event.
+- The ticker symbol (e.g., MSFT) is extracted from the period report's Holdings section (e.g., pattern `"MICROSOFT CORP (MSFT)"`). It does not appear in the vesting row itself in the Activity section.
