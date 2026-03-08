@@ -5,6 +5,8 @@ Auto-generated from all feature plans. Last updated: 2026-03-07
 ## Active Technologies
 - Python 3.11+ + pdfplumber 0.11+ (unchanged), click 8+ (unchanged), urllib (stdlib, unchanged), decimal (stdlib, unchanged) (002-dual-rate-report)
 - N/A — in-memory only; no new persistence (002-dual-rate-report)
+- Python 3.11+ + click 8+, decimal (stdlib), pdfplumber 0.11+ (unchanged) (004-espp-discount-display)
+- N/A — stateless, in-memory only (004-espp-discount-display)
 
 - **001-broker-tax-calculator**: Python 3.11+, pdfplumber 0.11+ (PDF extraction), click 8+ (CLI), urllib (CNB fetch), decimal (monetary arithmetic), pytest
 
@@ -37,10 +39,10 @@ ruff check .                  # lint
 - Calculators are pure functions; no I/O side effects
 
 ## Recent Changes
+- 004-espp-discount-display: Added Python 3.11+ + click 8+, decimal (stdlib), pdfplumber 0.11+ (unchanged)
 - 003-fidelity-rsu: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 002-dual-rate-report: Added Python 3.11+ + pdfplumber 0.11+ (unchanged), click 8+ (unchanged), urllib (stdlib, unchanged), decimal (stdlib, unchanged)
 
-- 001-broker-tax-calculator: Added Python 3.11+ + pdfplumber 0.11+ (PDF text extraction), click 8+ (CLI), httpx or
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
