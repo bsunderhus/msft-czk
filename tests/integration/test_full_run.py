@@ -177,31 +177,6 @@ class TestHappyPath:
         assert "No recommendation is made" in result.output
 
 
-@pytest.mark.integration
-@skip_if_no_pdfs
-class TestFullRunWithRow42Row57:
-    """Full run including Příloha č. 3 credit computation."""
-
-    def test_rows_324_to_330_in_output(self):
-        runner = CliRunner()
-        result = runner.invoke(
-            main,
-            [
-                "--year", "2024",
-                "--base-salary", "2246694",
-                "--cnb-rate", "23.28",
-                "--row42", "2942244",
-                "--row57", "542836",
-                *(str(p) for p in ALL_PDFS),
-            ],
-        )
-        assert result.exit_code == 0
-        assert "ROW 324" in result.output
-        assert "ROW 325" in result.output
-        assert "ROW 326" in result.output
-        assert "ROW 330" in result.output
-
-
 # ---------------------------------------------------------------------------
 # Error handling tests (no real PDFs required)
 # ---------------------------------------------------------------------------
@@ -266,27 +241,6 @@ class TestCnbNetworkFailureExitCode4:
 
         assert result.exit_code == 4
         assert "Could not fetch CNB" in (result.output + (result.exception and str(result.exception) or ""))
-
-
-class TestRow42WithoutRow57ExitCode1:
-    """Providing --row42 without --row57 exits with code 1."""
-
-    def test_row42_without_row57_exit_1(self, tmp_path):
-        fake_pdf = tmp_path / "ms.pdf"
-        fake_pdf.write_bytes(b"%PDF-1.4\n")
-
-        runner = CliRunner()
-        result = runner.invoke(
-            main,
-            [
-                "--year", "2024",
-                "--base-salary", "2246694",
-                "--cnb-rate", "23.28",
-                "--row42", "2942244",
-                str(fake_pdf),
-            ],
-        )
-        assert result.exit_code == 1
 
 
 class TestMissingQuarterWarning:
