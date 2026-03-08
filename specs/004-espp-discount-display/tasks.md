@@ -26,8 +26,8 @@ totals must be identical to the previous output.
 
 ### Implementation for User Story 1
 
-- [ ] T001 [P] [US1] Add `discount_pct` computation and update ESPP description string to formula format in `src/cz_tax_wizard/calculators/dual_rate.py` — include an inline `# §6 ZDP — ESPP taxable income = discount only` comment on the formula line per Constitution Principle II
-- [ ] T002 [P] [US1] Rename "Gain (USD)" → "Discount (USD)" and implement two-line-per-event ESPP layout in `src/cz_tax_wizard/reporter.py`
+- [X] T001 [P] [US1] Add `discount_pct` computation and update ESPP description string to formula format in `src/cz_tax_wizard/calculators/dual_rate.py` — include an inline `# §6 ZDP — ESPP taxable income = discount only` comment on the formula line per Constitution Principle II
+- [X] T002 [P] [US1] Rename "Gain (USD)" → "Discount (USD)" and implement two-line-per-event ESPP layout in `src/cz_tax_wizard/reporter.py`
 
 **Checkpoint**: At this point, running the CLI with a Fidelity ESPP PDF must produce the
 two-line layout shown in `contracts/output.md`. All computed USD and CZK totals must be
@@ -39,8 +39,8 @@ unchanged.
 
 **Purpose**: Validation and final checks after implementation.
 
-- [ ] T003 Run full test suite (`pytest`) and linter (`ruff check .`) — both must pass with zero errors
-- [ ] T004 Update docstrings on all modified public functions in `src/cz_tax_wizard/calculators/dual_rate.py` and `src/cz_tax_wizard/reporter.py` to reflect the new ESPP description format and two-line layout (Constitution Principle I)
+- [X] T003 Run full test suite (`pytest`) and linter (`ruff check .`) — both must pass with zero errors
+- [X] T004 Update docstrings on all modified public functions in `src/cz_tax_wizard/calculators/dual_rate.py` and `src/cz_tax_wizard/reporter.py` to reflect the new ESPP description format and two-line layout (Constitution Principle I)
 
 ---
 

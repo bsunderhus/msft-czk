@@ -244,7 +244,7 @@ def format_dual_rate_section(report: DualRateReport) -> str:
     When both methods are available, renders:
       1. Section header with §38 ZDP method labels
       2. RSU interleaved table (annual-avg CZK and daily-rate CZK per event)
-      3. ESPP interleaved table
+      3. ESPP interleaved table (two-line layout — see below)
       4. Footnote block for weekend/holiday date substitutions
       5. TOTALS SUMMARY comparing §6 and §8 rows under both methods
       6. Legal basis footer and neutral disclaimer
@@ -252,6 +252,13 @@ def format_dual_rate_section(report: DualRateReport) -> str:
     When the annual average is unavailable (``report.is_annual_avg_available``
     is ``False``), the annual-average column is omitted entirely and a
     prominent warning is prepended.
+
+    ESPP table layout (two lines per event):
+      Line 1: date, ``shares sh × ($fmv − $price) = disc%``, discount USD
+      Line 2: indented CZK conversion — ``Annual avg: N CZK | Daily (rate): N CZK``
+              (annual avg omitted when only daily rate is available)
+    This layout lets the taxpayer verify the §6 taxable ESPP income (discount
+    only, not the full market value) without opening the broker PDF (FR-001/002).
 
     Regulatory reference: §38 ZDP (Zákon č. 586/1992 Sb.) — annual average
     vs. per-transaction daily rate; no method recommendation is made.
@@ -341,18 +348,12 @@ def format_dual_rate_section(report: DualRateReport) -> str:
     # --- ESPP table ---
     if report.espp_rows:
         lines.append("ESPP EVENTS")
-        if dual:
-            lines.append(
-                f"  {'Purchase Date':<14}  {'Gain (USD)':>12}  "
-                f"{'Annual Avg CZK':>14}  {'Daily Rate':>10}  {'Daily CZK':>10}"
-            )
-            lines.append(f"  {'-'*14}  {'-'*12}  {'-'*14}  {'-'*10}  {'-'*10}")
-        else:
-            lines.append(
-                f"  {'Purchase Date':<14}  {'Gain (USD)':>12}  "
-                f"{'Daily Rate':>10}  {'Daily CZK':>10}"
-            )
-            lines.append(f"  {'-'*14}  {'-'*12}  {'-'*10}  {'-'*10}")
+        lines.append(
+            f"  {'Purchase Date':<14}  "
+            f"{'Shares × (FMV − Price) = Disc%':<40}  "
+            f"{'Discount (USD)':>14}"
+        )
+        lines.append(f"  {'-'*14}  {'-'*40}  {'-'*14}")
 
         for row in report.espp_rows:
             date_label = (
@@ -363,20 +364,23 @@ def format_dual_rate_section(report: DualRateReport) -> str:
                     f"  * {row.event_date}: no CNB rate published — "
                     f"rate from {row.daily_rate_entry.effective_date} used."
                 )
+            # Line 1: formula + discount USD
+            lines.append(
+                f"  {date_label:<14}  "
+                f"{row.description:<40}  "
+                f"${row.income_usd:>13.2f}"
+            )
+            # Line 2: CZK conversion values (indented under the event)
             if dual:
                 lines.append(
-                    f"  {date_label:<14}  "
-                    f"${row.income_usd:>11.2f}  "
-                    f"{row.annual_avg_czk:>13,} CZK  "
-                    f"{row.daily_rate_entry.rate:>10}  "
-                    f"{row.daily_czk:>9,} CZK"
+                    f"  {'':14}    "
+                    f"Annual avg: {row.annual_avg_czk:>8,} CZK  |  "
+                    f"Daily ({row.daily_rate_entry.rate}): {row.daily_czk:>8,} CZK"
                 )
             else:
                 lines.append(
-                    f"  {date_label:<14}  "
-                    f"${row.income_usd:>11.2f}  "
-                    f"{row.daily_rate_entry.rate:>10}  "
-                    f"{row.daily_czk:>9,} CZK"
+                    f"  {'':14}    "
+                    f"Daily ({row.daily_rate_entry.rate}): {row.daily_czk:>8,} CZK"
                 )
         lines.append("")
 
