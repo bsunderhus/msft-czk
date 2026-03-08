@@ -89,7 +89,10 @@ class FidelityExtractor:
         Returns:
             True if ``"Fidelity Stock Plan Services LLC"`` is present in text.
         """
-        return "Fidelity Stock Plan Services LLC" in text
+        return (
+            "Fidelity Stock Plan Services LLC" in text
+            and "STOCK PLAN SERVICES REPORT" not in text
+        )
 
     def extract(self, text: str, source_path: Path) -> ExtractionResult:
         """Extract dividend and ESPP events from pre-extracted Fidelity text.

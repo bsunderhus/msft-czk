@@ -502,8 +502,9 @@ def _qty_from_description(description: str) -> str:
 def _broker_label(broker: str) -> str:
     labels = {
         "morgan_stanley_rsu_quarterly": "Morgan Stanley (RSU / Quarterly)",
-        "fidelity_espp_annual": "Fidelity (ESPP / Annual)",
-        "fidelity_rsu_periodic": "Fidelity (RSU / Periodic)",
+        "fidelity_espp_annual":         "Fidelity (ESPP / Annual)",
+        "fidelity_espp_periodic":       "Fidelity (ESPP / Periodic)",
+        "fidelity_rsu_periodic":        "Fidelity (RSU / Periodic)",
     }
     return labels.get(broker, broker)
 
