@@ -105,8 +105,9 @@ class FidelityESPPPeriodicAdapter:
     and ``extract(text, path)``.
 
     Detection logic: the document contains both ``"STOCK PLAN SERVICES REPORT"``
-    AND ``"Employee Stock Purchase"``. This distinguishes ESPP periodic reports
-    from RSU periodic reports (which share the same header but lack ESPP content)
+    AND ``"Employee Stock Purchase"`` (2024) or ``"EMPLOYEE STOCK PURCHASE"``
+    (2025+). This distinguishes ESPP periodic reports from RSU periodic reports
+    (which share the same header but lack ESPP content)
     and from the annual ESPP report (which uses ``"YEAR-END INVESTMENT REPORT"``).
     (research.md Decision 1)
 
@@ -124,12 +125,13 @@ class FidelityESPPPeriodicAdapter:
             text: Full extracted text from all pages of the PDF.
 
         Returns:
-            True if both ``"STOCK PLAN SERVICES REPORT"`` and
-            ``"Employee Stock Purchase"`` are present in text.
+            True if ``"STOCK PLAN SERVICES REPORT"`` and either
+            ``"Employee Stock Purchase"`` or ``"EMPLOYEE STOCK PURCHASE"``
+            are present in text. The all-caps variant appears in 2025+ PDFs.
         """
-        return (
-            "STOCK PLAN SERVICES REPORT" in text
-            and "Employee Stock Purchase" in text
+        return "STOCK PLAN SERVICES REPORT" in text and (
+            "Employee Stock Purchase" in text
+            or "EMPLOYEE STOCK PURCHASE" in text
         )
 
     def extract(self, text: str, path: Path) -> ExtractionResult:
@@ -161,7 +163,8 @@ class FidelityESPPPeriodicAdapter:
         if not self.can_handle(text):
             raise ValueError(
                 f"{path.name} — not a Fidelity ESPP period report "
-                "(missing 'STOCK PLAN SERVICES REPORT' and/or 'Employee Stock Purchase')."
+                "(missing 'STOCK PLAN SERVICES REPORT' and/or 'Employee Stock Purchase' / "
+                "'EMPLOYEE STOCK PURCHASE')."
             )
 
         # --- Parse period dates ---
