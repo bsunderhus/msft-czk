@@ -5,9 +5,9 @@ Tests requiring real PDF fixtures are marked with pytest.mark.integration
 and skipped automatically if the PDFs are absent (CI-safe).
 
 Expected 2024 known values (from research.md and sample PDF analysis):
-  §8 ROW 321 (foreign income):   ~10,748 CZK
-  §8 ROW 323 (foreign tax paid):  ~1,612 CZK
-  §6 ROW 31 (total §6 income):  2,931,496 CZK  (at rate 23.28 and specific RSU events)
+  Foreign income total:   ~10,748 CZK
+  Foreign tax paid total:  ~1,612 CZK
+  Employment income total:  2,931,496 CZK  (at rate 23.28 and specific RSU events)
 """
 
 from pathlib import Path
@@ -53,7 +53,7 @@ class TestHappyPath:
         )
         assert result.exit_code == 0, f"Unexpected exit {result.exit_code}:\n{result.output}"
 
-    def test_row_321_in_output(self):
+    def test_foreign_income_total_in_output(self):
         runner = CliRunner()
         result = runner.invoke(
             main,
@@ -64,10 +64,9 @@ class TestHappyPath:
                 *(str(p) for p in ALL_PDFS),
             ],
         )
-        # ROW 321 should be ~10,748 CZK (±1 CZK tolerance)
-        assert "ROW 321" in result.output
+        assert "Foreign income total" in result.output
 
-    def test_row_323_in_output(self):
+    def test_foreign_tax_paid_total_in_output(self):
         runner = CliRunner()
         result = runner.invoke(
             main,
@@ -78,9 +77,9 @@ class TestHappyPath:
                 *(str(p) for p in ALL_PDFS),
             ],
         )
-        assert "ROW 323" in result.output
+        assert "Foreign tax paid total" in result.output
 
-    def test_row_31_in_output(self):
+    def test_employment_income_total_in_output(self):
         runner = CliRunner()
         result = runner.invoke(
             main,
@@ -91,8 +90,38 @@ class TestHappyPath:
                 *(str(p) for p in ALL_PDFS),
             ],
         )
-        # §6 row 31 total now appears in the dual-rate TOTALS SUMMARY
-        assert "§6 row 31 total" in result.output
+        assert "Employment income total" in result.output
+
+    def test_no_section8_in_output(self):
+        """FR-007/FR-008: §8 / PŘÍLOHA Č. 3 section must be absent."""
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "PŘÍLOHA Č. 3" not in result.output
+        assert "ROW 321" not in result.output
+        assert "ROW 323" not in result.output
+
+    def test_both_events_sections_present(self):
+        """SC-001: Both RSU EVENTS and ESPP EVENTS sections always appear."""
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "RSU EVENTS" in result.output
+        assert "ESPP EVENTS" in result.output
 
     def test_disclaimer_present(self):
         runner = CliRunner()

@@ -43,7 +43,6 @@ from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
 from cz_tax_wizard.models import EmployerCertificate, TaxYearSummary
 from cz_tax_wizard.reporter import (
     format_dual_rate_section,
-    format_foreign_income_section,
     format_header,
     format_priloha3_credit_section,
 )
@@ -469,8 +468,6 @@ def main(
     click.echo(format_header(year))
     click.echo("")
     click.echo(format_dual_rate_section(dual_report))
-    click.echo("")
-    click.echo(format_foreign_income_section(foreign_income))
 
     if priloha3 is not None:
         click.echo("")

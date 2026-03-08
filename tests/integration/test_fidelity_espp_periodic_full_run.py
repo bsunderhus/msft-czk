@@ -25,6 +25,8 @@ from cz_tax_wizard.extractors.fidelity_espp_periodic import FidelityESPPPeriodic
 
 PDF_DIR = Path(__file__).parent.parent.parent / "pdfs" / "fidelity_espp_periodic"
 ANNUAL_PDF_DIR = Path(__file__).parent.parent.parent / "pdfs" / "fidelity_espp"
+# 2025 periodic PDFs have dividends but no ESPP purchase events — used for disclaimer test
+PDF_DIR_2025 = Path(__file__).parent.parent.parent / "pdfs" / "fidelity_espp_periodic_2025"
 
 # Check which PDFs are available
 periodic_pdfs = sorted(PDF_DIR.glob("*.pdf")) if PDF_DIR.exists() else []
@@ -164,6 +166,45 @@ class TestCoverageGapWarning:
         result = runner.invoke(main, list(args), catch_exceptions=False)
         assert result.exit_code == 0
         assert "WARNING" in result.output and "cover" in result.output.lower()
+
+
+_periodic_2025 = sorted(PDF_DIR_2025.glob("*.pdf")) if PDF_DIR_2025.exists() else []
+_skip_if_no_2025 = pytest.mark.skipif(
+    not _periodic_2025,
+    reason="2025 ESPP periodic PDFs not present",
+)
+
+
+@_skip_if_no_2025
+class TestESPPEventsDisclaimer:
+    """FR-002 / SC-001: ESPP EVENTS section always shown; disclaimer when no purchase events."""
+
+    def test_espp_events_disclaimer_when_no_purchase_events(self):
+        """Periodic-only run (no annual ESPP) must show ESPP EVENTS disclaimer."""
+        args = [
+            "--year", "2025",
+            "--base-salary", "1000000",
+            "--cnb-rate", "22.00",
+            *(str(p) for p in _periodic_2025),
+        ]
+        runner = CliRunner()
+        result = runner.invoke(main, args, catch_exceptions=False)
+        assert result.exit_code == 0, result.output
+        assert "ESPP EVENTS" in result.output
+        assert "no ESPP purchase events found" in result.output
+
+    def test_rsu_events_section_absent_when_no_rsu_provided(self):
+        """FR-001: RSU EVENTS section shown with disclaimer when no RSU PDFs provided."""
+        args = [
+            "--year", "2025",
+            "--base-salary", "1000000",
+            "--cnb-rate", "22.00",
+            *(str(p) for p in _periodic_2025),
+        ]
+        runner = CliRunner()
+        result = runner.invoke(main, args, catch_exceptions=False)
+        assert result.exit_code == 0, result.output
+        assert "RSU EVENTS" in result.output
 
 
 @skip_if_no_pdfs

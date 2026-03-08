@@ -9,6 +9,8 @@ Auto-generated from all feature plans. Last updated: 2026-03-07
 - N/A — stateless, in-memory only (004-espp-discount-display)
 - Python 3.11+ + click 8+, pdfplumber 0.11+, decimal (stdlib) — all unchanged (005-broker-source-labels)
 - Python 3.11+ + pdfplumber 0.11+ (PDF text extraction), click 8+ (CLI), decimal (stdlib) (006-fidelity-espp-periodic)
+- Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib) — all unchanged (007-output-redesign)
+- N/A — in-memory only, no new persistence (007-output-redesign)
 
 - **001-broker-tax-calculator**: Python 3.11+, pdfplumber 0.11+ (PDF extraction), click 8+ (CLI), urllib (CNB fetch), decimal (monetary arithmetic), pytest
 
@@ -41,9 +43,9 @@ ruff check .                  # lint
 - Calculators are pure functions; no I/O side effects
 
 ## Recent Changes
+- 007-output-redesign: Added Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib) — all unchanged
 - 006-fidelity-espp-periodic: Added Python 3.11+ + pdfplumber 0.11+ (PDF text extraction), click 8+ (CLI), decimal (stdlib)
 - 005-broker-source-labels: Added Python 3.11+ + click 8+, pdfplumber 0.11+, decimal (stdlib) — all unchanged
-- 004-espp-discount-display: Added Python 3.11+ + click 8+, decimal (stdlib), pdfplumber 0.11+ (unchanged)
 
 
 <!-- MANUAL ADDITIONS START -->

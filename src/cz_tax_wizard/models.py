@@ -393,6 +393,43 @@ class DualRateEventRow:
 
 
 @dataclass(frozen=True)
+class BrokerDualRateRow:
+    """Per-broker dividend and withholding totals under both CNB rate methods.
+
+    Produced by ``compute_dual_rate_report()`` for each broker that contributed
+    dividend events to the tax year. Used to render the per-source breakdown
+    in the consolidated TOTALS SUMMARY.
+
+    Regulatory reference: §38 ZDP (Zákon č. 586/1992 Sb.) — annual average
+    vs. per-transaction daily rate; both methods are shown for dividends
+    consistent with §6 stock income treatment.
+
+    Fields:
+        broker_label: Raw broker identifier string (e.g.
+            ``"morgan_stanley_rsu_quarterly"``). Converted to a human-readable
+            label by the reporter via ``_broker_label()``.
+        dividends_usd: Total gross dividends from this broker (USD).
+        dividends_annual_czk: ``to_czk(dividends_usd, annual_rate)``.
+            ``0`` when the annual average is unavailable.
+        dividends_daily_czk: Sum of ``to_czk(event.gross_usd, daily_rate)``
+            for each individual dividend event from this broker.
+        withholding_usd: Total US withholding tax from this broker (USD).
+        withholding_annual_czk: ``to_czk(withholding_usd, annual_rate)``.
+            ``0`` when the annual average is unavailable.
+        withholding_daily_czk: Sum of ``to_czk(event.withholding_usd, daily_rate)``
+            for each individual dividend event from this broker.
+    """
+
+    broker_label: str
+    dividends_usd: Decimal
+    dividends_annual_czk: int
+    dividends_daily_czk: int
+    withholding_usd: Decimal
+    withholding_annual_czk: int
+    withholding_daily_czk: int
+
+
+@dataclass(frozen=True)
 class DualRateReport:
     """Full dual-rate comparison report for a single tax year.
 
@@ -422,10 +459,18 @@ class DualRateReport:
         base_salary_czk: Gross base salary in whole CZK (same under both methods).
         paragraph6_annual_czk: ``base_salary_czk + total_stock_annual_czk``.
         paragraph6_daily_czk: ``base_salary_czk + total_stock_daily_czk``.
-        row321_annual_czk: §8 foreign income total under annual method.
-        row321_daily_czk: §8 foreign income total under daily method.
-        row323_annual_czk: §8 foreign tax paid total under annual method.
-        row323_daily_czk: §8 foreign tax paid total under daily method.
+        row321_annual_czk: Foreign income total under annual method (single conversion
+            from combined USD — not sum of per-broker values).
+        row321_daily_czk: Foreign income total under daily method (sum of per-event
+            daily conversions).
+        row323_annual_czk: Foreign tax paid total under annual method (single conversion).
+        row323_daily_czk: Foreign tax paid total under daily method.
+        rsu_broker_label: Raw broker identifier for the RSU source (e.g.
+            ``"morgan_stanley_rsu_quarterly"``). Empty string when no RSU events.
+        espp_broker_label: Raw broker identifier for the ESPP source. Empty string
+            when no ESPP purchase events.
+        broker_dividend_rows: Per-broker dividend and withholding breakdown, one entry
+            per broker that contributed dividend events.
     """
 
     tax_year: int
@@ -450,6 +495,10 @@ class DualRateReport:
     row321_daily_czk: int
     row323_annual_czk: int
     row323_daily_czk: int
+
+    rsu_broker_label: str
+    espp_broker_label: str
+    broker_dividend_rows: tuple[BrokerDualRateRow, ...]
 
     def __post_init__(self) -> None:
         if self.total_stock_annual_czk != self.total_rsu_annual_czk + self.total_espp_annual_czk:
