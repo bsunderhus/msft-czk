@@ -206,56 +206,6 @@ class ESPPPurchaseEvent:
 
 
 @dataclass(frozen=True)
-class BrokerDividendSummary:
-    """Aggregated dividend totals for one broker, used in per-broker breakdown output.
-
-    Fields:
-        broker: ``"morgan_stanley_rsu_quarterly"``, ``"fidelity_espp_annual"``,
-            ``"fidelity_espp_periodic"``, or ``"fidelity_rsu_periodic"``.
-        total_gross_usd: Sum of all gross dividends for this broker (USD).
-        total_withholding_usd: Sum of all US withholding tax for this broker (USD).
-        event_count: Number of individual DividendEvent records aggregated.
-    """
-
-    broker: str
-    total_gross_usd: Decimal
-    total_withholding_usd: Decimal
-    event_count: int
-
-
-@dataclass(frozen=True)
-class ForeignIncomeReport:
-    """Aggregated output for §8 (capital income) and Příloha č. 3.
-
-    Source country is always United States (US) — single-country coefficient.
-    DPFDP7 Příloha č. 3, rows 321 (foreign income) and 323 (foreign tax paid).
-    Double-taxation treaty CZ–US, credit method (metoda zápočtu), Czech Income
-    Tax Act §38f.
-
-    Fields:
-        tax_year: Calendar year of the tax declaration.
-        source_country: Always ``"US"`` for this feature scope.
-        cnb_rate: CNB annual average USD/CZK exchange rate used (e.g. Decimal("23.13")).
-        cnb_rate_source: URL of the CNB data file, or ``"user-supplied via --cnb-rate"``.
-        total_dividends_usd: Combined gross dividends from all brokers (USD).
-        total_dividends_czk: Row 321 value (CZK, converted at cnb_rate, rounded half-up).
-        total_withholding_usd: Combined US withholding from all brokers (USD).
-        total_withholding_czk: Row 323 value (CZK, converted at cnb_rate, rounded half-up).
-        broker_breakdown: Per-broker dividend summaries for itemized output.
-    """
-
-    tax_year: int
-    source_country: str
-    cnb_rate: Decimal
-    cnb_rate_source: str
-    total_dividends_usd: Decimal
-    total_dividends_czk: int
-    total_withholding_usd: Decimal
-    total_withholding_czk: int
-    broker_breakdown: tuple[BrokerDividendSummary, ...]
-
-
-@dataclass(frozen=True)
 class StockIncomeReport:
     """Aggregated §6 self-declared stock income from both brokers.
 
@@ -280,42 +230,6 @@ class StockIncomeReport:
         if self.combined_stock_czk != self.total_rsu_czk + self.total_espp_czk:
             raise ValueError("combined_stock_czk must equal total_rsu_czk + total_espp_czk")
 
-
-@dataclass(frozen=True)
-class Priloha3Computation:
-    """Full Příloha č. 3 credit computation for double-taxation relief.
-
-    Produced only when the user supplies ``--row42`` and ``--row57``.
-    Source country is always US (single-country coefficient).
-
-    Regulatory reference: DPFDP7 Příloha č. 3, rows 324–330;
-    Czech Income Tax Act §38f (credit method / metoda zápočtu).
-
-    Fields:
-        row_321: Foreign income CZK (= ForeignIncomeReport.total_dividends_czk).
-        row_323: Foreign tax paid CZK (= ForeignIncomeReport.total_withholding_czk).
-        row_42_input: User-supplied total tax base in CZK (DPFDP7 row 42 = kc_zakldan23).
-        row_57_input: User-supplied tax per §16 in CZK (DPFDP7 row 57 = da_dan16).
-        row_324: Coefficient = (row_321 / row_42) × 100 (percent, Decimal).
-        row_325: Credit cap = round_half_up(row_57 × row_324 / 100).
-        row_326: Credit = min(row_323, row_325).
-        row_327: Non-credited foreign tax = max(0, row_323 − row_325).
-        row_328: Credit applied to Czech tax = row_326.
-        row_330: Tax after credit = row_57 − row_328.
-        formula_notes: Human-readable formula string for each row (keyed by row number).
-    """
-
-    row_321: int
-    row_323: int
-    row_42_input: int
-    row_57_input: int
-    row_324: Decimal
-    row_325: int
-    row_326: int
-    row_327: int
-    row_328: int
-    row_330: int
-    formula_notes: dict[str, str]
 
 
 @dataclass(frozen=True)
@@ -523,38 +437,3 @@ class DualRateReport:
             )
 
 
-@dataclass(frozen=True)
-class TaxYearSummary:
-    """Complete output picture for a single tax year run.
-
-    Assembles all computed components for traceability. The individual sections
-    (employer, stock, foreign_income, priloha3) are rendered by the reporter;
-    TaxYearSummary serves as the authoritative in-memory record.
-
-    Fields:
-        tax_year: Calendar year of the tax declaration.
-        employer: Base salary from --base-salary.
-        stock: RSU and ESPP income aggregated across both brokers.
-        foreign_income: Dividend totals and §8 / Příloha č. 3 rows 321/323.
-        paragraph6_total_czk: employer.base_salary_czk + stock.combined_stock_czk
-            (DPFDP7 row 31).
-        priloha3: Full credit computation, or None if --row42/--row57 not supplied.
-        warnings: Non-fatal warnings collected during processing (missing quarters,
-            non-USD dividends, dates outside tax year, etc.).
-    """
-
-    tax_year: int
-    employer: EmployerCertificate
-    stock: StockIncomeReport
-    foreign_income: ForeignIncomeReport
-    paragraph6_total_czk: int
-    priloha3: Priloha3Computation | None
-    warnings: tuple[str, ...]
-
-    def __post_init__(self) -> None:
-        expected = self.employer.base_salary_czk + self.stock.combined_stock_czk
-        if self.paragraph6_total_czk != expected:
-            raise ValueError(
-                f"paragraph6_total_czk {self.paragraph6_total_czk} != "
-                f"base_salary + combined_stock = {expected}"
-            )

@@ -17,7 +17,7 @@ All changes are deletions — no new code is written.
 
 **Purpose**: Read all affected files before making any edits — ensures no symbol is missed.
 
-- [ ] T001 Read `src/cz_tax_wizard/cli.py`, `src/cz_tax_wizard/models.py`, `src/cz_tax_wizard/reporter.py`, `src/cz_tax_wizard/calculators/priloha3.py`, `tests/integration/test_full_run.py`, and `tests/unit/test_calculators/test_priloha3.py` in full before starting any edits
+- [X] T001 Read `src/cz_tax_wizard/cli.py`, `src/cz_tax_wizard/models.py`, `src/cz_tax_wizard/reporter.py`, `src/cz_tax_wizard/calculators/priloha3.py`, `tests/integration/test_full_run.py`, and `tests/unit/test_calculators/test_priloha3.py` in full before starting any edits
 
 ---
 
@@ -33,9 +33,9 @@ No blocking prerequisites — all user story tasks target different files and ca
 
 **Independent Test**: Run `cz-tax-wizard --help` and confirm the options are absent; run the full-run integration test baseline to confirm output is unchanged.
 
-- [ ] T002 [US1] In `src/cz_tax_wizard/cli.py`: remove the two `@click.option` decorators for `--row42` and `--row57`, remove `row42: int | None` and `row57: int | None` from the `main()` signature, remove the `if (row42 is None) != (row57 is None)` validation block, remove the `priloha3 = None` variable and the `if row42 is not None and row57 is not None:` block that calls `compute_rows_324_330`, remove the `if priloha3 is not None:` output block that calls `format_priloha3_credit_section`, and remove `compute_rows_324_330` and `format_priloha3_credit_section` from imports
+- [X] T002 [US1] In `src/cz_tax_wizard/cli.py`: remove the two `@click.option` decorators for `--row42` and `--row57`, remove `row42: int | None` and `row57: int | None` from the `main()` signature, remove the `if (row42 is None) != (row57 is None)` validation block, remove the `priloha3 = None` variable and the `if row42 is not None and row57 is not None:` block that calls `compute_rows_324_330`, remove the `if priloha3 is not None:` output block that calls `format_priloha3_credit_section`, and remove `compute_rows_324_330` and `format_priloha3_credit_section` from imports
 
-- [ ] T003 [US1] In `tests/integration/test_full_run.py`: delete the `TestFullRunWithRow42Row57` class (the test that passes `--row42`/`--row57`) and delete the `TestRow42WithoutRow57ExitCode1` class (the test that verifies pairing validation exits with code 1)
+- [X] T003 [US1] In `tests/integration/test_full_run.py`: delete the `TestFullRunWithRow42Row57` class (the test that passes `--row42`/`--row57`) and delete the `TestRow42WithoutRow57ExitCode1` class (the test that verifies pairing validation exits with code 1)
 
 **Checkpoint**: `cz-tax-wizard --help` shows no `--row42`/`--row57`; integration baseline passes.
 
@@ -47,15 +47,15 @@ No blocking prerequisites — all user story tasks target different files and ca
 
 **Independent Test**: `ruff check .` reports zero errors; `pytest` passes with no references to removed symbols.
 
-- [ ] T004 [P] [US2] In `src/cz_tax_wizard/models.py`: delete the `ForeignIncomeReport` dataclass, the `Priloha3Computation` dataclass, and the `TaxYearSummary` dataclass (including their docstrings and `__post_init__` methods)
+- [X] T004 [P] [US2] In `src/cz_tax_wizard/models.py`: delete the `ForeignIncomeReport` dataclass, the `Priloha3Computation` dataclass, and the `TaxYearSummary` dataclass (including their docstrings and `__post_init__` methods)
 
-- [ ] T005 [P] [US2] In `src/cz_tax_wizard/reporter.py`: delete the `format_foreign_income_section` function (marked deprecated) and the `format_priloha3_credit_section` function; remove `ForeignIncomeReport` and `Priloha3Computation` from the imports block at the top of the file
+- [X] T005 [P] [US2] In `src/cz_tax_wizard/reporter.py`: delete the `format_foreign_income_section` function (marked deprecated) and the `format_priloha3_credit_section` function; remove `ForeignIncomeReport` and `Priloha3Computation` from the imports block at the top of the file
 
-- [ ] T006 [P] [US2] Delete the file `src/cz_tax_wizard/calculators/priloha3.py` entirely (contains `compute_rows_321_323` and `compute_rows_324_330`, both now unreferenced)
+- [X] T006 [P] [US2] Delete the file `src/cz_tax_wizard/calculators/priloha3.py` entirely (contains `compute_rows_321_323` and `compute_rows_324_330`, both now unreferenced)
 
-- [ ] T007 [P] [US2] Delete the file `tests/unit/test_calculators/test_priloha3.py` entirely (all tests target removed functions)
+- [X] T007 [P] [US2] Delete the file `tests/unit/test_calculators/test_priloha3.py` entirely (all tests target removed functions)
 
-- [ ] T008 [US2] In `src/cz_tax_wizard/cli.py`: remove the now-dead `_summary = TaxYearSummary(...)` construction and its associated imports (`TaxYearSummary` from `models`, `compute_rows_321_323` from `calculators.priloha3`); also remove the `foreign_income = compute_rows_321_323(...)` call and the `foreign_income` variable
+- [X] T008 [US2] In `src/cz_tax_wizard/cli.py`: remove the now-dead `_summary = TaxYearSummary(...)` construction and its associated imports (`TaxYearSummary` from `models`, `compute_rows_321_323` from `calculators.priloha3`); also remove the `foreign_income = compute_rows_321_323(...)` call and the `foreign_income` variable
 
 **Checkpoint**: No references to removed symbols remain anywhere in `src/` or `tests/`.
 
@@ -63,7 +63,7 @@ No blocking prerequisites — all user story tasks target different files and ca
 
 ## Phase 5: Polish & Verification
 
-- [ ] T009 Run `pytest` and confirm all tests pass with zero failures or errors
+- [X] T009 Run `pytest` and confirm all tests pass with zero failures or errors
 
 - [ ] T010 Run `uvx ruff check .` and confirm zero lint issues
 

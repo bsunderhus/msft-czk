@@ -5,9 +5,7 @@ Orchestrates the full tax calculation pipeline:
   2. Extract dividend, RSU, and ESPP events from all PDFs
   3. Fetch CNB annual average USD/CZK rate (or use --cnb-rate override)
   4. Compute §6 paragraph 6 income (base salary + RSU + ESPP)
-  5. Compute §8 / Příloha č. 3 rows 321 and 323 (foreign income)
-  6. Optionally compute rows 324–330 (double-taxation credit)
-  7. Print structured report to stdout; warnings/errors to stderr
+  5. Print structured report to stdout; warnings/errors to stderr
 
 Exit codes:
   0 — success
@@ -18,7 +16,6 @@ Exit codes:
 
 Regulatory references:
   - Czech Income Tax Act §6 (employment income), §8 (capital income), §38f (credit method).
-  - DPFDP7 Příloha č. 3, rows 321–330.
   - Double-taxation treaty CZ–US (credit method / metoda zápočtu).
 """
 
@@ -34,17 +31,15 @@ import pdfplumber
 
 from cz_tax_wizard.calculators.dual_rate import compute_dual_rate_report
 from cz_tax_wizard.calculators.paragraph6 import compute_paragraph6
-from cz_tax_wizard.calculators.priloha3 import compute_rows_321_323, compute_rows_324_330
 from cz_tax_wizard.cnb import CNB_DAILY_URL_TEMPLATE, CNB_URL, fetch_cnb_usd_annual, fetch_cnb_usd_daily
 from cz_tax_wizard.extractors.fidelity import FidelityExtractor
 from cz_tax_wizard.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
 from cz_tax_wizard.extractors.fidelity_rsu import FidelityRSUAdapter
 from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
-from cz_tax_wizard.models import EmployerCertificate, TaxYearSummary
+from cz_tax_wizard.models import EmployerCertificate
 from cz_tax_wizard.reporter import (
     format_dual_rate_section,
     format_header,
-    format_priloha3_credit_section,
 )
 
 
@@ -124,41 +119,18 @@ def _find_coverage_gaps(
     type=float,
     help="Override CNB annual average CZK/USD rate (skips auto-fetch)",
 )
-@click.option(
-    "--row42",
-    default=None,
-    type=int,
-    help="Czech total tax base in CZK (DPFDP7 row 42). Required with --row57.",
-)
-@click.option(
-    "--row57",
-    default=None,
-    type=int,
-    help="Czech tax per §16 in CZK (DPFDP7 row 57). Required with --row42.",
-)
 @click.argument("pdfs", nargs=-1, required=True, type=click.Path(exists=False))
 def main(
     year: int,
     base_salary: int,
     cnb_rate_override: float | None,
-    row42: int | None,
-    row57: int | None,
     pdfs: tuple[str, ...],
 ) -> None:
     """Compute Czech personal income tax declaration values from broker PDFs.
 
     Processes Morgan Stanley quarterly statements and Fidelity year-end
-    reports to produce §6 employment income and §8 / Příloha č. 3 foreign
-    income values for the DPFDP7 tax form.
+    reports to produce §6 employment income and foreign income values.
     """
-    # Validate --row42 / --row57 pairing
-    if (row42 is None) != (row57 is None):
-        click.echo(
-            "ERROR: --row42 and --row57 must be provided together or not at all.",
-            err=True,
-        )
-        sys.exit(1)
-
     # --- Adapter registry (FR-002) ---
     ADAPTERS = [
         MorganStanleyExtractor(),
@@ -402,25 +374,6 @@ def main(
     # --- §6 Computation ---
     employer = EmployerCertificate(tax_year=year, base_salary_czk=base_salary)
     stock = compute_paragraph6(employer, all_rsu, all_espp, cnb_rate)
-    paragraph6_total = employer.base_salary_czk + stock.combined_stock_czk
-
-    # --- §8 / Příloha č. 3 rows 321/323 ---
-    foreign_income = compute_rows_321_323(
-        dividend_events=all_dividends,
-        cnb_rate=cnb_rate,
-        cnb_rate_source=cnb_rate_source,
-        tax_year=year,
-    )
-
-    # --- Optional rows 324–330 ---
-    priloha3 = None
-    if row42 is not None and row57 is not None:
-        priloha3 = compute_rows_324_330(
-            row_321=foreign_income.total_dividends_czk,
-            row_323=foreign_income.total_withholding_czk,
-            row_42=row42,
-            row_57=row57,
-        )
 
     # --- Fetch per-transaction daily CNB rates ---
     # §38 ZDP — daily rate method: one network request per unique event date.
@@ -453,22 +406,7 @@ def main(
         tax_year=year,
     )
 
-    # --- Assemble in-memory aggregate for traceability ---
-    _summary = TaxYearSummary(
-        tax_year=year,
-        employer=employer,
-        stock=stock,
-        foreign_income=foreign_income,
-        paragraph6_total_czk=paragraph6_total,
-        priloha3=priloha3,
-        warnings=tuple(warnings),
-    )
-
     # --- Print report to stdout ---
     click.echo(format_header(year))
     click.echo("")
     click.echo(format_dual_rate_section(dual_report))
-
-    if priloha3 is not None:
-        click.echo("")
-        click.echo(format_priloha3_credit_section(priloha3))
