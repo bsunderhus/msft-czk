@@ -16,9 +16,11 @@ from pathlib import Path
 import pytest
 
 from cz_tax_wizard.calculators.dual_rate import compute_dual_rate_report
+from cz_tax_wizard.currency import to_czk
 from cz_tax_wizard.models import (
     BrokerStatement,
     DailyRateEntry,
+    DividendEvent,
     DualRateReport,
     ESPPPurchaseEvent,
     RSUVestingEvent,
@@ -53,6 +55,19 @@ _FIDELITY_STATEMENT = BrokerStatement(
     source_file=Path("/dev/null"),
     periodicity="annual",
 )
+
+_DATE_DIV = date(2024, 3, 15)
+_DAILY_RATE_DIV = Decimal("23.200")
+
+
+def _div(d: date, gross: str, withholding: str, stmt: BrokerStatement) -> DividendEvent:
+    return DividendEvent(
+        date=d,
+        gross_usd=Decimal(gross),
+        withholding_usd=Decimal(withholding),
+        reinvested=False,
+        source_statement=stmt,
+    )
 
 
 def _rsu(d: date, qty: str, fmv: str) -> RSUVestingEvent:
@@ -238,6 +253,9 @@ class TestDualRateReportInvariants:
                 row321_daily_czk=0,
                 row323_annual_czk=0,
                 row323_daily_czk=0,
+                rsu_broker_label="",
+                espp_broker_label="",
+                broker_dividend_rows=(),
             )
 
     def test_annual_avg_rate_none_when_unavailable(self) -> None:
@@ -262,4 +280,93 @@ class TestDualRateReportInvariants:
                 row321_daily_czk=0,
                 row323_annual_czk=0,
                 row323_daily_czk=0,
+                rsu_broker_label="",
+                espp_broker_label="",
+                broker_dividend_rows=(),
             )
+
+
+# ---------------------------------------------------------------------------
+# Tests: BrokerDualRateRow population and aggregate rounding
+# ---------------------------------------------------------------------------
+
+
+class TestBrokerDualRateRows:
+    def test_rsu_broker_label_is_raw_broker_string(self) -> None:
+        rsu = _rsu(_DATE_A, "8", "407.72")
+        stock = _make_stock([rsu], [])
+        cache = _cache((_DATE_A, _DAILY_RATE_A, None))
+
+        report = compute_dual_rate_report(stock, [], _ANNUAL_RATE, cache, 2_000_000, 2024)
+
+        assert report.rsu_broker_label == "morgan_stanley_rsu_quarterly"
+
+    def test_espp_broker_label_is_raw_broker_string(self) -> None:
+        espp = _espp(_DATE_B, "90.00", "100.00", "5.235", "52.35")
+        stock = _make_stock([], [espp])
+        cache = _cache((_DATE_B, _DAILY_RATE_B, None))
+
+        report = compute_dual_rate_report(stock, [], _ANNUAL_RATE, cache, 2_000_000, 2024)
+
+        assert report.espp_broker_label == "fidelity_espp_annual"
+
+    def test_broker_labels_empty_when_no_events(self) -> None:
+        stock = _make_stock([], [])
+        report = compute_dual_rate_report(stock, [], _ANNUAL_RATE, {}, 2_000_000, 2024)
+
+        assert report.rsu_broker_label == ""
+        assert report.espp_broker_label == ""
+
+    def test_broker_dividend_rows_usd_totals(self) -> None:
+        div = _div(_DATE_DIV, "50.00", "7.50", _STATEMENT)
+        cache = _cache((_DATE_A, _DAILY_RATE_A, None), (_DATE_DIV, _DAILY_RATE_DIV, None))
+        stock = _make_stock([], [])
+
+        report = compute_dual_rate_report(stock, [div], _ANNUAL_RATE, cache, 2_000_000, 2024)
+
+        assert len(report.broker_dividend_rows) == 1
+        assert report.broker_dividend_rows[0].dividends_usd == Decimal("50.00")
+        assert report.broker_dividend_rows[0].withholding_usd == Decimal("7.50")
+
+    def test_broker_dividend_rows_annual_czk(self) -> None:
+        div = _div(_DATE_DIV, "50.00", "7.50", _STATEMENT)
+        cache = _cache((_DATE_DIV, _DAILY_RATE_DIV, None))
+        stock = _make_stock([], [])
+
+        report = compute_dual_rate_report(stock, [div], _ANNUAL_RATE, cache, 2_000_000, 2024)
+
+        expected_annual = to_czk(Decimal("50.00"), _ANNUAL_RATE)
+        assert report.broker_dividend_rows[0].dividends_annual_czk == expected_annual
+
+    def test_broker_dividend_rows_daily_czk(self) -> None:
+        div = _div(_DATE_DIV, "50.00", "7.50", _STATEMENT)
+        cache = _cache((_DATE_DIV, _DAILY_RATE_DIV, None))
+        stock = _make_stock([], [])
+
+        report = compute_dual_rate_report(stock, [div], _ANNUAL_RATE, cache, 2_000_000, 2024)
+
+        expected_daily = to_czk(Decimal("50.00"), _DAILY_RATE_DIV)
+        assert report.broker_dividend_rows[0].dividends_daily_czk == expected_daily
+
+    def test_aggregate_row321_single_conversion_rounding(self) -> None:
+        """row321_annual_czk must equal to_czk(total_usd, rate), not sum of per-broker values.
+
+        When two brokers each have $0.005 gross dividends, per-broker rounding gives
+        to_czk(0.005, rate) + to_czk(0.005, rate) but the aggregate must be
+        to_czk(0.010, rate) — which may differ by ±1 CZK due to ROUND_HALF_UP.
+        """
+        # Use two distinct statements (different broker strings) to get two broker rows
+        stmt_a = _STATEMENT  # morgan_stanley_rsu_quarterly
+        stmt_b = _FIDELITY_STATEMENT  # fidelity_espp_annual
+
+        # Each has a small gross amount where per-event rounding could drift
+        div_a = _div(_DATE_DIV, "100.00", "15.00", stmt_a)
+        div_b = _div(_DATE_DIV, "200.00", "30.00", stmt_b)
+
+        cache = _cache((_DATE_DIV, _DAILY_RATE_DIV, None))
+        stock = _make_stock([], [])
+
+        report = compute_dual_rate_report(stock, [div_a, div_b], _ANNUAL_RATE, cache, 2_000_000, 2024)
+
+        combined_usd = Decimal("100.00") + Decimal("200.00")
+        assert report.row321_annual_czk == to_czk(combined_usd, _ANNUAL_RATE)

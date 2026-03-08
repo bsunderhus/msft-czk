@@ -26,8 +26,7 @@ _SEP_INNER = "─" * 53
 _DISCLAIMER = (
     "⚠ DISCLAIMER: These values are informational only. "
     "Verify with a qualified Czech tax\n"
-    "  advisor before filing. "
-    "Row numbers refer to DPFDP7 form valid for the given tax year."
+    "  advisor before filing."
 )
 
 
@@ -49,6 +48,10 @@ def format_header(tax_year: int) -> str:
 
 def format_foreign_income_section(report: ForeignIncomeReport) -> str:
     """Render §8 / Příloha č. 3 rows 321 and 323.
+
+    .. deprecated::
+        No longer called from cli.py. All dividend and withholding data is now
+        rendered inside ``format_dual_rate_section`` as part of TOTALS SUMMARY.
 
     Shows per-broker dividend and withholding amounts in USD and CZK,
     then aggregate ROW 321 (foreign income) and ROW 323 (foreign tax paid),
@@ -302,9 +305,11 @@ def format_dual_rate_section(report: DualRateReport) -> str:
     # Collect footnotes for annotated dates
     footnotes: list[str] = []
 
-    # --- RSU table ---
-    if report.rsu_rows:
-        lines.append("RSU EVENTS")
+    # --- RSU table (always shown; disclaimer when no events) ---
+    lines.append("RSU EVENTS")
+    if not report.rsu_rows:
+        lines.append("  (no RSU vesting events found)")
+    else:
         if dual:
             lines.append(
                 f"  {'Date':<14}  {'Qty':<10}  {'Income (USD)':>12}  "
@@ -343,11 +348,13 @@ def format_dual_rate_section(report: DualRateReport) -> str:
                     f"{row.daily_rate_entry.rate:>10}  "
                     f"{row.daily_czk:>9,} CZK"
                 )
-        lines.append("")
+    lines.append("")
 
-    # --- ESPP table ---
-    if report.espp_rows:
-        lines.append("ESPP EVENTS")
+    # --- ESPP table (always shown; disclaimer when no events) ---
+    lines.append("ESPP EVENTS")
+    if not report.espp_rows:
+        lines.append("  (no ESPP purchase events found for this tax year)")
+    else:
         lines.append(
             f"  {'Purchase Date':<14}  "
             f"{'Shares × (FMV − Price) = Disc%':<40}  "
@@ -382,7 +389,7 @@ def format_dual_rate_section(report: DualRateReport) -> str:
                     f"  {'':14}    "
                     f"Daily ({row.daily_rate_entry.rate}): {row.daily_czk:>8,} CZK"
                 )
-        lines.append("")
+    lines.append("")
 
     # --- Footnotes ---
     if footnotes:
@@ -394,73 +401,87 @@ def format_dual_rate_section(report: DualRateReport) -> str:
         lines.append("")
 
     # --- Totals summary ---
+    # §38 ZDP — two legally permitted methods shown side by side (or daily only).
+    # Aggregate totals (Foreign income total, Foreign tax paid total) read from
+    # report.row321_*/row323_* which use single-conversion rounding (T010/T011).
+    _D = 46  # description column width
+
     lines.append(_SEP_NARROW)
+    lines.append("TOTALS SUMMARY")
+    lines.append(_SEP_NARROW)
+    lines.append("")
     if dual:
         lines.append(
-            "TOTALS SUMMARY (§38 ZDP — two legally permitted methods)"
+            f"  {'Description':<{_D}}  {'Annual Avg Method':>18}  {'Daily Rate Method':>18}"
         )
-        lines.append(_SEP_NARROW)
-        lines.append("")
-        col1 = "Annual Avg Method"
-        col2 = "Daily Rate Method"
-        lines.append(f"  {'Row':<38}  {col1:>18}  {col2:>18}")
-        lines.append(f"  {'-'*38}  {'-'*18}  {'-'*18}")
-        lines.append(
-            f"  {'RSU income (extra §6)':<38}  "
-            f"{report.total_rsu_annual_czk:>15,} CZK  "
-            f"{report.total_rsu_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'ESPP income (extra §6)':<38}  "
-            f"{report.total_espp_annual_czk:>15,} CZK  "
-            f"{report.total_espp_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'§6 stock total':<38}  "
-            f"{report.total_stock_annual_czk:>15,} CZK  "
-            f"{report.total_stock_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'§6 row 31 total':<38}  "
-            f"{report.paragraph6_annual_czk:>15,} CZK  "
-            f"{report.paragraph6_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'§8 row 321 (foreign income)':<38}  "
-            f"{report.row321_annual_czk:>15,} CZK  "
-            f"{report.row321_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'§8 row 323 (foreign tax paid)':<38}  "
-            f"{report.row323_annual_czk:>15,} CZK  "
-            f"{report.row323_daily_czk:>15,} CZK"
-        )
+        lines.append(f"  {'-'*_D}  {'-'*18}  {'-'*18}")
     else:
-        lines.append(
-            "TOTALS SUMMARY (§38 ZDP — daily rate method only)"
-        )
-        lines.append(_SEP_NARROW)
-        lines.append("")
-        lines.append(f"  {'Row':<38}  {'Daily Rate Method':>18}")
-        lines.append(f"  {'-'*38}  {'-'*18}")
-        lines.append(
-            f"  {'RSU income (extra §6)':<38}  {report.total_rsu_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'ESPP income (extra §6)':<38}  {report.total_espp_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'§6 stock total':<38}  {report.total_stock_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'§6 row 31 total':<38}  {report.paragraph6_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'§8 row 321 (foreign income)':<38}  {report.row321_daily_czk:>15,} CZK"
-        )
-        lines.append(
-            f"  {'§8 row 323 (foreign tax paid)':<38}  {report.row323_daily_czk:>15,} CZK"
-        )
+        lines.append(f"  {'Description':<{_D}}  {'Daily Rate Method':>18}")
+        lines.append(f"  {'-'*_D}  {'-'*18}")
+
+    def _czk_row(label: str, annual: int, daily: int) -> str:
+        """Format one summary row with dual-method or daily-only columns."""
+        if dual:
+            return (
+                f"  {label:<{_D}}  {annual:>15,} CZK  {daily:>15,} CZK"
+            )
+        return f"  {label:<{_D}}  {daily:>15,} CZK"
+
+    # Stock income block
+    if report.rsu_broker_label:
+        lines.append(_czk_row(
+            f"RSU income ({_broker_label(report.rsu_broker_label)})",
+            report.total_rsu_annual_czk,
+            report.total_rsu_daily_czk,
+        ))
+    espp_label = (
+        f"ESPP income ({_broker_label(report.espp_broker_label)})"
+        if report.espp_broker_label
+        else "ESPP income"
+    )
+    lines.append(_czk_row(
+        espp_label,
+        report.total_espp_annual_czk,
+        report.total_espp_daily_czk,
+    ))
+    lines.append(_czk_row(
+        "Stock income total",
+        report.total_stock_annual_czk,
+        report.total_stock_daily_czk,
+    ))
+    lines.append(_czk_row(
+        "Employment income total",
+        report.paragraph6_annual_czk,
+        report.paragraph6_daily_czk,
+    ))
+
+    # Dividends block
+    lines.append("")
+    for brow in report.broker_dividend_rows:
+        lines.append(_czk_row(
+            f"Dividends ({_broker_label(brow.broker_label)})",
+            brow.dividends_annual_czk,
+            brow.dividends_daily_czk,
+        ))
+    lines.append(_czk_row(
+        "Foreign income total",
+        report.row321_annual_czk,
+        report.row321_daily_czk,
+    ))
+
+    # Withholdings block
+    lines.append("")
+    for brow in report.broker_dividend_rows:
+        lines.append(_czk_row(
+            f"Withholding ({_broker_label(brow.broker_label)})",
+            brow.withholding_annual_czk,
+            brow.withholding_daily_czk,
+        ))
+    lines.append(_czk_row(
+        "Foreign tax paid total",
+        report.row323_annual_czk,
+        report.row323_daily_czk,
+    ))
 
     lines.append("")
     lines.append("  Legal basis: §38 ZDP (Zákon č. 586/1992 Sb.)")

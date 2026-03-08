@@ -18,6 +18,7 @@ from decimal import Decimal
 
 from cz_tax_wizard.currency import to_czk
 from cz_tax_wizard.models import (
+    BrokerDualRateRow,
     DailyRateEntry,
     DividendEvent,
     DualRateEventRow,
@@ -133,19 +134,65 @@ def compute_dual_rate_report(
     total_espp_annual_czk = sum(r.annual_avg_czk for r in espp_rows)
     total_espp_daily_czk = sum(r.daily_czk for r in espp_rows)
 
-    # --- §8 dividend aggregates ---
-    # §38 ZDP — same rate method applied to dividend events
-    row321_annual_czk = 0
-    row321_daily_czk = 0
-    row323_annual_czk = 0
-    row323_daily_czk = 0
+    # --- §8 dividend aggregates — per-broker breakdown ---
+    # §38 ZDP — same rate method choice applied to dividend events.
+    # Group events by broker to build BrokerDualRateRow entries.
+    broker_groups: dict[str, list[DividendEvent]] = {}
     for div in dividend_events:
-        entry = daily_rate_cache[div.date]
-        if is_annual_avg_available:
-            row321_annual_czk += to_czk(div.gross_usd, annual_rate)
-            row323_annual_czk += to_czk(div.withholding_usd, annual_rate)
-        row321_daily_czk += to_czk(div.gross_usd, entry.rate)
-        row323_daily_czk += to_czk(div.withholding_usd, entry.rate)
+        broker = div.source_statement.broker
+        if broker not in broker_groups:
+            broker_groups[broker] = []
+        broker_groups[broker].append(div)
+
+    broker_dividend_rows: list[BrokerDualRateRow] = []
+    for broker, events in broker_groups.items():
+        broker_gross_usd = sum(e.gross_usd for e in events)
+        broker_wh_usd = sum(e.withholding_usd for e in events)
+        broker_div_annual = (
+            to_czk(broker_gross_usd, annual_rate) if is_annual_avg_available else 0
+        )
+        broker_div_daily = sum(
+            to_czk(e.gross_usd, daily_rate_cache[e.date].rate) for e in events
+        )
+        broker_wh_annual = (
+            to_czk(broker_wh_usd, annual_rate) if is_annual_avg_available else 0
+        )
+        broker_wh_daily = sum(
+            to_czk(e.withholding_usd, daily_rate_cache[e.date].rate) for e in events
+        )
+        broker_dividend_rows.append(
+            BrokerDualRateRow(
+                broker_label=broker,
+                dividends_usd=broker_gross_usd,
+                dividends_annual_czk=broker_div_annual,
+                dividends_daily_czk=broker_div_daily,
+                withholding_usd=broker_wh_usd,
+                withholding_annual_czk=broker_wh_annual,
+                withholding_daily_czk=broker_wh_daily,
+            )
+        )
+
+    # T010: Aggregate totals use a single USD→CZK conversion (not sum of per-broker CZK)
+    # to avoid rounding discrepancies between the total row and per-source rows.
+    # §38 ZDP — annual avg: one conversion; daily: sum of per-event conversions.
+    if dividend_events and is_annual_avg_available:
+        total_div_usd = sum(e.gross_usd for e in dividend_events)
+        total_wh_usd = sum(e.withholding_usd for e in dividend_events)
+        row321_annual_czk = to_czk(total_div_usd, annual_rate)
+        row323_annual_czk = to_czk(total_wh_usd, annual_rate)
+    else:
+        row321_annual_czk = 0
+        row323_annual_czk = 0
+    row321_daily_czk = sum(b.dividends_daily_czk for b in broker_dividend_rows)
+    row323_daily_czk = sum(b.withholding_daily_czk for b in broker_dividend_rows)
+
+    # --- Broker labels (raw strings; reporter converts to human-readable) ---
+    rsu_broker_label = (
+        stock.rsu_events[0].source_statement.broker if stock.rsu_events else ""
+    )
+    espp_broker_label = (
+        stock.espp_events[0].source_statement.broker if stock.espp_events else ""
+    )
 
     return DualRateReport(
         tax_year=tax_year,
@@ -166,4 +213,7 @@ def compute_dual_rate_report(
         row321_daily_czk=row321_daily_czk,
         row323_annual_czk=row323_annual_czk,
         row323_daily_czk=row323_daily_czk,
+        rsu_broker_label=rsu_broker_label,
+        espp_broker_label=espp_broker_label,
+        broker_dividend_rows=tuple(broker_dividend_rows),
     )

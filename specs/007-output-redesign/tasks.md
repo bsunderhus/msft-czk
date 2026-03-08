@@ -100,13 +100,13 @@
 
 - [ ] T012 [P] Update `tests/integration/test_full_run.py` to assert: §8 section absent (`"PŘÍLOHA Č. 3"` not in output), both `RSU EVENTS` and `ESPP EVENTS` headings present, `TOTALS SUMMARY` present, per-source dividend/withholding rows present, no `"row 321"` or `"row 323"` strings in output
 
-- [ ] T013 [P] Update `tests/integration/test_fidelity_espp_periodic_full_run.py` to assert ESPP EVENTS disclaimer text appears when no purchase events provided (`"no ESPP purchase events found"` in output)
+- [X] T013 [P] Update `tests/integration/test_fidelity_espp_periodic_full_run.py` to assert ESPP EVENTS disclaimer text appears when no purchase events provided (`"no ESPP purchase events found"` in output)
 
-- [ ] T014 Update `tests/unit/test_calculators/test_dual_rate.py` to cover: `BrokerDualRateRow` field values (both annual and daily CZK), `rsu_broker_label` and `espp_broker_label` population, and that `row321_annual_czk == to_czk(combined_usd, annual_rate)` (not sum of per-broker annual CZK)
+- [X] T014 Update `tests/unit/test_calculators/test_dual_rate.py` to cover: `BrokerDualRateRow` field values (both annual and daily CZK), `rsu_broker_label` and `espp_broker_label` population, and that `row321_annual_czk == to_czk(combined_usd, annual_rate)` (not sum of per-broker annual CZK)
 
-- [ ] T015 [P] Update docstrings on `format_dual_rate_section` in `reporter.py`, `compute_dual_rate_report` in `calculators/dual_rate.py`, and the new `BrokerDualRateRow` dataclass to describe their updated contracts and cite §38 ZDP
+- [X] T015 [P] Update docstrings on `format_dual_rate_section` in `reporter.py`, `compute_dual_rate_report` in `calculators/dual_rate.py`, and the new `BrokerDualRateRow` dataclass to describe their updated contracts and cite §38 ZDP
 
-- [ ] T016 Run `pytest` and confirm all tests pass; run `ruff check .` and fix any lint issues
+- [X] T016 Run `pytest` and confirm all tests pass; run `ruff check .` and fix any lint issues
 
 ---
 
