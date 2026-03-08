@@ -142,7 +142,7 @@ class MorganStanleyExtractor:
         period_start = self._parse_period_date(start_str.strip(), tax_year)
 
         statement = BrokerStatement(
-            broker="morgan_stanley",
+            broker="morgan_stanley_rsu_quarterly",
             account_number=account_number,
             period_start=period_start,
             period_end=period_end,

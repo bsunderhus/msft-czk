@@ -104,7 +104,7 @@ class TestPeriodDates:
     @skip_if_no_fixtures
     def test_broker_is_fidelity_rsu(self):
         result = FidelityRSUAdapter().extract(load(SEP_OCT_FIXTURE), SEP_OCT_FIXTURE)
-        assert result.statement.broker == "fidelity_rsu"
+        assert result.statement.broker == "fidelity_rsu_periodic"
 
     @skip_if_no_fixtures
     def test_periodicity_is_periodic(self):

@@ -1,7 +1,7 @@
 """Unit tests for model extensions supporting Fidelity RSU period reports.
 
 Covers:
-  - BrokerStatement accepts ``broker="fidelity_rsu"`` and ``periodicity="periodic"``
+  - BrokerStatement accepts ``broker="fidelity_rsu_periodic"`` and ``periodicity="periodic"``
   - BrokerStatement rejects unknown broker / periodicity values
   - RSUVestingEvent default ``ticker=""`` field
   - RSUVestingEvent explicit ``ticker="MSFT"`` stored correctly
@@ -21,7 +21,7 @@ _DUMMY_PATH = Path("/tmp/dummy.pdf")
 
 def _make_statement(**kwargs) -> BrokerStatement:
     defaults = dict(
-        broker="fidelity_rsu",
+        broker="fidelity_rsu_periodic",
         account_number="Z81-202254",
         period_start=date(2025, 9, 24),
         period_end=date(2025, 10, 31),
@@ -34,20 +34,20 @@ def _make_statement(**kwargs) -> BrokerStatement:
 
 class TestBrokerStatementFidelityRSU:
     def test_accepts_fidelity_rsu_broker(self):
-        stmt = _make_statement(broker="fidelity_rsu")
-        assert stmt.broker == "fidelity_rsu"
+        stmt = _make_statement(broker="fidelity_rsu_periodic")
+        assert stmt.broker == "fidelity_rsu_periodic"
 
     def test_accepts_periodic_periodicity(self):
         stmt = _make_statement(periodicity="periodic")
         assert stmt.periodicity == "periodic"
 
     def test_accepts_existing_morgan_stanley(self):
-        stmt = _make_statement(broker="morgan_stanley", periodicity="quarterly")
-        assert stmt.broker == "morgan_stanley"
+        stmt = _make_statement(broker="morgan_stanley_rsu_quarterly", periodicity="quarterly")
+        assert stmt.broker == "morgan_stanley_rsu_quarterly"
 
     def test_accepts_existing_fidelity_espp(self):
-        stmt = _make_statement(broker="fidelity", periodicity="annual")
-        assert stmt.broker == "fidelity"
+        stmt = _make_statement(broker="fidelity_espp_annual", periodicity="annual")
+        assert stmt.broker == "fidelity_espp_annual"
 
     def test_rejects_unknown_broker(self):
         with pytest.raises(ValueError, match="Unknown broker"):

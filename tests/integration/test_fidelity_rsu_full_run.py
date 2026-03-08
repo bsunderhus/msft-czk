@@ -74,7 +74,7 @@ class TestSepOctOnly:
             "--cnb-rate", "22.00",
             str(SEP_OCT_PDF),
         )
-        assert "Fidelity (RSU)" in result.output
+        assert "Fidelity (RSU / Periodic)" in result.output
 
 
 @skip_if_no_pdfs

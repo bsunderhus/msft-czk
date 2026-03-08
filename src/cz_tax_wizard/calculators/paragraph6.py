@@ -2,8 +2,8 @@
 
 Computes total §6 employment income from:
   - Base salary declared by employer (EmployerCertificate)
-  - RSU vesting income (Morgan Stanley)
-  - ESPP discount income (Fidelity)
+  - RSU vesting income (Morgan Stanley (RSU / Quarterly))
+  - ESPP discount income (Fidelity (ESPP / Annual))
 
 Regulatory references:
   - Czech Income Tax Act §6 (employment and similar income).
