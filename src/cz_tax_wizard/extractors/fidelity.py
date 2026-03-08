@@ -121,7 +121,7 @@ class FidelityExtractor:
         tax_year = int(year_match.group(1))
 
         statement = BrokerStatement(
-            broker="fidelity",
+            broker="fidelity_espp_annual",
             account_number=account_number,
             period_start=date(tax_year, 1, 1),
             period_end=date(tax_year, 12, 31),

@@ -37,7 +37,7 @@ _DATE_A = date(2024, 2, 29)
 _DATE_B = date(2024, 6, 14)
 
 _STATEMENT = BrokerStatement(
-    broker="morgan_stanley",
+    broker="morgan_stanley_rsu_quarterly",
     account_number="MS-TEST",
     period_start=date(2024, 1, 1),
     period_end=date(2024, 3, 31),
@@ -46,7 +46,7 @@ _STATEMENT = BrokerStatement(
 )
 
 _FIDELITY_STATEMENT = BrokerStatement(
-    broker="fidelity",
+    broker="fidelity_espp_annual",
     account_number="FID-TEST",
     period_start=date(2024, 1, 1),
     period_end=date(2024, 12, 31),

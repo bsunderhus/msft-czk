@@ -148,7 +148,7 @@ def format_paragraph6_section(
         f"{stock.total_rsu_czk:>11,} CZK"
     )
     lines.append(
-        f"  ESPP discount income (source: Fidelity):      "
+        f"  ESPP discount income (source: Fidelity (ESPP / Annual)):      "
         f"{stock.total_espp_czk:>11,} CZK"
     )
     lines.append("")
@@ -501,9 +501,9 @@ def _qty_from_description(description: str) -> str:
 
 def _broker_label(broker: str) -> str:
     labels = {
-        "morgan_stanley": "Morgan Stanley (RSU)",
-        "fidelity": "Fidelity (ESPP)",
-        "fidelity_rsu": "Fidelity (RSU)",
+        "morgan_stanley_rsu_quarterly": "Morgan Stanley (RSU / Quarterly)",
+        "fidelity_espp_annual": "Fidelity (ESPP / Annual)",
+        "fidelity_rsu_periodic": "Fidelity (RSU / Periodic)",
     }
     return labels.get(broker, broker)
 

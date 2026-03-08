@@ -183,7 +183,7 @@ class FidelityRSUAdapter:
         ticker = ticker_match.group(1) if ticker_match else ""
 
         statement = BrokerStatement(
-            broker="fidelity_rsu",
+            broker="fidelity_rsu_periodic",
             account_number=account_number,
             period_start=period_start,
             period_end=period_end,

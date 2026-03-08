@@ -23,10 +23,10 @@ extractors before touching CLI or reporter.
 
 **⚠️ CRITICAL**: No US1 work can begin until all four files in this phase are complete.
 
-- [ ] T001 Update `BrokerStatement.__post_init__` allowlist and `BrokerStatement.broker` docstring in `src/cz_tax_wizard/models.py` — new valid set: `{"morgan_stanley_rsu_quarterly", "fidelity_espp_annual", "fidelity_rsu_periodic"}`; also update `BrokerDividendSummary.broker` docstring (line 207)
-- [ ] T002 [P] Update `broker=` kwarg to `"morgan_stanley_rsu_quarterly"` in `src/cz_tax_wizard/extractors/morgan_stanley.py`
-- [ ] T003 [P] Update `broker=` kwarg to `"fidelity_espp_annual"` in `src/cz_tax_wizard/extractors/fidelity.py`
-- [ ] T004 [P] Update `broker=` kwarg to `"fidelity_rsu_periodic"` in `src/cz_tax_wizard/extractors/fidelity_rsu.py`
+- [X] T001 Update `BrokerStatement.__post_init__` allowlist and `BrokerStatement.broker` docstring in `src/cz_tax_wizard/models.py` — new valid set: `{"morgan_stanley_rsu_quarterly", "fidelity_espp_annual", "fidelity_rsu_periodic"}`; also update `BrokerDividendSummary.broker` docstring (line 207)
+- [X] T002 [P] Update `broker=` kwarg to `"morgan_stanley_rsu_quarterly"` in `src/cz_tax_wizard/extractors/morgan_stanley.py`
+- [X] T003 [P] Update `broker=` kwarg to `"fidelity_espp_annual"` in `src/cz_tax_wizard/extractors/fidelity.py`
+- [X] T004 [P] Update `broker=` kwarg to `"fidelity_rsu_periodic"` in `src/cz_tax_wizard/extractors/fidelity_rsu.py`
 
 **Checkpoint**: Run `uv run pytest tests/unit/test_extractors/ -x -q` — must pass.
 
@@ -43,18 +43,18 @@ any broker PDF and confirm loading lines show `Morgan Stanley (RSU / Quarterly)`
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] Update all broker identifier strings and display labels in `src/cz_tax_wizard/cli.py`:
+- [X] T005 [P] [US1] Update all broker identifier strings and display labels in `src/cz_tax_wizard/cli.py`:
   - Identifiers: `"morgan_stanley"` → `"morgan_stanley_rsu_quarterly"` (lines 145, 184); `"fidelity"` → `"fidelity_espp_annual"` (line 152); `"fidelity_rsu"` → `"fidelity_rsu_periodic"` (lines 157, 194)
   - Loading-line display: `[Morgan Stanley (RSU / Quarterly) ...]`, `[Fidelity (ESPP / Annual) ...]`, `[Fidelity (RSU / Periodic) ...]`
   - Error message (line 187): `"Morgan Stanley (RSU / Quarterly) and Fidelity (RSU / Periodic) results cannot be combined"`
-- [ ] T006 [P] [US1] Update `_broker_label()` dict keys and the inline ESPP source string in `src/cz_tax_wizard/reporter.py`:
+- [X] T006 [P] [US1] Update `_broker_label()` dict keys and the inline ESPP source string in `src/cz_tax_wizard/reporter.py`:
   - Dict keys: `"morgan_stanley_rsu_quarterly"`, `"fidelity_espp_annual"`, `"fidelity_rsu_periodic"`
   - Display values: `"Morgan Stanley (RSU / Quarterly)"`, `"Fidelity (ESPP / Annual)"`, `"Fidelity (RSU / Periodic)"`
   - Inline (line 151): `"ESPP discount income (source: Fidelity (ESPP / Annual)):"`
-- [ ] T007 [P] [US1] Update all `broker=` fixture arguments and `assert stmt.broker ==` assertions in `tests/unit/test_models_rsu.py` (7 occurrences: lines 24, 37, 38, 45, 46, 49, 50)
-- [ ] T008 [P] [US1] Update `broker=` fixture arguments in `tests/unit/test_calculators/test_dual_rate.py` (2 occurrences: lines 40, 49)
-- [ ] T009 [P] [US1] Update `broker=` fixture arguments in `tests/unit/test_calculators/test_paragraph6.py` (2 occurrences: lines 33, 44)
-- [ ] T010 [P] [US1] Update `assert result.statement.broker == "fidelity_rsu"` assertion in `tests/unit/test_extractors/test_fidelity_rsu.py` (line 107)
+- [X] T007 [P] [US1] Update all `broker=` fixture arguments and `assert stmt.broker ==` assertions in `tests/unit/test_models_rsu.py` (7 occurrences: lines 24, 37, 38, 45, 46, 49, 50)
+- [X] T008 [P] [US1] Update `broker=` fixture arguments in `tests/unit/test_calculators/test_dual_rate.py` (2 occurrences: lines 40, 49)
+- [X] T009 [P] [US1] Update `broker=` fixture arguments in `tests/unit/test_calculators/test_paragraph6.py` (2 occurrences: lines 33, 44)
+- [X] T010 [P] [US1] Update `assert result.statement.broker == "fidelity_rsu"` assertion in `tests/unit/test_extractors/test_fidelity_rsu.py` (line 107)
 
 **Checkpoint**: Run `uv run pytest -x -q` — all 133 previously passing tests must pass.
 
@@ -62,8 +62,8 @@ any broker PDF and confirm loading lines show `Morgan Stanley (RSU / Quarterly)`
 
 ## Phase 4: Polish & Cross-Cutting Concerns
 
-- [ ] T011 Update docstring broker name references in `src/cz_tax_wizard/calculators/paragraph6.py` (module docstring mentions `"RSU vesting income (Morgan Stanley)"` and `"ESPP discount income (Fidelity)"` — update to `"Morgan Stanley (RSU / Quarterly)"` and `"Fidelity (ESPP / Annual)"`); `src/cz_tax_wizard/calculators/priloha3.py` uses `"broker"` generically — no change needed there
-- [ ] T012 Run full test suite (`uv run pytest`) and linter (`uvx ruff check .`) — both must pass with zero errors
+- [X] T011 Update docstring broker name references in `src/cz_tax_wizard/calculators/paragraph6.py` (module docstring mentions `"RSU vesting income (Morgan Stanley)"` and `"ESPP discount income (Fidelity)"` — update to `"Morgan Stanley (RSU / Quarterly)"` and `"Fidelity (ESPP / Annual)"`); `src/cz_tax_wizard/calculators/priloha3.py` uses `"broker"` generically — no change needed there
+- [X] T012 Run full test suite (`uv run pytest`) and linter (`uvx ruff check .`) — both must pass with zero errors
 
 ---
 

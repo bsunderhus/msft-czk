@@ -142,25 +142,25 @@ def main(
         broker = result.statement.broker
         period = result.statement
 
-        if broker == "morgan_stanley":
+        if broker == "morgan_stanley_rsu_quarterly":
             ms_quarter_count += 1
             click.echo(
-                f"  ✓ [Morgan Stanley (RSU) {period.period_end.strftime('%b %Y')}] "
+                f"  ✓ [Morgan Stanley (RSU / Quarterly) {period.period_end.strftime('%b %Y')}] "
                 f"{pdf_path.name}",
                 err=True,
             )
-        elif broker == "fidelity":
+        elif broker == "fidelity_espp_annual":
             click.echo(
-                f"  ✓ [Fidelity (ESPP) {period.period_end.year}] {pdf_path.name}",
+                f"  ✓ [Fidelity (ESPP / Annual) {period.period_end.year}] {pdf_path.name}",
                 err=True,
             )
-        elif broker == "fidelity_rsu":
+        elif broker == "fidelity_rsu_periodic":
             period_label = (
                 f"{period.period_start.strftime('%b')}–"
                 f"{period.period_end.strftime('%b %Y')}"
             )
             click.echo(
-                f"  ✓ [Fidelity (RSU) {period_label}] {pdf_path.name}",
+                f"  ✓ [Fidelity (RSU / Periodic) {period_label}] {pdf_path.name}",
                 err=True,
             )
         else:
@@ -181,17 +181,17 @@ def main(
     brokers_present = {r.statement.broker for r in all_results}
 
     # FR-012: Reject multi-RSU-broker invocations
-    if "morgan_stanley" in brokers_present and "fidelity_rsu" in brokers_present:
+    if "morgan_stanley_rsu_quarterly" in brokers_present and "fidelity_rsu_periodic" in brokers_present:
         click.echo(
             "ERROR: RSU income from multiple brokers detected. "
-            "Morgan Stanley (RSU) and Fidelity (RSU) results cannot be combined "
+            "Morgan Stanley (RSU / Quarterly) and Fidelity (RSU / Periodic) results cannot be combined "
             "in the same run — this would double-count §6 RSU income.",
             err=True,
         )
         sys.exit(1)
 
     # FR-010 + FR-011: Validate Fidelity RSU period reports
-    rsu_results = [r for r in all_results if r.statement.broker == "fidelity_rsu"]
+    rsu_results = [r for r in all_results if r.statement.broker == "fidelity_rsu_periodic"]
     if rsu_results:
         rsu_results_sorted = sorted(rsu_results, key=lambda r: r.statement.period_start)
 
