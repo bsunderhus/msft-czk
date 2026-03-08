@@ -12,7 +12,6 @@ Expected 2024 known values (from research.md and sample PDF analysis):
 
 from pathlib import Path
 from unittest.mock import patch
-from decimal import Decimal
 
 import pytest
 from click.testing import CliRunner
@@ -183,7 +182,6 @@ class TestUnrecognizedBrokerExitCode3:
     """Supplying a non-broker PDF should exit with code 3."""
 
     def test_unrecognized_broker_exit_3(self, tmp_path):
-        import pdfplumber
 
         # Create a minimal dummy text file (pdfplumber can't open it, but we
         # can test via a PDF that has no broker text by mocking pdfplumber)
@@ -208,8 +206,8 @@ class TestUnrecognizedBrokerExitCode3:
             )
 
         assert result.exit_code == 3
-        assert "broker identity not recognized" in result.output or \
-               "broker identity not recognized" in (result.exception and str(result.exception) or "")
+        assert "unrecognized document type" in result.output or \
+               "unrecognized document type" in (result.exception and str(result.exception) or "")
 
 
 class TestCnbNetworkFailureExitCode4:

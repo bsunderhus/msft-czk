@@ -12,7 +12,7 @@ Regulatory references:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
@@ -51,12 +51,15 @@ class BrokerStatement:
     One instance is produced per PDF provided on the command line.
 
     Fields:
-        broker: Canonical broker identifier — ``"morgan_stanley"`` or ``"fidelity"``.
+        broker: Canonical broker identifier — ``"morgan_stanley"``,
+            ``"fidelity"`` (ESPP), or ``"fidelity_rsu"`` (RSU period reports).
         account_number: Broker-assigned account number (e.g. ``"MS05003017"``).
         period_start: First date of the statement period.
-        period_end: Last date of the statement period (quarter-end or year-end).
+        period_end: Last date of the statement period (quarter-end, year-end,
+            or period-end for Fidelity RSU).
         source_file: Absolute path to the source PDF on disk.
-        periodicity: ``"quarterly"`` for Morgan Stanley; ``"annual"`` for Fidelity.
+        periodicity: ``"quarterly"`` for Morgan Stanley; ``"annual"`` for
+            Fidelity ESPP; ``"periodic"`` for Fidelity RSU period reports.
     """
 
     broker: str
@@ -71,9 +74,9 @@ class BrokerStatement:
             raise ValueError(
                 f"period_start {self.period_start} must be <= period_end {self.period_end}"
             )
-        if self.broker not in {"morgan_stanley", "fidelity"}:
+        if self.broker not in {"morgan_stanley", "fidelity", "fidelity_rsu"}:
             raise ValueError(f"Unknown broker: {self.broker!r}")
-        if self.periodicity not in {"quarterly", "annual"}:
+        if self.periodicity not in {"quarterly", "annual", "periodic"}:
             raise ValueError(f"Unknown periodicity: {self.periodicity!r}")
 
 
@@ -110,14 +113,15 @@ class DividendEvent:
 
 @dataclass(frozen=True)
 class RSUVestingEvent:
-    """A Share Deposit transaction from a Morgan Stanley quarterly statement.
+    """A Share Deposit (RSU vesting) transaction from a broker statement.
 
     Represents RSU income that must be self-declared as an additional §6 row
-    in the DPFDP7 employer income table.
+    in the DPFDP7 employer income table. Produced by both the Morgan Stanley
+    extractor and the Fidelity RSU period report adapter.
 
     Regulatory reference: Czech Income Tax Act §6. The FMV at vesting date equals
-    the per-share deposit price shown in the Morgan Stanley statement — NOT the
-    quarter-end closing price. (research.md Finding 6)
+    the per-share deposit price shown in the statement — NOT a period-end price.
+    (research.md Finding 6)
 
     Fields:
         date: Vesting / deposit date.
@@ -127,6 +131,8 @@ class RSUVestingEvent:
         income_usd: Total vesting income = quantity × fmv_usd (computed at
             extraction time and validated as an invariant).
         source_statement: The BrokerStatement this event was extracted from.
+        ticker: Ticker symbol of the vested stock (e.g. ``"MSFT"``). Empty string
+            for Morgan Stanley events where the ticker is not extracted.
     """
 
     date: date
@@ -134,6 +140,7 @@ class RSUVestingEvent:
     fmv_usd: Decimal
     income_usd: Decimal
     source_statement: BrokerStatement
+    ticker: str = ""
 
     def __post_init__(self) -> None:
         if self.quantity <= 0:

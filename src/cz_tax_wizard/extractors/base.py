@@ -1,20 +1,19 @@
-"""Abstract base extractor and broker detection logic.
+"""Broker adapter protocol and extraction result contract.
 
-Defines the ``ExtractionResult`` contract that all concrete extractors must
-return, and the ``detect_broker`` function that determines broker identity from
-PDF text content.
+Defines the ``BrokerAdapter`` protocol that all concrete broker adapters must
+implement, and the ``ExtractionResult`` container returned by every adapter.
 
-Broker identification uses the exact identifier strings found in the footer/body
-of the verified 2024 sample PDFs (research.md Finding 6 and 7):
-  - Morgan Stanley quarterly statements: ``"Morgan Stanley Smith Barney LLC"``
-  - Fidelity year-end reports:           ``"Fidelity Stock Plan Services LLC"``
+The adapter pattern replaces the former ``detect_broker()`` function and
+``AbstractBrokerExtractor`` ABC: each adapter co-locates detection and
+extraction logic, and the CLI iterates over a registered adapter list calling
+``can_handle()`` to route each PDF.
 """
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Protocol
 
 from cz_tax_wizard.models import (
     BrokerStatement,
@@ -23,26 +22,20 @@ from cz_tax_wizard.models import (
     RSUVestingEvent,
 )
 
-# Exact broker identifier strings from verified 2024 sample PDFs.
-# Using the full legal entity name prevents false positives on PDFs that happen
-# to contain a partial broker name in disclaimers or forwarding addresses.
-_MORGAN_STANLEY_ID = "Morgan Stanley Smith Barney LLC"
-_FIDELITY_ID = "Fidelity Stock Plan Services LLC"
-
 
 @dataclass
 class ExtractionResult:
     """Typed container for all data extracted from a single broker PDF.
 
-    All fields default to empty lists so that an extractor implementing only
-    a subset of income types (e.g. dividends only in Phase 3) can return a
+    All fields default to empty lists so that an adapter implementing only
+    a subset of income types (e.g. RSU only, no dividends) can return a
     complete, valid result without boilerplate.
 
     Fields:
         statement: Metadata for the source PDF (broker, account, period).
         dividends: Dividend payment events extracted from the statement.
-        rsu_events: RSU vesting (Share Deposit) events; Morgan Stanley only.
-        espp_events: ESPP purchase events; Fidelity only.
+        rsu_events: RSU vesting (Share Deposit) events.
+        espp_events: ESPP purchase events; Fidelity ESPP only.
     """
 
     statement: BrokerStatement
@@ -51,52 +44,42 @@ class ExtractionResult:
     espp_events: list[ESPPPurchaseEvent] = field(default_factory=list)
 
 
-class AbstractBrokerExtractor(ABC):
-    """Abstract base class for broker PDF extractors.
+class BrokerAdapter(Protocol):
+    """Structural protocol for all broker PDF adapters.
 
-    Each concrete subclass handles one broker's PDF format using deterministic
-    structured text parsing (pdfplumber + regex). AI-based extraction is
-    explicitly out of scope (spec.md FR-003).
+    Each adapter handles one broker's PDF format: ``can_handle()`` detects
+    whether the adapter owns a given document, and ``extract()`` parses it.
+    Adapters conform structurally — no inheritance required.
 
-    Subclasses:
+    Implementations:
         MorganStanleyExtractor: Quarterly statements — RSU vesting + dividends.
-        FidelityExtractor: Annual report — ESPP purchases + dividends.
+        FidelityExtractor: Annual ESPP report — ESPP purchases + dividends.
+        FidelityRSUAdapter: Period reports — RSU vesting + dividends (§6/§8).
     """
 
-    @abstractmethod
-    def extract(self, path: Path) -> ExtractionResult:
-        """Extract all broker data from the given PDF file.
+    def can_handle(self, text: str) -> bool:
+        """Return True if this adapter recognises the document.
 
         Args:
-            path: Absolute path to the broker statement PDF.
+            text: Full extracted text from all pages of a broker PDF.
+
+        Returns:
+            True if this adapter should process the document.
+        """
+        ...
+
+    def extract(self, text: str, path: Path) -> ExtractionResult:
+        """Extract all broker data from the given pre-extracted text.
+
+        Args:
+            text: Full concatenated text from all pages of the PDF.
+            path: Path to use as source_file in the BrokerStatement.
 
         Returns:
             ExtractionResult with statement metadata and all extracted events.
 
         Raises:
-            FileNotFoundError: If the PDF does not exist.
             ValueError: If the PDF content does not match the expected layout
-                (spec.md FR-003a — fail loudly on unrecognized format).
+                or contains invalid data (e.g. zero/negative share count).
         """
-
-
-def detect_broker(text: str) -> str | None:
-    """Identify the broker from the full text content of a PDF.
-
-    Uses the exact legal entity names from the verified 2024 sample PDFs
-    (research.md Finding 6 and 7). Returns the canonical broker identifier
-    string used throughout the codebase, or None if neither broker is found.
-
-    Args:
-        text: Full extracted text from all pages of a broker PDF.
-
-    Returns:
-        ``"morgan_stanley"`` if the Morgan Stanley entity name is present,
-        ``"fidelity"`` if the Fidelity entity name is present,
-        ``None`` if neither is found (unrecognized PDF — exit code 3).
-    """
-    if _MORGAN_STANLEY_ID in text:
-        return "morgan_stanley"
-    if _FIDELITY_ID in text:
-        return "fidelity"
-    return None
+        ...

@@ -26,9 +26,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
 
-import pdfplumber
-
-from cz_tax_wizard.extractors.base import AbstractBrokerExtractor, ExtractionResult
+from cz_tax_wizard.extractors.base import ExtractionResult
 from cz_tax_wizard.models import BrokerStatement, DividendEvent, ESPPPurchaseEvent
 
 # --- Regex patterns derived from research.md Finding 7 ---
@@ -66,42 +64,35 @@ def _parse_date(s: str) -> date:
     return datetime.strptime(s, _DATE_FMT).date()
 
 
-class FidelityExtractor(AbstractBrokerExtractor):
-    """Extractor for Fidelity Stock Plan Services year-end investment reports.
+class FidelityExtractor:
+    """Adapter for Fidelity Stock Plan Services year-end investment reports.
 
     Handles dividend extraction (§8) and ESPP purchase extraction (§6).
     A single Fidelity PDF covers the full calendar year (annual periodicity).
 
+    Conforms structurally to the ``BrokerAdapter`` protocol via ``can_handle()``
+    and ``extract(text, path)``.
+
     Usage::
 
-        extractor = FidelityExtractor()
-        result = extractor.extract(Path("8a76ad8e-...-376d5dbe1647.pdf"))
+        adapter = FidelityExtractor()
+        if adapter.can_handle(text):
+            result = adapter.extract(text, path)
     """
 
-    def extract(self, path: Path) -> ExtractionResult:
-        """Extract dividend and ESPP events from a Fidelity year-end PDF.
+    def can_handle(self, text: str) -> bool:
+        """Return True if the document contains the Fidelity ESPP identifier.
 
         Args:
-            path: Absolute path to the Fidelity year-end investment report PDF.
+            text: Full extracted text from all pages of the PDF.
 
         Returns:
-            ExtractionResult with statement metadata, dividend events, and ESPP events.
-
-        Raises:
-            FileNotFoundError: If the PDF does not exist.
-            ValueError: If the PDF does not match the expected Fidelity layout.
+            True if ``"Fidelity Stock Plan Services LLC"`` is present in text.
         """
-        if not path.exists():
-            raise FileNotFoundError(f"PDF not found: {path}")
+        return "Fidelity Stock Plan Services LLC" in text
 
-        with pdfplumber.open(path) as pdf:
-            pages_text = [page.extract_text() or "" for page in pdf.pages]
-
-        full_text = "\n\n".join(pages_text)
-        return self.extract_from_text(full_text, path)
-
-    def extract_from_text(self, text: str, source_path: Path) -> ExtractionResult:
-        """Extract from pre-extracted text (used in unit tests with fixture files).
+    def extract(self, text: str, source_path: Path) -> ExtractionResult:
+        """Extract dividend and ESPP events from pre-extracted Fidelity text.
 
         Args:
             text: Full concatenated text from all pages of the PDF.

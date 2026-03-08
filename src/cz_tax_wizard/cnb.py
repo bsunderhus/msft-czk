@@ -42,6 +42,10 @@ import urllib.error
 import urllib.request
 from datetime import date, timedelta
 from decimal import Decimal
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from cz_tax_wizard.models import DailyRateEntry
 
 CNB_URL = (
     "https://www.cnb.cz/cs/financni-trhy/devizovy-trh/"

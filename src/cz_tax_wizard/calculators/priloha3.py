@@ -129,7 +129,7 @@ def compute_rows_324_330(
     from decimal import ROUND_HALF_UP
 
     d_321 = Decimal(row_321)
-    d_323 = Decimal(row_323)
+    _d_323 = Decimal(row_323)  # kept for symmetry; raw int used in row_326/327
     d_42 = Decimal(row_42)
     d_57 = Decimal(row_57)
 

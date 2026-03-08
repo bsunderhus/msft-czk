@@ -22,8 +22,6 @@ from cz_tax_wizard.models import (
     DividendEvent,
     DualRateEventRow,
     DualRateReport,
-    ESPPPurchaseEvent,
-    RSUVestingEvent,
     StockIncomeReport,
 )
 
@@ -73,7 +71,12 @@ def compute_dual_rate_report(
         entry = daily_rate_cache[event.date]
         annual_czk = to_czk(event.income_usd, annual_rate) if is_annual_avg_available else 0
         daily_czk = to_czk(event.income_usd, entry.rate)
-        description = f"{event.quantity} shares × ${event.fmv_usd}"
+        shares_label = (
+            f"{event.quantity} {event.ticker} shares"
+            if event.ticker
+            else f"{event.quantity} shares"
+        )
+        description = f"{shares_label} × ${event.fmv_usd}"
         rsu_rows.append(
             DualRateEventRow(
                 event_date=event.date,

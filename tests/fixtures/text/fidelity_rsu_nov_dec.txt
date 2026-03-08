@@ -1,0 +1,225 @@
+STOCK PLAN SERVICES REPORT
+November 1, 2025 - December 31, 2025
+Envelope # BSPMTZBBCCCGX
+VENDULA KUDEJOVA
+U LESA 367
+STRUHA@OV
+251 64
+CZECH REPUBLIC
+1 of 6
+S
+13215202
+BBBBB_XGCCCBBZTMPSB_
+EC_RM
+VENDULA KUDEJOVA
+Participant Number: I08869652
+Your Account Value: $20,344.60
+Change from Last Period: $1,403.42
+This Period Year-to-Date
+Beginning Account Value $21,748.02 -
+Subtractions -5.73 -5.73
+Change in Investment Value * -1,397.69 20,350.33
+Ending Account Value ** $20,344.60 $20,344.60
+Accrued Interest (AI) 0.00
+Ending Account Value Incl. AI $20,344.60
+* Reflects appreciation or depreciation of your holdings due to price changes, transactions
+from Other Activity In or Out and Multi-currency transactions, plus any distribution and
+Contact Information income earned during the statement period.
+** Excludes unpriced securities.
+Online www.netbenefits.com
+Stock Plan Services (800) 544-0275
+Sun 5pm - Sat 12am ET
+Save on your tax preparation services; Fidelity is pleased to offer
+exclusive discounts to help you prepare your tax return. Learn more at
+Fidelity.com/taxprep. 1064976.1.3
+H06162798920251231
+
+S
+13215202
+BBBBB_XGCCCBBZTMPSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+November 1, 2025 - December 31, 2025
+Account # Z81-202254
+Account Summary
+VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+Account Value: $20,344.60 Account Holdings
+Change in Account Value $1,403.42
+This Period Year-to-Date
+Beginning Account Value $21,748.02 -
+Subtractions -5.73 -5.73
+Taxes Withheld -5.73 -5.73
+Change in Investment Value * -1,397.69 20,350.33
+100% Stocks ($20,312)
+Ending Account Value $20,344.60 $20,344.60
+Accrued Interest (AI) 0.00
+Top Holdings
+Ending Account Value Incl. AI $20,344.60 Percent of
+Description Value Account
+* Reflects appreciation or depreciation of your holdings due to price changes, transactions Microsoft Corp $20,312 100%
+from Other Activity In or Out and Multi-currency transactions, plus any distribution and
+Fid Treasury Only MMkt Fund Cl Ous 32 -
+income earned during the statement period.
+Total $20,344 100%
+In order to comply with FINRA Rule 4512, Fidelity is asking clients to review
+or update trusted contact information. To learn more, go to Please note that, due to rounding, percentages may not add to 100%.
+www.fidelity.com/trustedcontact or contact a representative. 1223253.1.0
+Income Summary
+This Period Year-to-Date
+Taxable $38.29 $38.29
+Dividends 38.29 38.29
+Total $38.29 $38.29
+2 of 6
+
+S
+13215202
+BBBBB_XGCCCBBZTMPSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+November 1, 2025 - December 31, 2025
+Account # Z81-202254
+Holdings
+VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+Core Account
+Beginning Price Ending Unrealized
+Market Value Quantity Per Unit Market Value Total Gain/Loss EAI ($) /
+Description Nov 1, 2025 Dec 31, 2025 Dec 31, 2025 Dec 31, 2025 Cost Basis Dec 31, 2025 EY (%)
+FID TREASURY ONLY MMKT FUND CL unavailable 32.560 $1.0000 $32.56 not applicable not applicable $1.16
+OUS (FYIXX) 3.560%
+Total Core Account (0% of account unavailable $32.56 $1.16
+holdings)
+Stocks
+Beginning Price Ending Unrealized
+Market Value Quantity Per Unit Market Value Total Gain/Loss EAI ($) /
+Description Nov 1, 2025 Dec 31, 2025 Dec 31, 2025 Dec 31, 2025 Cost Basis Dec 31, 2025 EY (%)
+Common Stock
+MICROSOFT CORP (MSFT) $21,748.02 42.000 $483.6200 $20,312.04 $21,569.94t -$1,257.90 $152.88
+0.750%
+Total Common Stock (100% of account $21,748.02 $20,312.04 $21,569.94 -$1,257.90 $152.88
+holdings)
+Total Stocks (100% of account holdings) $21,748.02 $20,312.04 $21,569.94 -$1,257.90 $152.88
+Total Holdings $20,344.60 $21,569.94 -$1,257.90 $154.04
+EAI Estimated Annual Income (EAI) & Estimated Yield (EY ) - EAI is an estimate of annual income for a specific security position over the next rolling 12 months. EAI may be negative on short
+& EY positions. EY is calculated by dividing the current EAI for a security position by its statement closing date market value. EAI and EY are estimates only and may include return of principal
+and/or capital gains, which would render them overstated. Actual income and yield might be lower or higher than the estimated amounts. F o r calculation details, refer to the
+"Additional Information and Endnotes" section.
+All positions held in cash account unless indicated otherwise.
+Total Cost Basis does not include the cost basis on core, money market or other positions where cost basis is unknown or not applicable.
+t Third-party provided
+3 of 6
+
+S
+13215202
+BBBBB_XGCCCBBZTMPSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+November 1, 2025 - December 31, 2025
+Account # Z81-202254
+Activity
+VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+Dividends, Interest & Other Income
+(Includes dividend reinvestment)
+Settlement Symbol/
+Date Security Name CUSIP Description Quantity Price Amount
+12/11 MICROSOFT CORP 594918104 Dividend Received - - $38.22
+12/31 FID TREASURY ONLY MMKT FUND CL 31617H821 Dividend Received - - 0.07
+OUS
+Total Dividends, Interest & Other Income $38.29
+Taxes Withheld
+Date Security Description Amount
+12/11 MICROSOFT CORP Non-Resident Tax -$5.73
+Total Federal Taxes Withheld -5.73
+Total Taxes Withheld -$5.73
+Core Fund Activity
+For more information about the operation of your core account, please refer to your Customer Agreement.
+SettlementAccount
+Date Type Transaction Description Quantity Price Amount Balance
+12/11 CASH You Bought FID TREASURY ONLY MMKT FUND CL OUS 32.490 $1.0000 $32.49 $32.49
+MORNING TRADE @ 1
+12/31 CASH Reinvestment FID TREASURY ONLY MMKT FUND CL OUS 0.070 1.0000 0.07 32.56
+REINVEST @ $1.000
+Total Core Fund Activity $32.56
+4 of 6
+
+S
+13215202
+BBBBB_XGCCCBBZTMPSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+November 1, 2025 - December 31, 2025
+Account # Z81-202254
+Estimated Cash Flow
+(Rolling as of December 31, 2025) VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+Bond & CD Bond & CD Stock ETP Mutual Fund Other Total Est.
+Month Income Principal Income Income Income Income Cash Flow
+January 2026 -- -- -- -- -- -- --
+February -- -- -- -- -- -- --
+March -- -- 38 -- -- -- 38
+April -- -- -- -- -- -- --
+May -- -- -- -- -- -- --
+June -- -- 38 -- -- -- 38
+July -- -- -- -- -- -- --
+August -- -- -- -- -- -- --
+September -- -- 38 -- -- -- 38
+October -- -- -- -- -- -- --
+November -- -- -- -- -- -- --
+December -- -- 38 -- -- -- 38
+Total -- -- $152 -- -- -- $152
+This table presents the estimated monthly interest and dividend income and return of principal that your current holdings may generate over the next rolling 12 months.
+The cash flows displayed are estimates provided for informational purposes only and there is no guarantee that you will actually receive any of the amounts displayed.
+These estimates should not be relied upon for making investment, trading or tax decisions. The estimates for fixed income are calculated using the security's coupon
+rate. The estimates for all other securities are calculated using an indicated annual dividend (IAD). The IAD is an estimate of a security's dividend payments for the next
+12 months calculated based on prior and/or declared dividends for that security. IADs are sourced from third party vendors believed to be reliable, but no assurance can
+be made as to accuracy. There are circumstances in which these estimates will not be presented for a specific security you hold. Please refer to Help/Glossary on
+Fidelity.com for additional information on these calculations.
+Bond & CD Income includes interest payments for fixed and variable rate bonds, international bonds that pay in USD, certificates of deposit (CDs), and credit union
+share certificates (CUSCs).
+Bond & CD Principal includes maturing principal payments for fixed and variable rate bonds, international bonds that pay in USD, CDs, and CUSCs.
+Stock Income includes estimated dividend payments for common stocks, preferred stocks, ADRs, closed-end mutual funds, and MLPs.
+ETP Income includes estimated dividend payments for Exchange Traded Funds (ETFs) and Exchange Traded Notes (ETNs).
+Mutual Fund Income includes estimated dividend payments for Fidelity and non-Fidelity mutual funds.
+Other Income includes, but is not limited to estimated dividend payments for Unit Investment Trusts (UITs), REITs, and LPs.
+This table does not include cash flow from foreign denominated fixed income.
+-- not available
+5 of 6
+
+S
+13215202
+BBBBB_XGCCCBBZTMPSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+November 1, 2025 - December 31, 2025
+Account # Z81-202254
+Additional Information and Endnotes
+VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+Important information about your telephone conversations with Fidelity. Telephone conversations made with/to Fidelity may be monitored and/or recorded without
+further notice or disclosure. 570303.1.0
+Estimated Annual Income (EAI) & Estimated Yield (EY) - EAI for fixed income is calculated using the coupon rate. For all other securities, EAI is calculated using an
+indicated annual dividend (IAD). The IAD is an estimate of a security's dividend payments for the next 12 months calculated based on prior and/or declared dividends for
+that security. EY reflects only the income generated by an investment and not changes in its price which may fluctuate. Interest and dividend rates are subject to change at
+any time and may be affected by current and future economic, political and business conditions. EAI and EY are provided for informational purposes only and should not
+be used or relied on for making investment, trading or tax decisions. EAI and EY are based on data obtained from information providers believed to be reliable, but no
+assurance can be made as to accuracy, timeliness or completeness. Please refer to the Help/Glossary on Fidelity.com for additional information regarding these
+calculations.
+Copyright 2022, S&P Global Market Intelligence. Reproduction of any information, data or material, including ratings ("Content") in any form is prohibited except with the
+prior written permission of the relevant party. Such party, its affiliates and suppliers ("Content Providers") do not guarantee the accuracy, adequacy, completeness,
+timeliness or availability of any Content and are not responsible for any errors or omissions (negligent or otherwise), regardless of the cause, or for the results obtained
+from the use of such Content. In no event shall Content Providers be liable for any damages, costs, expenses, legal fees, or losses (including lost income or lost profit and
+opportunity costs) in connection with any use of the Content. A reference to a particular investment or security, a rating or any observation concerning an investment that is
+part of the Content is not a recommendation to buy, sell or hold such investment or security, does not address the suitability of an investment or security and should not be
+relied on as investment advice. Credit ratings are statements of opinions and are not statements of fact.
+Moody's© Copyright 2022, Moody's Investors Service, Inc. ("Moody's"). Moody's ratings ("Ratings") are proprietary to Moody's or its affiliates and are protected by
+copyright and other intellectual property laws. Ratings are licensed to Licensee by Moody's. RATINGS MAY NOT BE COPIED OR OTHERWISE REPRODUCED,
+REPACKAGED, FURTHER TRANSMITTED, TRANSFERRED, DISSEMINATED, REDISTRIBUTED OR RESOLD, OR STORED FOR SUBSEQUENT USE FOR ANY
+SUCH PURPOSE, IN WHOLE OR IN PART, IN ANY FORM OR MANNER OR BY ANY MEANS WHATSOEVER, BY ANY PERSON WITHOUT MOODY'S PRIOR
+WRITTEN CONSENT. Moody's® is a registered trademark.
+Fractional Share Trading: With the exception of managed accounts, National Financial Services ("NFS"), an affiliate broker-dealer, will execute the fractional component
+of a customer order in a principal or riskless principal capacity. FBS will act as agent. This includes fractional shares liquidations as a result of an ACATS transfer of whole
+shares or a dividend reinvestment that created a residual fractional position in a customer account.
+Payment for Order Flow: Fidelity Brokerage Services LLC ("FBS") receives remuneration, compensation, or consideration for directing orders particular broker/dealers or
+market centers for execution. The source and nature of any compensation received in connection with your particular transaction, the name of the other party, and the time
+of execution will be disclosed upon written request.
+Please go to Fidelity.com/disclosures to review important legal and regulatory disclosures. Historical statements, confirms and other regulatory documents are available to
+access and download at Fidelity.com/statements.
+For more information about your statement, please refer to our Frequently Asked Questions document at Fidelity.com/statements.
+6 of 6

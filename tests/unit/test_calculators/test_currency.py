@@ -13,7 +13,6 @@ Reference rate 23.28 is the value used in the filed 2024 declaration
 
 from decimal import Decimal
 
-import pytest
 
 from cz_tax_wizard.currency import to_czk
 
