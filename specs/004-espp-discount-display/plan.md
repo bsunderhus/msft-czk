@@ -172,8 +172,10 @@ f"{'Annual Avg CZK':>14}  {'Daily Rate':>10}  {'Daily CZK':>10}"
 
 **After** (dual mode, two-line layout):
 ```python
-f"  {'Purchase Date':<14}  {'Shares × (FMV − Price) = Disc%':<34}  {'Discount (USD)':>14}"
+f"  {'Purchase Date':<14}  {'Shares × (FMV − Price) = Disc%':<40}  {'Discount (USD)':>14}"
 # CZK values rendered on indented second line per row (no header needed)
+# Width 40: typical description is 38 chars (e.g. "5.235 sh × ($420.72 − $378.65) = 10.0%"),
+# so :<40 provides 2-char padding buffer without misaligning the Discount (USD) column.
 ```
 
 #### `reporter.py` — ESPP row rendering (lines ~357–376)
@@ -182,7 +184,7 @@ Replace single-line row with two-line format:
 ```python
 # Line 1: formula + discount USD
 lines.append(
-    f"  {date_label:<14}  {row.description:<34}  ${row.income_usd:>13.2f}"
+    f"  {date_label:<14}  {row.description:<40}  ${row.income_usd:>13.2f}"
 )
 # Line 2: CZK values (indented)
 if dual:
