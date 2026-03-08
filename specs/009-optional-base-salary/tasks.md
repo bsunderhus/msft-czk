@@ -14,7 +14,7 @@
 **Purpose**: No new project structure needed — this is a change to an existing project.
 All tooling, dependencies, and structure are already in place.
 
-- [ ] T001 Verify current test suite passes before starting in src/ and tests/ (`pytest` and `ruff check .`)
+- [X] T001 Verify current test suite passes before starting in src/ and tests/ (`pytest` and `ruff check .`)
 
 ---
 
@@ -24,8 +24,8 @@ All tooling, dependencies, and structure are already in place.
 
 **⚠️ CRITICAL**: Both model changes must be complete before CLI or reporter work can begin.
 
-- [ ] T002 Update `EmployerCertificate` in `src/cz_tax_wizard/models.py`: allow `base_salary_czk == 0` (change `<= 0` to `< 0` in validation), add `base_salary_provided: bool = True` field, update docstring
-- [ ] T003 Add `base_salary_provided: bool` field to `DualRateReport` in `src/cz_tax_wizard/models.py`, update docstring
+- [X] T002 Update `EmployerCertificate` in `src/cz_tax_wizard/models.py`: allow `base_salary_czk == 0` (change `<= 0` to `< 0` in validation), add `base_salary_provided: bool = True` field, update docstring
+- [X] T003 Add `base_salary_provided: bool` field to `DualRateReport` in `src/cz_tax_wizard/models.py`, update docstring
 
 **Checkpoint**: Models updated — CLI, calculator, reporter, and test tasks can now proceed.
 
@@ -39,11 +39,11 @@ All tooling, dependencies, and structure are already in place.
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Update `--base-salary` option in `src/cz_tax_wizard/cli.py`: change `required=True` to `default=None`, add normalization block (`base_salary_provided = base_salary is not None and base_salary != 0; base_salary = base_salary or 0`), pass `base_salary_provided` to `EmployerCertificate` and `compute_dual_rate_report`, update `main()` docstring
-- [ ] T005 [US1] Update `compute_dual_rate_report()` in `src/cz_tax_wizard/calculators/dual_rate.py`: add `base_salary_provided: bool = True` parameter, pass it through to `DualRateReport(base_salary_provided=base_salary_provided, ...)`, update docstring
-- [ ] T006 [P] [US1] Add integration test `TestNoBaseSalary` class in `tests/integration/test_full_run.py`: test exit code 0 when `--base-salary` omitted (mocked PDF), test exit code 0 when `--base-salary 0` (mocked PDF), test output contains stock income lines
-- [ ] T007 [P] [US1] Add unit tests for `EmployerCertificate(base_salary_czk=0, base_salary_provided=False)` in `tests/unit/test_models.py`: verify no exception raised, verify existing positive-salary construction unchanged
-- [ ] T008 [P] [US1] Add unit tests for `base_salary_provided` propagation in `tests/unit/test_calculators/test_dual_rate.py`: verify `DualRateReport.base_salary_provided` matches input when `True` and when `False`
+- [X] T004 [US1] Update `--base-salary` option in `src/cz_tax_wizard/cli.py`: change `required=True` to `default=None`, add normalization block (`base_salary_provided = base_salary is not None and base_salary != 0; base_salary = base_salary or 0`), pass `base_salary_provided` to `EmployerCertificate` and `compute_dual_rate_report`, update `main()` docstring
+- [X] T005 [US1] Update `compute_dual_rate_report()` in `src/cz_tax_wizard/calculators/dual_rate.py`: add `base_salary_provided: bool = True` parameter, pass it through to `DualRateReport(base_salary_provided=base_salary_provided, ...)`, update docstring
+- [X] T006 [P] [US1] Add integration test `TestNoBaseSalary` class in `tests/integration/test_full_run.py`: test exit code 0 when `--base-salary` omitted (mocked PDF), test exit code 0 when `--base-salary 0` (mocked PDF), test output contains stock income lines
+- [X] T007 [P] [US1] Add unit tests for `EmployerCertificate(base_salary_czk=0, base_salary_provided=False)` in `tests/unit/test_models.py`: verify no exception raised, verify existing positive-salary construction unchanged
+- [X] T008 [P] [US1] Add unit tests for `base_salary_provided` propagation in `tests/unit/test_calculators/test_dual_rate.py`: verify `DualRateReport.base_salary_provided` matches input when `True` and when `False`
 
 **Checkpoint**: User Story 1 is done — tool runs without `--base-salary`, exits 0, produces valid output.
 
@@ -57,9 +57,9 @@ All tooling, dependencies, and structure are already in place.
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Update `format_dual_rate_section()` in `src/cz_tax_wizard/reporter.py`: after the "Employment income total" `_czk_row(...)` call, add `if not report.base_salary_provided:` block that appends `"  (base salary not provided — total is stock income only; add §6 base salary before filing)"`, update docstring
-- [ ] T010 [P] [US2] Add integration tests for notice in `tests/integration/test_full_run.py`: `test_no_base_salary_notice_present` (omit flag), `test_base_salary_zero_notice_present` (pass `--base-salary 0`), `test_no_notice_when_base_salary_provided` (positive salary)
-- [ ] T011 [P] [US2] Add unit test for notice rendering in `tests/unit/test_reporter.py` (or nearest reporter test file): call `format_dual_rate_section` with `base_salary_provided=False` report, assert notice string present; call with `base_salary_provided=True`, assert notice absent
+- [X] T009 [US2] Update `format_dual_rate_section()` in `src/cz_tax_wizard/reporter.py`: after the "Employment income total" `_czk_row(...)` call, add `if not report.base_salary_provided:` block that appends `"  (base salary not provided — total is stock income only; add §6 base salary before filing)"`, update docstring
+- [X] T010 [P] [US2] Add integration tests for notice in `tests/integration/test_full_run.py`: `test_no_base_salary_notice_present` (omit flag), `test_base_salary_zero_notice_present` (pass `--base-salary 0`), `test_no_notice_when_base_salary_provided` (positive salary)
+- [X] T011 [P] [US2] Add unit test for notice rendering in `tests/unit/test_reporter.py` (or nearest reporter test file): call `format_dual_rate_section` with `base_salary_provided=False` report, assert notice string present; call with `base_salary_provided=True`, assert notice absent
 
 **Checkpoint**: User Stories 1 and 2 complete — tool exits 0 without base salary and shows the safety notice.
 
@@ -69,9 +69,9 @@ All tooling, dependencies, and structure are already in place.
 
 **Purpose**: Validate all quickstart scenarios, ensure ruff and full test suite pass.
 
-- [ ] T012 [P] Run `pytest` and confirm all tests pass (no regressions from existing test suite)
-- [ ] T013 [P] Run `ruff check .` and fix any lint issues introduced by the changes
-- [ ] T014 Validate quickstart.md Scenario A (omit flag), B (pass 0), C (positive salary), D (no PDFs) manually or via integration tests
+- [X] T012 [P] Run `pytest` and confirm all tests pass (no regressions from existing test suite)
+- [X] T013 [P] Run `ruff check .` and fix any lint issues introduced by the changes
+- [X] T014 Validate quickstart.md Scenario A (omit flag), B (pass 0), C (positive salary), D (no PDFs) manually or via integration tests
 
 ---
 

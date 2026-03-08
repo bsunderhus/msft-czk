@@ -108,9 +108,13 @@ def _find_coverage_gaps(
 @click.option(
     "--base-salary",
     "base_salary",
-    required=True,
+    default=None,
     type=int,
-    help="Base salary in whole CZK (manually read from Potvrzení row 1)",
+    help=(
+        "Base salary in whole CZK (manually read from Potvrzení row 1). "
+        "Omit or pass 0 if the employer certificate is not yet available — "
+        "the report will show stock income only with a reminder to add base salary before filing."
+    ),
 )
 @click.option(
     "--cnb-rate",
@@ -122,7 +126,7 @@ def _find_coverage_gaps(
 @click.argument("pdfs", nargs=-1, required=True, type=click.Path(exists=False))
 def main(
     year: int,
-    base_salary: int,
+    base_salary: int | None,
     cnb_rate_override: float | None,
     pdfs: tuple[str, ...],
 ) -> None:
@@ -130,7 +134,15 @@ def main(
 
     Processes Morgan Stanley quarterly statements and Fidelity year-end
     reports to produce §6 employment income and foreign income values.
+
+    When ``--base-salary`` is omitted or passed as ``0``, the tool treats the
+    base salary as absent (``base_salary_provided = False``) and computes
+    employment income totals from stock income only.  A prominent notice is
+    printed reminding the user to add the §6 base salary before filing.
     """
+    # Normalise --base-salary: None (omitted) and 0 are both treated as "absent".
+    base_salary_provided: bool = base_salary is not None and base_salary != 0
+    base_salary = base_salary or 0
     # --- Adapter registry (FR-002) ---
     ADAPTERS = [
         MorganStanleyExtractor(),
@@ -372,7 +384,11 @@ def main(
         )
 
     # --- §6 Computation ---
-    employer = EmployerCertificate(tax_year=year, base_salary_czk=base_salary)
+    employer = EmployerCertificate(
+        tax_year=year,
+        base_salary_czk=base_salary,
+        base_salary_provided=base_salary_provided,
+    )
     stock = compute_paragraph6(employer, all_rsu, all_espp, cnb_rate)
 
     # --- Fetch per-transaction daily CNB rates ---
@@ -403,6 +419,7 @@ def main(
         cnb_annual_rate=cnb_rate,
         daily_rate_cache=daily_rate_cache,
         base_salary_czk=base_salary,
+        base_salary_provided=base_salary_provided,
         tax_year=year,
     )
 
