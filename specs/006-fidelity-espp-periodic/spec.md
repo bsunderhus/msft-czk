@@ -18,7 +18,7 @@ to the annual report, enabling more accurate daily exchange-rate conversions for
 
 ### Session 2026-03-08
 
-- Q: Should dividend events also be deduplicated across overlapping periodic reports? → A: Yes — deduplicate by settlement date + security (same dedup logic as ESPP purchases).
+- Q: Should dividend events also be deduplicated across overlapping periodic reports? → A: Yes — deduplicate by settlement date + gross USD amount (practical key; `DividendEvent` has no security name field; two dividends with the same date and amount from different securities is practically impossible for this portfolio).
 - Q: How should retroactive withholding adjustments be applied? → A: Sum all withholding entries (positive and negative) across all provided reports to produce the net yearly total.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -137,8 +137,9 @@ totals match the expected values.
 
 - **FR-004**: The tool MUST extract individual dividend payment events from the periodic reports,
   capturing the settlement date and gross USD amount for each entry (including money-market fund
-  dividends). Dividend events MUST be deduplicated across overlapping reports by settlement
-  date + security name.
+  dividends). Dividend events MUST be deduplicated across overlapping reports using settlement
+  date + gross USD amount as the identity key (practical approximation of settlement date +
+  security, used because the dividend event record does not carry a security name field).
 
 - **FR-005**: The tool MUST extract US withholding tax amounts from the periodic reports and
   sum all entries (including retroactive positive adjustments and negative corrections) across
