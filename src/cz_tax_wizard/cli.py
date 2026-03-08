@@ -35,15 +35,14 @@ from cz_tax_wizard.calculators.dual_rate import compute_dual_rate_report
 from cz_tax_wizard.calculators.paragraph6 import compute_paragraph6
 from cz_tax_wizard.calculators.priloha3 import compute_rows_321_323, compute_rows_324_330
 from cz_tax_wizard.cnb import CNB_DAILY_URL_TEMPLATE, CNB_URL, fetch_cnb_usd_annual, fetch_cnb_usd_daily
-from cz_tax_wizard.extractors.base import detect_broker
 from cz_tax_wizard.extractors.fidelity import FidelityExtractor
+from cz_tax_wizard.extractors.fidelity_rsu import FidelityRSUAdapter
 from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
 from cz_tax_wizard.models import EmployerCertificate, TaxYearSummary
 from cz_tax_wizard.reporter import (
     format_dual_rate_section,
     format_foreign_income_section,
     format_header,
-    format_paragraph6_section,
     format_priloha3_credit_section,
 )
 
@@ -99,9 +98,8 @@ def main(
         )
         sys.exit(1)
 
-    # --- Extract events from all PDFs ---
-    ms_extractor = MorganStanleyExtractor()
-    fidelity_extractor = FidelityExtractor()
+    # --- Adapter registry (FR-002) ---
+    ADAPTERS = [MorganStanleyExtractor(), FidelityExtractor(), FidelityRSUAdapter()]
 
     all_results = []
     ms_quarter_count = 0
@@ -122,44 +120,104 @@ def main(
             sys.exit(2)
 
         full_text = "\n\n".join(pages_text)
-        broker = detect_broker(full_text)
 
-        if broker is None:
+        for adapter in ADAPTERS:
+            if adapter.can_handle(full_text):
+                try:
+                    result = adapter.extract(full_text, pdf_path)
+                except ValueError as exc:
+                    click.echo(
+                        f"ERROR: {pdf_path.name} — parse error: {exc}", err=True
+                    )
+                    sys.exit(2)
+                break
+        else:
             click.echo(
-                f"ERROR: {pdf_path.name} — broker identity not recognized. "
-                "Expected \"Morgan Stanley\" or \"Fidelity\" in document text. "
-                "No data extracted.",
+                f"ERROR: {pdf_path.name} — unrecognized document type. "
+                "No registered adapter matched.",
                 err=True,
             )
             sys.exit(3)
 
+        broker = result.statement.broker
+        period = result.statement
+
         if broker == "morgan_stanley":
-            result = ms_extractor.extract_from_text(full_text, pdf_path)
             ms_quarter_count += 1
-            period = result.statement
             click.echo(
-                f"  ✓ [Morgan Stanley {period.period_end.strftime('%b %Y')}] "
+                f"  ✓ [Morgan Stanley (RSU) {period.period_end.strftime('%b %Y')}] "
                 f"{pdf_path.name}",
                 err=True,
             )
-            # Warn if statement period year does not match --year
-            if period.period_end.year != year:
-                warnings.append(
-                    f"⚠ WARNING: {pdf_path.name} contains dates outside tax year {year}."
-                )
-        else:
-            result = fidelity_extractor.extract_from_text(full_text, pdf_path)
-            period = result.statement
+        elif broker == "fidelity":
             click.echo(
-                f"  ✓ [Fidelity {period.period_end.year}] {pdf_path.name}",
+                f"  ✓ [Fidelity (ESPP) {period.period_end.year}] {pdf_path.name}",
                 err=True,
             )
-            if period.period_end.year != year:
-                warnings.append(
-                    f"⚠ WARNING: {pdf_path.name} contains dates outside tax year {year}."
-                )
+        elif broker == "fidelity_rsu":
+            period_label = (
+                f"{period.period_start.strftime('%b')}–"
+                f"{period.period_end.strftime('%b %Y')}"
+            )
+            click.echo(
+                f"  ✓ [Fidelity (RSU) {period_label}] {pdf_path.name}",
+                err=True,
+            )
+        else:
+            click.echo(
+                f"  ✓ [{broker} {period.period_end.year}] {pdf_path.name}",
+                err=True,
+            )
+
+        # Warn if statement period year does not match --year
+        if period.period_end.year != year:
+            warnings.append(
+                f"⚠ WARNING: {pdf_path.name} contains dates outside tax year {year}."
+            )
 
         all_results.append(result)
+
+    # --- Cross-PDF validations (FR-010, FR-011, FR-012) ---
+    brokers_present = {r.statement.broker for r in all_results}
+
+    # FR-012: Reject multi-RSU-broker invocations
+    if "morgan_stanley" in brokers_present and "fidelity_rsu" in brokers_present:
+        click.echo(
+            "ERROR: RSU income from multiple brokers detected. "
+            "Morgan Stanley (RSU) and Fidelity (RSU) results cannot be combined "
+            "in the same run — this would double-count §6 RSU income.",
+            err=True,
+        )
+        sys.exit(1)
+
+    # FR-010 + FR-011: Validate Fidelity RSU period reports
+    rsu_results = [r for r in all_results if r.statement.broker == "fidelity_rsu"]
+    if rsu_results:
+        rsu_results_sorted = sorted(rsu_results, key=lambda r: r.statement.period_start)
+
+        # FR-011: All period reports must belong to the same calendar year as --year
+        for r in rsu_results_sorted:
+            if r.statement.period_end.year != year:
+                click.echo(
+                    f"ERROR: {r.statement.source_file.name} covers "
+                    f"{r.statement.period_start}–{r.statement.period_end} "
+                    f"which does not belong to tax year {year}.",
+                    err=True,
+                )
+                sys.exit(1)
+
+        # FR-010: Reject overlapping consecutive period date ranges
+        for i in range(len(rsu_results_sorted) - 1):
+            current = rsu_results_sorted[i].statement
+            nxt = rsu_results_sorted[i + 1].statement
+            if current.period_end >= nxt.period_start:
+                click.echo(
+                    f"ERROR: Overlapping Fidelity RSU period reports detected. "
+                    f"{current.source_file.name} ends {current.period_end} "
+                    f"and {nxt.source_file.name} starts {nxt.period_start}.",
+                    err=True,
+                )
+                sys.exit(1)
 
     # Emit missing-quarter warning
     if ms_quarter_count > 0 and ms_quarter_count < 4:

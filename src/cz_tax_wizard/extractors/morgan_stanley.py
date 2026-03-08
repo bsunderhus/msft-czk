@@ -26,9 +26,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
 
-import pdfplumber
-
-from cz_tax_wizard.extractors.base import AbstractBrokerExtractor, ExtractionResult
+from cz_tax_wizard.extractors.base import ExtractionResult
 from cz_tax_wizard.models import BrokerStatement, DividendEvent, RSUVestingEvent
 
 # --- Regex patterns derived from research.md Finding 6 ---
@@ -82,50 +80,43 @@ _RE_SHARE_DEPOSIT = re.compile(
 )
 
 
-class MorganStanleyExtractor(AbstractBrokerExtractor):
-    """Extractor for Morgan Stanley quarterly equity plan statements.
+class MorganStanleyExtractor:
+    """Adapter for Morgan Stanley quarterly equity plan statements.
 
     Handles dividend extraction (§8) and RSU vesting extraction (§6) from
     the same PDF. RSU same-date tranches are summed into a single event
     per vesting date (spec edge case — multiple tranches vest on one day).
 
+    Conforms structurally to the ``BrokerAdapter`` protocol via ``can_handle()``
+    and ``extract(text, path)``.
+
     Usage::
 
-        extractor = MorganStanleyExtractor()
-        result = extractor.extract(Path("Quarterly Statement 03_31_2024.pdf"))
+        adapter = MorganStanleyExtractor()
+        if adapter.can_handle(text):
+            result = adapter.extract(text, path)
     """
 
-    def extract(self, path: Path) -> ExtractionResult:
-        """Extract dividend and RSU events from a Morgan Stanley quarterly PDF.
+    def can_handle(self, text: str) -> bool:
+        """Return True if the document contains the Morgan Stanley identifier.
 
         Args:
-            path: Absolute path to the Morgan Stanley quarterly statement PDF.
+            text: Full extracted text from all pages of the PDF.
 
         Returns:
-            ExtractionResult with statement metadata, dividend events, and RSU events.
-
-        Raises:
-            FileNotFoundError: If the PDF does not exist.
-            ValueError: If the PDF does not match the expected Morgan Stanley layout.
+            True if ``"Morgan Stanley Smith Barney LLC"`` is present in text.
         """
-        if not path.exists():
-            raise FileNotFoundError(f"PDF not found: {path}")
+        return "Morgan Stanley Smith Barney LLC" in text
 
-        with pdfplumber.open(path) as pdf:
-            pages_text = [page.extract_text() or "" for page in pdf.pages]
-
-        full_text = "\n\n".join(pages_text)
-        return self.extract_from_text(full_text, path)
-
-    def extract_from_text(self, text: str, source_path: Path) -> ExtractionResult:
-        """Extract from pre-extracted text (used in unit tests with fixture files).
+    def extract(self, text: str, source_path: Path) -> ExtractionResult:
+        """Extract dividend and RSU events from pre-extracted Morgan Stanley text.
 
         Args:
             text: Full concatenated text from all pages of the PDF.
             source_path: Path to use as the source_file for the BrokerStatement.
 
         Returns:
-            ExtractionResult with all extracted events.
+            ExtractionResult with statement metadata, dividend events, and RSU events.
 
         Raises:
             ValueError: If account number or period cannot be parsed from text.

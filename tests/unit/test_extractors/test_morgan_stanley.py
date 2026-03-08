@@ -75,7 +75,7 @@ class TestMorganStanleyDividendPatterns:
     def test_extractor_q1_dividends(self):
         from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
         path = FIXTURE_DIR / "ms_q1_2024.txt"
-        result = MorganStanleyExtractor().extract_from_text(load_fixture("ms_q1_2024.txt"), path)
+        result = MorganStanleyExtractor().extract(load_fixture("ms_q1_2024.txt"), path)
         assert len(result.dividends) == 1
         div = result.dividends[0]
         assert div.gross_usd == Decimal("93.72")
@@ -88,7 +88,7 @@ class TestMorganStanleyDividendPatterns:
         all_divs = []
         for fixture in ("ms_q1_2024.txt", "ms_q2_2024.txt", "ms_q3_2024.txt", "ms_q4_2024.txt"):
             text = load_fixture(fixture)
-            result = extractor.extract_from_text(text, FIXTURE_DIR / fixture)
+            result = extractor.extract(text, FIXTURE_DIR / fixture)
             all_divs.extend(result.dividends)
         total_gross = sum(d.gross_usd for d in all_divs)
         total_withholding = sum(d.withholding_usd for d in all_divs)
@@ -111,7 +111,7 @@ class TestMorganStanleyRSUPatterns:
     def test_extractor_q1_rsu_grouped_by_date(self):
         """Feb 29 has three separate Share Deposit rows (2+2+4) — must be summed to 8."""
         from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
-        result = MorganStanleyExtractor().extract_from_text(
+        result = MorganStanleyExtractor().extract(
             load_fixture("ms_q1_2024.txt"), FIXTURE_DIR / "ms_q1_2024.txt"
         )
         feb29 = [e for e in result.rsu_events if str(e.date) == "2024-02-29"]
@@ -122,7 +122,7 @@ class TestMorganStanleyRSUPatterns:
 
     def test_extractor_q1_mar15_rsu(self):
         from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
-        result = MorganStanleyExtractor().extract_from_text(
+        result = MorganStanleyExtractor().extract(
             load_fixture("ms_q1_2024.txt"), FIXTURE_DIR / "ms_q1_2024.txt"
         )
         mar15 = [e for e in result.rsu_events if str(e.date) == "2024-03-15"]
@@ -136,7 +136,7 @@ class TestMorganStanleyRSUPatterns:
         extractor = MorganStanleyExtractor()
         all_rsu = []
         for fixture in ("ms_q1_2024.txt", "ms_q2_2024.txt", "ms_q3_2024.txt", "ms_q4_2024.txt"):
-            result = extractor.extract_from_text(load_fixture(fixture), FIXTURE_DIR / fixture)
+            result = extractor.extract(load_fixture(fixture), FIXTURE_DIR / fixture)
             all_rsu.extend(result.rsu_events)
         assert len(all_rsu) == 8, f"Expected 8 grouped events, got {len(all_rsu)}"
 
@@ -145,7 +145,7 @@ class TestMorganStanleyRSUPatterns:
         extractor = MorganStanleyExtractor()
         all_rsu = []
         for fixture in ("ms_q1_2024.txt", "ms_q2_2024.txt", "ms_q3_2024.txt", "ms_q4_2024.txt"):
-            result = extractor.extract_from_text(load_fixture(fixture), FIXTURE_DIR / fixture)
+            result = extractor.extract(load_fixture(fixture), FIXTURE_DIR / fixture)
             all_rsu.extend(result.rsu_events)
         total_shares = sum(e.quantity for e in all_rsu)
         assert total_shares == Decimal("67"), f"Expected 67 total shares, got {total_shares}"
@@ -153,7 +153,7 @@ class TestMorganStanleyRSUPatterns:
     def test_extractor_q4_dec2_grouped(self):
         """Dec 2 has four rows (2+2+2+4) — must sum to 10 shares."""
         from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
-        result = MorganStanleyExtractor().extract_from_text(
+        result = MorganStanleyExtractor().extract(
             load_fixture("ms_q4_2024.txt"), FIXTURE_DIR / "ms_q4_2024.txt"
         )
         dec2 = [e for e in result.rsu_events if str(e.date) == "2024-12-02"]

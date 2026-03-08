@@ -144,7 +144,7 @@ def format_paragraph6_section(
         f"{employer.base_salary_czk:>12,} CZK"
     )
     lines.append(
-        f"  RSU vesting income (source: Morgan Stanley):  "
+        f"  RSU vesting income:                            "
         f"{stock.total_rsu_czk:>11,} CZK"
     )
     lines.append(
@@ -158,9 +158,15 @@ def format_paragraph6_section(
         lines.append("  RSU breakdown (per vesting event):")
         for event in sorted(stock.rsu_events, key=lambda e: e.date):
             event_czk = to_czk(event.income_usd, cnb_rate)
+            # Conditionally prefix ticker when non-empty (Fidelity RSU events)
+            shares_label = (
+                f"{event.quantity} {event.ticker} shares"
+                if event.ticker
+                else f"{event.quantity} shares"
+            )
             lines.append(
                 f"    {event.date}  "
-                f"{event.quantity} shares × ${event.fmv_usd}  "
+                f"{shares_label} × ${event.fmv_usd}  "
                 f"= ${event.income_usd:>10.2f}  →  {event_czk:>7,} CZK"
             )
         lines.append("")
@@ -294,16 +300,16 @@ def format_dual_rate_section(report: DualRateReport) -> str:
         lines.append("RSU EVENTS")
         if dual:
             lines.append(
-                f"  {'Date':<14}  {'Qty':<6}  {'Income (USD)':>12}  "
+                f"  {'Date':<14}  {'Qty':<10}  {'Income (USD)':>12}  "
                 f"{'Annual Avg CZK':>14}  {'Daily Rate':>10}  {'Daily CZK':>10}"
             )
-            lines.append(f"  {'-'*14}  {'-'*6}  {'-'*12}  {'-'*14}  {'-'*10}  {'-'*10}")
+            lines.append(f"  {'-'*14}  {'-'*10}  {'-'*12}  {'-'*14}  {'-'*10}  {'-'*10}")
         else:
             lines.append(
-                f"  {'Date':<14}  {'Qty':<6}  {'Income (USD)':>12}  "
+                f"  {'Date':<14}  {'Qty':<10}  {'Income (USD)':>12}  "
                 f"{'Daily Rate':>10}  {'Daily CZK':>10}"
             )
-            lines.append(f"  {'-'*14}  {'-'*6}  {'-'*12}  {'-'*10}  {'-'*10}")
+            lines.append(f"  {'-'*14}  {'-'*10}  {'-'*12}  {'-'*10}  {'-'*10}")
 
         for row in report.rsu_rows:
             date_label = (
@@ -317,7 +323,7 @@ def format_dual_rate_section(report: DualRateReport) -> str:
             qty_label = _qty_from_description(row.description)
             if dual:
                 lines.append(
-                    f"  {date_label:<14}  {qty_label:<6}  "
+                    f"  {date_label:<14}  {qty_label:<10}  "
                     f"${row.income_usd:>11.2f}  "
                     f"{row.annual_avg_czk:>13,} CZK  "
                     f"{row.daily_rate_entry.rate:>10}  "
@@ -325,7 +331,7 @@ def format_dual_rate_section(report: DualRateReport) -> str:
                 )
             else:
                 lines.append(
-                    f"  {date_label:<14}  {qty_label:<6}  "
+                    f"  {date_label:<14}  {qty_label:<10}  "
                     f"${row.income_usd:>11.2f}  "
                     f"{row.daily_rate_entry.rate:>10}  "
                     f"{row.daily_czk:>9,} CZK"
@@ -387,7 +393,7 @@ def format_dual_rate_section(report: DualRateReport) -> str:
     lines.append(_SEP_NARROW)
     if dual:
         lines.append(
-            f"TOTALS SUMMARY (§38 ZDP — two legally permitted methods)"
+            "TOTALS SUMMARY (§38 ZDP — two legally permitted methods)"
         )
         lines.append(_SEP_NARROW)
         lines.append("")
@@ -453,7 +459,7 @@ def format_dual_rate_section(report: DualRateReport) -> str:
         )
 
     lines.append("")
-    lines.append(f"  Legal basis: §38 ZDP (Zákon č. 586/1992 Sb.)")
+    lines.append("  Legal basis: §38 ZDP (Zákon č. 586/1992 Sb.)")
     if dual:
         lines.append(
             "  — Annual avg: one CNB rate for all transactions in the tax year"
@@ -477,16 +483,23 @@ def format_dual_rate_section(report: DualRateReport) -> str:
 
 
 def _qty_from_description(description: str) -> str:
-    """Extract the share quantity prefix from a DualRateEventRow description."""
-    # Description format: "8 shares × $407.72" → "8"
+    """Extract the quantity (and ticker if present) from a DualRateEventRow description.
+
+    Handles two formats:
+      - ``"8 shares × $407.72"`` → ``"8"`` (Morgan Stanley — no ticker)
+      - ``"42 MSFT shares × $513.57"`` → ``"42 MSFT"`` (Fidelity RSU — with ticker)
+    """
     parts = description.split()
+    if len(parts) >= 2 and parts[1] != "shares" and parts[1].isupper():
+        return f"{parts[0]} {parts[1]}"
     return parts[0] if parts else ""
 
 
 def _broker_label(broker: str) -> str:
     labels = {
-        "morgan_stanley": "Morgan Stanley",
-        "fidelity": "Fidelity",
+        "morgan_stanley": "Morgan Stanley (RSU)",
+        "fidelity": "Fidelity (ESPP)",
+        "fidelity_rsu": "Fidelity (RSU)",
     }
     return labels.get(broker, broker)
 

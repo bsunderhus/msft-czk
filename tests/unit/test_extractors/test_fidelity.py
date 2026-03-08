@@ -53,7 +53,7 @@ class TestFidelityDividendPatterns:
 
     def test_extractor_dividend_amount(self):
         from cz_tax_wizard.extractors.fidelity import FidelityExtractor
-        result = FidelityExtractor().extract_from_text(
+        result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
         assert len(result.dividends) == 1
@@ -80,14 +80,14 @@ class TestFidelityESPPPatterns:
 
     def test_extractor_three_espp_events(self):
         from cz_tax_wizard.extractors.fidelity import FidelityExtractor
-        result = FidelityExtractor().extract_from_text(
+        result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
         assert len(result.espp_events) == 3
 
     def test_extractor_q1_espp_event(self):
         from cz_tax_wizard.extractors.fidelity import FidelityExtractor
-        result = FidelityExtractor().extract_from_text(
+        result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
         q1 = next(e for e in result.espp_events if str(e.purchase_date) == "2024-03-28")
@@ -103,7 +103,7 @@ class TestFidelityESPPPatterns:
         Display-rounded price/share fields yield up to ~$0.06 difference in 2024.
         """
         from cz_tax_wizard.extractors.fidelity import FidelityExtractor
-        result = FidelityExtractor().extract_from_text(
+        result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
         for event in result.espp_events:
@@ -115,7 +115,7 @@ class TestFidelityESPPPatterns:
 
     def test_extractor_total_gain(self):
         from cz_tax_wizard.extractors.fidelity import FidelityExtractor
-        result = FidelityExtractor().extract_from_text(
+        result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
         total = sum(e.discount_usd for e in result.espp_events)
@@ -123,7 +123,7 @@ class TestFidelityESPPPatterns:
 
     def test_extractor_total_shares(self):
         from cz_tax_wizard.extractors.fidelity import FidelityExtractor
-        result = FidelityExtractor().extract_from_text(
+        result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
         total = sum(e.shares_purchased for e in result.espp_events)
