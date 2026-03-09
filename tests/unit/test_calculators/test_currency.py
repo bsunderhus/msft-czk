@@ -14,7 +14,7 @@ Reference rate 23.28 is the value used in the filed 2024 declaration
 from decimal import Decimal
 
 
-from cz_tax_wizard.currency import to_czk
+from msft_czk.currency import to_czk
 
 RATE_2024 = Decimal("23.28")
 

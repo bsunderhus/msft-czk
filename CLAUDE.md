@@ -1,4 +1,4 @@
-# cz-tax-wizard Development Guidelines
+# msft-czk Development Guidelines
 
 Auto-generated from all feature plans. Last updated: 2026-03-07
 
@@ -22,16 +22,17 @@ Auto-generated from all feature plans. Last updated: 2026-03-07
 ## Project Structure
 
 ```text
-src/cz_tax_wizard/   # package source
+src/msft_czk/        # package source
 tests/               # unit, integration, fixtures
 pyproject.toml       # dependencies and entry point
+msft-czk.spec        # PyInstaller spec for binary builds
 ```
 
 ## Commands
 
 ```bash
-pip install -e .              # install in development mode
-cz-tax-wizard --help          # verify CLI entry point
+uv pip install -e .           # install in development mode
+msft-czk --help               # verify CLI entry point
 pytest                        # run all tests
 pytest tests/unit/            # unit tests only
 ruff check .                  # lint

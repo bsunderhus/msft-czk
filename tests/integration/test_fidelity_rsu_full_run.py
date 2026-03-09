@@ -17,7 +17,7 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from cz_tax_wizard.cli import main
+from msft_czk.cli import main
 
 PDF_DIR = Path(__file__).parent.parent.parent / "pdfs" / "fidelity_rsu"
 SEP_OCT_PDF = PDF_DIR / "Vendy_fidelity_2025_09-10.pdf"
@@ -204,7 +204,7 @@ class TestMultiRSUBrokerConflict:
             return FakePDF()
 
         runner = CliRunner()
-        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
             mock_pdf.open.side_effect = fake_open
             result = runner.invoke(
                 main,

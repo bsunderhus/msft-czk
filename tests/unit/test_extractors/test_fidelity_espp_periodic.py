@@ -30,7 +30,7 @@ from pathlib import Path
 
 import pytest
 
-from cz_tax_wizard.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
+from msft_czk.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
 
 FIXTURE_DIR = Path(__file__).parent.parent.parent / "fixtures" / "text"
 PURCHASE_FIXTURE = FIXTURE_DIR / "fidelity_espp_periodic_purchase.txt"
@@ -247,7 +247,7 @@ class TestFindCoverageGaps:
     """Tests for the _find_coverage_gaps() helper in cli.py."""
 
     def setup_method(self):
-        from cz_tax_wizard.cli import _find_coverage_gaps
+        from msft_czk.cli import _find_coverage_gaps
         self._fn = _find_coverage_gaps
         self.y_start = date(2024, 1, 1)
         self.y_end = date(2024, 12, 31)

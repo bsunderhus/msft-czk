@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from cz_tax_wizard.models import DualRateReport
-from cz_tax_wizard.reporter import format_dual_rate_section
+from msft_czk.models import DualRateReport
+from msft_czk.reporter import format_dual_rate_section
 
 _RATE = Decimal("23.28")
 

@@ -18,8 +18,8 @@ from unittest.mock import patch
 
 import pytest
 
-from cz_tax_wizard.cnb import fetch_cnb_usd_daily
-from cz_tax_wizard.models import DailyRateEntry, DualRateEventRow
+from msft_czk.cnb import fetch_cnb_usd_daily
+from msft_czk.models import DailyRateEntry, DualRateEventRow
 
 FIXTURE_DIR = Path(__file__).parent.parent / "fixtures" / "text"
 

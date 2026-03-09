@@ -73,7 +73,7 @@ class TestMorganStanleyDividendPatterns:
             assert "Withholding Tax" in load_fixture(q), f"Missing Withholding Tax in {q}"
 
     def test_extractor_q1_dividends(self):
-        from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
+        from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
         path = FIXTURE_DIR / "ms_q1_2024.txt"
         result = MorganStanleyExtractor().extract(load_fixture("ms_q1_2024.txt"), path)
         assert len(result.dividends) == 1
@@ -83,7 +83,7 @@ class TestMorganStanleyDividendPatterns:
         assert div.reinvested is True
 
     def test_extractor_full_year_dividend_totals(self):
-        from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
+        from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
         extractor = MorganStanleyExtractor()
         all_divs = []
         for fixture in ("ms_q1_2024.txt", "ms_q2_2024.txt", "ms_q3_2024.txt", "ms_q4_2024.txt"):
@@ -110,7 +110,7 @@ class TestMorganStanleyRSUPatterns:
 
     def test_extractor_q1_rsu_grouped_by_date(self):
         """Feb 29 has three separate Share Deposit rows (2+2+4) — must be summed to 8."""
-        from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
+        from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
         result = MorganStanleyExtractor().extract(
             load_fixture("ms_q1_2024.txt"), FIXTURE_DIR / "ms_q1_2024.txt"
         )
@@ -121,7 +121,7 @@ class TestMorganStanleyRSUPatterns:
         assert feb29[0].income_usd == Decimal("8") * Decimal("407.7200")
 
     def test_extractor_q1_mar15_rsu(self):
-        from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
+        from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
         result = MorganStanleyExtractor().extract(
             load_fixture("ms_q1_2024.txt"), FIXTURE_DIR / "ms_q1_2024.txt"
         )
@@ -132,7 +132,7 @@ class TestMorganStanleyRSUPatterns:
 
     def test_extractor_full_year_rsu_event_count(self):
         """Eight unique vesting dates across the year after same-date grouping."""
-        from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
+        from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
         extractor = MorganStanleyExtractor()
         all_rsu = []
         for fixture in ("ms_q1_2024.txt", "ms_q2_2024.txt", "ms_q3_2024.txt", "ms_q4_2024.txt"):
@@ -141,7 +141,7 @@ class TestMorganStanleyRSUPatterns:
         assert len(all_rsu) == 8, f"Expected 8 grouped events, got {len(all_rsu)}"
 
     def test_extractor_full_year_rsu_total_shares(self):
-        from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
+        from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
         extractor = MorganStanleyExtractor()
         all_rsu = []
         for fixture in ("ms_q1_2024.txt", "ms_q2_2024.txt", "ms_q3_2024.txt", "ms_q4_2024.txt"):
@@ -152,7 +152,7 @@ class TestMorganStanleyRSUPatterns:
 
     def test_extractor_q4_dec2_grouped(self):
         """Dec 2 has four rows (2+2+2+4) — must sum to 10 shares."""
-        from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
+        from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
         result = MorganStanleyExtractor().extract(
             load_fixture("ms_q4_2024.txt"), FIXTURE_DIR / "ms_q4_2024.txt"
         )

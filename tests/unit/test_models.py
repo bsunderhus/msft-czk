@@ -6,7 +6,7 @@ correctly distinguishes absent salary from a supplied positive salary.
 
 import pytest
 
-from cz_tax_wizard.models import EmployerCertificate
+from msft_czk.models import EmployerCertificate
 
 
 class TestEmployerCertificateOptionalSalary:

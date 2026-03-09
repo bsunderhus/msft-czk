@@ -15,9 +15,9 @@ from pathlib import Path
 
 import pytest
 
-from cz_tax_wizard.calculators.dual_rate import compute_dual_rate_report
-from cz_tax_wizard.currency import to_czk
-from cz_tax_wizard.models import (
+from msft_czk.calculators.dual_rate import compute_dual_rate_report
+from msft_czk.currency import to_czk
+from msft_czk.models import (
     BrokerStatement,
     DailyRateEntry,
     DividendEvent,
@@ -96,7 +96,7 @@ def _espp(d: date, purchase: str, fmv: str, shares: str, discount: str) -> ESPPP
 
 
 def _make_stock(rsu_events: list[RSUVestingEvent], espp_events: list[ESPPPurchaseEvent]) -> StockIncomeReport:
-    from cz_tax_wizard.currency import to_czk
+    from msft_czk.currency import to_czk
     total_rsu = sum(to_czk(e.income_usd, _ANNUAL_RATE) for e in rsu_events)
     total_espp = sum(to_czk(e.discount_usd, _ANNUAL_RATE) for e in espp_events)
     return StockIncomeReport(
@@ -121,7 +121,7 @@ def _cache(*entries: tuple[date, Decimal, date | None]) -> dict[date, DailyRateE
 
 class TestComputeDualRateReport:
     def test_rsu_annual_czk_matches_to_czk(self) -> None:
-        from cz_tax_wizard.currency import to_czk
+        from msft_czk.currency import to_czk
         rsu = _rsu(_DATE_A, "8", "407.72")
         stock = _make_stock([rsu], [])
         cache = _cache((_DATE_A, _DAILY_RATE_A, None))
@@ -132,7 +132,7 @@ class TestComputeDualRateReport:
         assert report.rsu_rows[0].annual_avg_czk == to_czk(rsu.income_usd, _ANNUAL_RATE)
 
     def test_rsu_daily_czk_matches_to_czk(self) -> None:
-        from cz_tax_wizard.currency import to_czk
+        from msft_czk.currency import to_czk
         rsu = _rsu(_DATE_A, "8", "407.72")
         stock = _make_stock([rsu], [])
         cache = _cache((_DATE_A, _DAILY_RATE_A, None))
@@ -142,7 +142,7 @@ class TestComputeDualRateReport:
         assert report.rsu_rows[0].daily_czk == to_czk(rsu.income_usd, _DAILY_RATE_A)
 
     def test_espp_annual_and_daily_czk(self) -> None:
-        from cz_tax_wizard.currency import to_czk
+        from msft_czk.currency import to_czk
         espp = _espp(_DATE_B, "90.00", "100.00", "5.235", "52.35")
         stock = _make_stock([], [espp])
         cache = _cache((_DATE_B, _DAILY_RATE_B, None))

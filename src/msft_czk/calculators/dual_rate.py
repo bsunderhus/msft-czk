@@ -16,8 +16,8 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
-from cz_tax_wizard.currency import to_czk
-from cz_tax_wizard.models import (
+from msft_czk.currency import to_czk
+from msft_czk.models import (
     BrokerDualRateRow,
     DailyRateEntry,
     DividendEvent,
