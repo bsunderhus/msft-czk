@@ -152,8 +152,8 @@ def compute_dual_rate_report(
 
     broker_dividend_rows: list[BrokerDualRateRow] = []
     for broker, events in broker_groups.items():
-        broker_gross_usd = sum(e.gross_usd for e in events)
-        broker_wh_usd = sum(e.withholding_usd for e in events)
+        broker_gross_usd = sum((e.gross_usd for e in events), Decimal(0))
+        broker_wh_usd = sum((e.withholding_usd for e in events), Decimal(0))
         broker_div_annual = (
             to_czk(broker_gross_usd, annual_rate) if is_annual_avg_available else 0
         )
@@ -182,8 +182,8 @@ def compute_dual_rate_report(
     # to avoid rounding discrepancies between the total row and per-source rows.
     # §38 ZDP — annual avg: one conversion; daily: sum of per-event conversions.
     if dividend_events and is_annual_avg_available:
-        total_div_usd = sum(e.gross_usd for e in dividend_events)
-        total_wh_usd = sum(e.withholding_usd for e in dividend_events)
+        total_div_usd = sum((e.gross_usd for e in dividend_events), Decimal(0))
+        total_wh_usd = sum((e.withholding_usd for e in dividend_events), Decimal(0))
         row321_annual_czk = to_czk(total_div_usd, annual_rate)
         row323_annual_czk = to_czk(total_wh_usd, annual_rate)
     else:

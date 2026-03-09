@@ -36,6 +36,7 @@ msft-czk --help               # verify CLI entry point
 pytest                        # run all tests
 pytest tests/unit/            # unit tests only
 ruff check .                  # lint
+pyright                       # type check (basic mode, src/ only)
 ```
 
 ## Code Style
