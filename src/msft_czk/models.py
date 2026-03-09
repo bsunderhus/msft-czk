@@ -1,4 +1,4 @@
-"""Domain model dataclasses for the CZ Tax Wizard broker tax calculator.
+"""Domain model dataclasses for the msft-czk broker tax calculator.
 
 All entities are immutable (frozen=True) and live only in memory for the
 duration of a single tool run. No persistence or external transmission.
