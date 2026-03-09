@@ -36,7 +36,8 @@ from msft_czk.extractors.fidelity import FidelityExtractor
 from msft_czk.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
 from msft_czk.extractors.fidelity_rsu import FidelityRSUAdapter
 from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
-from msft_czk.models import EmployerCertificate
+from msft_czk.extractors.base import ExtractionResult
+from msft_czk.models import DailyRateEntry, DividendEvent, EmployerCertificate, ESPPPurchaseEvent
 from msft_czk.reporter import (
     format_dual_rate_section,
     format_header,
@@ -151,7 +152,7 @@ def main(
         FidelityRSUAdapter(),
     ]
 
-    all_results = []
+    all_results: list[ExtractionResult] = []
     ms_quarter_count = 0
     warnings: list[str] = []
 
@@ -342,8 +343,8 @@ def main(
     # FR-003: Deduplicate ESPP purchases across overlapping ESPP periodic reports
     # Key: (offering_period_start, offering_period_end, purchase_date)
     if any(r.statement.broker == "fidelity_espp_periodic" for r in all_results):
-        seen_purchases: set[tuple] = set()
-        deduped_espp = []
+        seen_purchases: set[tuple[date, date, date]] = set()
+        deduped_espp: list[ESPPPurchaseEvent] = []
         for e in all_espp:
             key = (e.offering_period_start, e.offering_period_end, e.purchase_date)
             if key not in seen_purchases:
@@ -354,8 +355,8 @@ def main(
     # FR-004: Deduplicate dividends across overlapping ESPP periodic reports
     # Key: (date, gross_usd) — practical approximation; security name not in model
     if any(r.statement.broker == "fidelity_espp_periodic" for r in all_results):
-        seen_dividends: set[tuple] = set()
-        deduped_dividends = []
+        seen_dividends: set[tuple[date, Decimal]] = set()
+        deduped_dividends: list[DividendEvent] = []
         for d in all_dividends:
             key = (d.date, d.gross_usd)
             if key not in seen_dividends:
@@ -394,7 +395,7 @@ def main(
     # --- Fetch per-transaction daily CNB rates ---
     # §38 ZDP — daily rate method: one network request per unique event date.
     # The cache deduplicates requests within this run.
-    daily_rate_cache: dict = {}
+    daily_rate_cache: dict[date, DailyRateEntry] = {}
     unique_dates = {
         *[e.date for e in all_rsu],
         *[e.purchase_date for e in all_espp],
