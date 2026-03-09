@@ -4,8 +4,8 @@
 # No inputs required — version is read from pyproject.toml at runtime.
 #
 # What it does:
-#   1. Builds self-contained binaries for Linux x86-64, macOS arm64, macOS x86-64
-#   2. Creates a GitHub Release tagged v<version> with all 3 binaries attached
+#   1. Builds self-contained binaries for Linux x86-64 and macOS arm64
+#   2. Creates a GitHub Release tagged v<version> with both binaries attached
 #
 # Prerequisites:
 #   - Repository has write permissions for GITHUB_TOKEN (default on Actions)
@@ -32,9 +32,6 @@ jobs:
           - os: macos-latest
             target: macos-arm64
             asset_name: msft-czk-macos-arm64
-          - os: macos-13
-            target: macos-x86_64
-            asset_name: msft-czk-macos-x86_64
 
     runs-on: ${{ matrix.os }}
 
@@ -104,10 +101,8 @@ jobs:
           TAG="v${{ steps.version.outputs.version }}"
           chmod +x artifacts/msft-czk-linux-x86_64/msft-czk-linux-x86_64
           chmod +x artifacts/msft-czk-macos-arm64/msft-czk-macos-arm64
-          chmod +x artifacts/msft-czk-macos-x86_64/msft-czk-macos-x86_64
           gh release create "$TAG" \
             --title "$TAG" \
             --generate-notes \
             artifacts/msft-czk-linux-x86_64/msft-czk-linux-x86_64 \
-            artifacts/msft-czk-macos-arm64/msft-czk-macos-arm64 \
-            artifacts/msft-czk-macos-x86_64/msft-czk-macos-x86_64
+            artifacts/msft-czk-macos-arm64/msft-czk-macos-arm64
