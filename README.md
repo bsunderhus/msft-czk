@@ -34,19 +34,22 @@ broker PDF statements.
 
 ## Installation
 
-Download the pre-built binary for your platform from the [latest GitHub Release](https://github.com/bsunderhus/msft-czk/releases/latest):
+Download the pre-built binary for your platform from the [latest GitHub Release](https://github.com/bsunderhus/msft-czk/releases/latest).
+
+> **Note:** This repository is private. Direct `curl` downloads will return a 404 error.
+> You must authenticate via the [GitHub CLI](https://cli.github.com/) (`gh auth login`) and use `gh release download` instead.
 
 **Linux (x86-64)**
 ```bash
-curl -L https://github.com/bsunderhus/msft-czk/releases/latest/download/msft-czk-linux-x86_64 -o msft-czk && chmod +x msft-czk
+gh release download --repo bsunderhus/msft-czk --pattern "msft-czk-linux-x86_64" && chmod +x msft-czk-linux-x86_64
 ```
 
 **macOS (Apple Silicon / arm64)**
 ```bash
-curl -L https://github.com/bsunderhus/msft-czk/releases/latest/download/msft-czk-macos-arm64 -o msft-czk && chmod +x msft-czk
+gh release download --repo bsunderhus/msft-czk --pattern "msft-czk-macos-arm64" && chmod +x msft-czk-macos-arm64
 ```
 
-No Python runtime required. Run `./msft-czk --help` after download.
+No Python runtime required. Run `./msft-czk-linux-x86_64 --help` (or `./msft-czk-macos-arm64 --help`) after download.
 
 ### Development setup
 
