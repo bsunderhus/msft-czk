@@ -27,7 +27,7 @@ instead of plain text separators. Delivers the primary user value immediately.
 1. **Given** valid broker PDFs and a `--base-salary` value, **When** the user runs
    `msft-czk`, **Then** the terminal output contains Unicode-bordered tables for
    RSU events and ESPP events, styled section headers with separators, and
-   color-highlighted CZK totals.
+   visually distinct CZK totals.
 2. **Given** a terminal that does not support color (e.g., output piped to a file),
    **When** the user runs `msft-czk`, **Then** the output degrades gracefully to
    plain text without ANSI escape codes, preserving all data and layout structure.

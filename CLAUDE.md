@@ -16,6 +16,7 @@ Auto-generated from all feature plans. Last updated: 2026-03-07
 - N/A — in-memory only; no persistence (009-optional-base-salary)
 - Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib), urllib (stdlib) — unchanged; PyInstaller 6+ (build-time only, new) (010-rename-project-cli)
 - N/A — in-memory only, no persistence (010-rename-project-cli)
+- Python 3.11+ + Rich ≥ 14.0 (new), pdfplumber 0.11+, click 8+ (unchanged) (012-migrate-rich)
 
 - **001-broker-tax-calculator**: Python 3.11+, pdfplumber 0.11+ (PDF extraction), click 8+ (CLI), urllib (CNB fetch), decimal (monetary arithmetic), pytest
 
@@ -50,9 +51,9 @@ pyright                       # type check (basic mode, src/ only)
 - Calculators are pure functions; no I/O side effects
 
 ## Recent Changes
+- 012-migrate-rich: Added Python 3.11+ + Rich ≥ 14.0 (new), pdfplumber 0.11+, click 8+ (unchanged)
 - 010-rename-project-cli: Added Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib), urllib (stdlib) — unchanged; PyInstaller 6+ (build-time only, new)
 - 009-optional-base-salary: Added Python 3.11+ + click 8+, pdfplumber 0.11+ (unchanged), decimal (stdlib)
-- 008-remove-deprecated-cli: Added Python 3.11+ + click 8+ (CLI), pdfplumber 0.11+, decimal (stdlib)
 
 
 <!-- MANUAL ADDITIONS START -->
