@@ -23,7 +23,7 @@ from msft_czk.models import StockIncomeReport
 
 ### Added
 
-- Self-contained binary distribution via GitHub Releases (Linux x86-64, macOS arm64, macOS x86-64)
+- Self-contained binary distribution via GitHub Releases (Linux x86-64, macOS arm64)
 - No Python runtime required: download the binary for your platform and run directly
 - GitHub Actions release workflow (`workflow_dispatch`) that reads version from `pyproject.toml`
 - PyInstaller spec file (`msft-czk.spec`) for reproducible binary builds

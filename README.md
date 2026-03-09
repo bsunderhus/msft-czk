@@ -46,11 +46,6 @@ curl -L https://github.com/bsunderhus/msft-czk/releases/latest/download/msft-czk
 curl -L https://github.com/bsunderhus/msft-czk/releases/latest/download/msft-czk-macos-arm64 -o msft-czk && chmod +x msft-czk
 ```
 
-**macOS (Intel / x86-64)**
-```bash
-curl -L https://github.com/bsunderhus/msft-czk/releases/latest/download/msft-czk-macos-x86_64 -o msft-czk && chmod +x msft-czk
-```
-
 No Python runtime required. Run `./msft-czk --help` after download.
 
 ### Development setup
