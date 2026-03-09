@@ -1,4 +1,4 @@
-"""Command-line entry point for cz-tax-wizard.
+"""Command-line entry point for msft-czk.
 
 Orchestrates the full tax calculation pipeline:
   1. Load and detect each broker PDF (Morgan Stanley or Fidelity)
@@ -29,15 +29,15 @@ from pathlib import Path
 import click
 import pdfplumber
 
-from cz_tax_wizard.calculators.dual_rate import compute_dual_rate_report
-from cz_tax_wizard.calculators.paragraph6 import compute_paragraph6
-from cz_tax_wizard.cnb import CNB_DAILY_URL_TEMPLATE, CNB_URL, fetch_cnb_usd_annual, fetch_cnb_usd_daily
-from cz_tax_wizard.extractors.fidelity import FidelityExtractor
-from cz_tax_wizard.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
-from cz_tax_wizard.extractors.fidelity_rsu import FidelityRSUAdapter
-from cz_tax_wizard.extractors.morgan_stanley import MorganStanleyExtractor
-from cz_tax_wizard.models import EmployerCertificate
-from cz_tax_wizard.reporter import (
+from msft_czk.calculators.dual_rate import compute_dual_rate_report
+from msft_czk.calculators.paragraph6 import compute_paragraph6
+from msft_czk.cnb import CNB_DAILY_URL_TEMPLATE, CNB_URL, fetch_cnb_usd_annual, fetch_cnb_usd_daily
+from msft_czk.extractors.fidelity import FidelityExtractor
+from msft_czk.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
+from msft_czk.extractors.fidelity_rsu import FidelityRSUAdapter
+from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
+from msft_czk.models import EmployerCertificate
+from msft_czk.reporter import (
     format_dual_rate_section,
     format_header,
 )
@@ -427,3 +427,7 @@ def main(
     click.echo(format_header(year))
     click.echo("")
     click.echo(format_dual_rate_section(dual_report))
+
+
+if __name__ == "__main__":
+    main()

@@ -45,7 +45,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cz_tax_wizard.models import DailyRateEntry
+    from msft_czk.models import DailyRateEntry
 
 CNB_URL = (
     "https://www.cnb.cz/cs/financni-trhy/devizovy-trh/"
@@ -150,7 +150,7 @@ def fetch_cnb_usd_daily(
             or if no rate could be found within 7 prior days.
     """
     # Import here to avoid circular import at module load time
-    from cz_tax_wizard.models import DailyRateEntry
+    from msft_czk.models import DailyRateEntry
 
     if d in cache:
         return cache[d]

@@ -30,6 +30,10 @@ coverage.xml
 .DS_Store
 Thumbs.db
 
+# PyInstaller binary output — built artifacts go to GitHub Releases, not git
+msft-czk
+msft-czk-*
+
 # Personal financial data — never commit PDFs containing personal tax data
 # (sample PDFs are referenced via tests/fixtures/pdfs/ symlinks only)
 pdfs/**/*.pdf

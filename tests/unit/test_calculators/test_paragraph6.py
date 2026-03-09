@@ -17,8 +17,8 @@ from pathlib import Path
 
 import pytest
 
-from cz_tax_wizard.calculators.paragraph6 import compute_paragraph6
-from cz_tax_wizard.models import (
+from msft_czk.calculators.paragraph6 import compute_paragraph6
+from msft_czk.models import (
     BrokerStatement,
     EmployerCertificate,
     ESPPPurchaseEvent,
@@ -123,7 +123,7 @@ class TestComputeParagraph6:
     def test_rsu_total_czk(self, employer, rsu_events, espp_events):
         result = compute_paragraph6(employer, rsu_events, espp_events, CNB_RATE)
         # to_czk(3261.76, 23.28) + to_czk(1680.00, 23.28)
-        from cz_tax_wizard.currency import to_czk
+        from msft_czk.currency import to_czk
         expected = (
             to_czk(Decimal("3261.76"), CNB_RATE)
             + to_czk(Decimal("1680.00"), CNB_RATE)

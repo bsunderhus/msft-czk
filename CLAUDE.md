@@ -1,4 +1,4 @@
-# cz-tax-wizard Development Guidelines
+# msft-czk Development Guidelines
 
 Auto-generated from all feature plans. Last updated: 2026-03-07
 
@@ -14,22 +14,25 @@ Auto-generated from all feature plans. Last updated: 2026-03-07
 - Python 3.11+ + click 8+ (CLI), pdfplumber 0.11+, decimal (stdlib) (008-remove-deprecated-cli)
 - Python 3.11+ + click 8+, pdfplumber 0.11+ (unchanged), decimal (stdlib) (009-optional-base-salary)
 - N/A — in-memory only; no persistence (009-optional-base-salary)
+- Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib), urllib (stdlib) — unchanged; PyInstaller 6+ (build-time only, new) (010-rename-project-cli)
+- N/A — in-memory only, no persistence (010-rename-project-cli)
 
 - **001-broker-tax-calculator**: Python 3.11+, pdfplumber 0.11+ (PDF extraction), click 8+ (CLI), urllib (CNB fetch), decimal (monetary arithmetic), pytest
 
 ## Project Structure
 
 ```text
-src/cz_tax_wizard/   # package source
+src/msft_czk/        # package source
 tests/               # unit, integration, fixtures
 pyproject.toml       # dependencies and entry point
+msft-czk.spec        # PyInstaller spec for binary builds
 ```
 
 ## Commands
 
 ```bash
-pip install -e .              # install in development mode
-cz-tax-wizard --help          # verify CLI entry point
+uv pip install -e .           # install in development mode
+msft-czk --help               # verify CLI entry point
 pytest                        # run all tests
 pytest tests/unit/            # unit tests only
 ruff check .                  # lint
@@ -46,9 +49,9 @@ ruff check .                  # lint
 - Calculators are pure functions; no I/O side effects
 
 ## Recent Changes
+- 010-rename-project-cli: Added Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib), urllib (stdlib) — unchanged; PyInstaller 6+ (build-time only, new)
 - 009-optional-base-salary: Added Python 3.11+ + click 8+, pdfplumber 0.11+ (unchanged), decimal (stdlib)
 - 008-remove-deprecated-cli: Added Python 3.11+ + click 8+ (CLI), pdfplumber 0.11+, decimal (stdlib)
-- 007-output-redesign: Added Python 3.11+ + pdfplumber 0.11+, click 8+, decimal (stdlib) — all unchanged
 
 
 <!-- MANUAL ADDITIONS START -->

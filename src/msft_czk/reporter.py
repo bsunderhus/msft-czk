@@ -1,4 +1,4 @@
-"""Human-readable report renderer for cz-tax-wizard output.
+"""Human-readable report renderer for msft-czk output.
 
 All public functions return a formatted string (or print directly to stdout).
 The output format follows contracts/cli.md Output Structure section.
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from cz_tax_wizard.models import (
+from msft_czk.models import (
     DualRateReport,
     EmployerCertificate,
     StockIncomeReport,
@@ -66,7 +66,7 @@ def format_paragraph6_section(
     Returns:
         Formatted §6 section string.
     """
-    from cz_tax_wizard.currency import to_czk
+    from msft_czk.currency import to_czk
 
     paragraph6_total = employer.base_salary_czk + stock.combined_stock_czk
 
@@ -432,5 +432,5 @@ def _broker_label(broker: str) -> str:
 
 
 def _czk_from_usd(amount_usd: Decimal, rate: Decimal) -> int:
-    from cz_tax_wizard.currency import to_czk
+    from msft_czk.currency import to_czk
     return to_czk(amount_usd, rate)

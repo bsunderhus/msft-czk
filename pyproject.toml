@@ -3,8 +3,8 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cz-tax-wizard"
-version = "0.1.0"
+name = "msft-czk"
+version = "1.0.0"
 description = "Czech personal income tax declaration toolkit for Microsoft employees"
 requires-python = ">=3.11"
 dependencies = [
@@ -13,12 +13,13 @@ dependencies = [
 ]
 
 [project.scripts]
-cz-tax-wizard = "cz_tax_wizard.cli:main"
+msft-czk = "msft_czk.cli:main"
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7",
     "pytest-cov",
+    "pyinstaller>=6",
 ]
 
 [tool.setuptools.packages.find]
@@ -34,4 +35,5 @@ markers = [
 dev = [
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
+    "pyinstaller>=6",
 ]

@@ -27,8 +27,8 @@ from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
-from cz_tax_wizard.extractors.base import ExtractionResult
-from cz_tax_wizard.models import BrokerStatement, DividendEvent, RSUVestingEvent
+from msft_czk.extractors.base import ExtractionResult
+from msft_czk.models import BrokerStatement, DividendEvent, RSUVestingEvent
 
 # ---------------------------------------------------------------------------
 # Regex patterns (derived from research.md Findings 2–5 and fixture analysis)

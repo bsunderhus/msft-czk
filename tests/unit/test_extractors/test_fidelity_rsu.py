@@ -28,7 +28,7 @@ from pathlib import Path
 
 import pytest
 
-from cz_tax_wizard.extractors.fidelity_rsu import FidelityRSUAdapter
+from msft_czk.extractors.fidelity_rsu import FidelityRSUAdapter
 
 FIXTURE_DIR = Path(__file__).parent.parent.parent / "fixtures" / "text"
 SEP_OCT_FIXTURE = FIXTURE_DIR / "fidelity_rsu_sep_oct.txt"

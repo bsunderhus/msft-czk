@@ -52,7 +52,7 @@ class TestFidelityDividendPatterns:
         assert "31.49" in load_fixture()
 
     def test_extractor_dividend_amount(self):
-        from cz_tax_wizard.extractors.fidelity import FidelityExtractor
+        from msft_czk.extractors.fidelity import FidelityExtractor
         result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
@@ -79,14 +79,14 @@ class TestFidelityESPPPatterns:
         assert "07/01/2024-09/30/2024" in text
 
     def test_extractor_three_espp_events(self):
-        from cz_tax_wizard.extractors.fidelity import FidelityExtractor
+        from msft_czk.extractors.fidelity import FidelityExtractor
         result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
         assert len(result.espp_events) == 3
 
     def test_extractor_q1_espp_event(self):
-        from cz_tax_wizard.extractors.fidelity import FidelityExtractor
+        from msft_czk.extractors.fidelity import FidelityExtractor
         result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
@@ -102,7 +102,7 @@ class TestFidelityESPPPatterns:
         The PDF gain is authoritative (Fidelity uses higher internal precision).
         Display-rounded price/share fields yield up to ~$0.06 difference in 2024.
         """
-        from cz_tax_wizard.extractors.fidelity import FidelityExtractor
+        from msft_czk.extractors.fidelity import FidelityExtractor
         result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
@@ -114,7 +114,7 @@ class TestFidelityESPPPatterns:
             )
 
     def test_extractor_total_gain(self):
-        from cz_tax_wizard.extractors.fidelity import FidelityExtractor
+        from msft_czk.extractors.fidelity import FidelityExtractor
         result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )
@@ -122,7 +122,7 @@ class TestFidelityESPPPatterns:
         assert total == Decimal("824.70"), f"Expected 824.70, got {total}"
 
     def test_extractor_total_shares(self):
-        from cz_tax_wizard.extractors.fidelity import FidelityExtractor
+        from msft_czk.extractors.fidelity import FidelityExtractor
         result = FidelityExtractor().extract(
             load_fixture(), FIXTURE_DIR / "fidelity_2024.txt"
         )

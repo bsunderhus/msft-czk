@@ -20,8 +20,8 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from cz_tax_wizard.cli import main
-from cz_tax_wizard.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
+from msft_czk.cli import main
+from msft_czk.extractors.fidelity_espp_periodic import FidelityESPPPeriodicAdapter
 
 PDF_DIR = Path(__file__).parent.parent.parent / "pdfs" / "fidelity_espp_periodic"
 ANNUAL_PDF_DIR = Path(__file__).parent.parent.parent / "pdfs" / "fidelity_espp"
@@ -50,7 +50,7 @@ def run_cli(*args: str) -> object:
 
 def run_with_mock_rate(*args: str) -> object:
     """Run CLI with mocked CNB rate and daily rates to avoid network calls."""
-    from cz_tax_wizard.models import DailyRateEntry
+    from msft_czk.models import DailyRateEntry
 
     def mock_fetch_annual(year: int) -> Decimal:
         return _MOCK_RATE
@@ -61,8 +61,8 @@ def run_with_mock_rate(*args: str) -> object:
         return cache[event_date]
 
     with (
-        patch("cz_tax_wizard.cli.fetch_cnb_usd_annual", side_effect=mock_fetch_annual),
-        patch("cz_tax_wizard.cli.fetch_cnb_usd_daily", side_effect=mock_fetch_daily),
+        patch("msft_czk.cli.fetch_cnb_usd_annual", side_effect=mock_fetch_annual),
+        patch("msft_czk.cli.fetch_cnb_usd_daily", side_effect=mock_fetch_daily),
     ):
         runner = CliRunner()
         return runner.invoke(main, list(args), catch_exceptions=False)

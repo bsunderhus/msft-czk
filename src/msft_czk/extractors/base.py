@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
 
-from cz_tax_wizard.models import (
+from msft_czk.models import (
     BrokerStatement,
     DividendEvent,
     ESPPPurchaseEvent,

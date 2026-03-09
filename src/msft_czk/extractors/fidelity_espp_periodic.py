@@ -28,8 +28,8 @@ from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
 
-from cz_tax_wizard.extractors.base import ExtractionResult
-from cz_tax_wizard.models import BrokerStatement, DividendEvent, ESPPPurchaseEvent
+from msft_czk.extractors.base import ExtractionResult
+from msft_czk.models import BrokerStatement, DividendEvent, ESPPPurchaseEvent
 
 # ---------------------------------------------------------------------------
 # Regex patterns (reused from existing adapters — research.md Decisions 7–9)

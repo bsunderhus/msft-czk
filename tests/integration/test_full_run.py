@@ -1,4 +1,4 @@
-"""Integration tests for the full cz-tax-wizard pipeline.
+"""Integration tests for the full msft-czk pipeline.
 
 Tests run the CLI end-to-end using click's CliRunner (no subprocess).
 Tests requiring real PDF fixtures are marked with pytest.mark.integration
@@ -16,7 +16,7 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from cz_tax_wizard.cli import main
+from msft_czk.cli import main
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures" / "pdfs"
 
@@ -195,7 +195,7 @@ class TestUnrecognizedBrokerExitCode3:
 
         runner = CliRunner()
 
-        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
             mock_pdf.open.return_value.__enter__.return_value.pages = [
                 type("Page", (), {"extract_text": lambda self: "No broker content here"})()
             ]
@@ -223,8 +223,8 @@ class TestCnbNetworkFailureExitCode4:
 
         runner = CliRunner()
 
-        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf, \
-             patch("cz_tax_wizard.cli.fetch_cnb_usd_annual", side_effect=Exception("network error")):
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf, \
+             patch("msft_czk.cli.fetch_cnb_usd_annual", side_effect=Exception("network error")):
             mock_pdf.open.return_value.__enter__.return_value.pages = [
                 type("Page", (), {
                     "extract_text": lambda self: "Morgan Stanley Smith Barney LLC\nAccount Number: MS05003017\nFor the Period January 1 (cid:151) March 31, 2024"
@@ -282,7 +282,7 @@ def _invoke_no_base_salary(tmp_path, extra_args=None):
     args = ["--year", "2024", "--cnb-rate", "23.28", str(fake_pdf)]
     if extra_args:
         args = extra_args + [str(fake_pdf)]
-    with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+    with patch("msft_czk.cli.pdfplumber") as mock_pdf:
         mock_pdf.open.return_value.__enter__.return_value.pages = [
             type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
         ]
@@ -300,7 +300,7 @@ class TestNoBaseSalary:
         fake_pdf = tmp_path / "ms.pdf"
         fake_pdf.write_bytes(b"%PDF-1.4\n")
         runner = CliRunner()
-        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
             mock_pdf.open.return_value.__enter__.return_value.pages = [
                 type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
             ]
@@ -330,7 +330,7 @@ class TestBaseSalaryNotice:
         fake_pdf = tmp_path / "ms.pdf"
         fake_pdf.write_bytes(b"%PDF-1.4\n")
         runner = CliRunner()
-        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
             mock_pdf.open.return_value.__enter__.return_value.pages = [
                 type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
             ]
@@ -344,7 +344,7 @@ class TestBaseSalaryNotice:
         fake_pdf = tmp_path / "ms.pdf"
         fake_pdf.write_bytes(b"%PDF-1.4\n")
         runner = CliRunner()
-        with patch("cz_tax_wizard.cli.pdfplumber") as mock_pdf:
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
             mock_pdf.open.return_value.__enter__.return_value.pages = [
                 type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
             ]

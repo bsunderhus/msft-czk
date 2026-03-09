@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from cz_tax_wizard.models import BrokerStatement, RSUVestingEvent
+from msft_czk.models import BrokerStatement, RSUVestingEvent
 
 _DUMMY_PATH = Path("/tmp/dummy.pdf")
 

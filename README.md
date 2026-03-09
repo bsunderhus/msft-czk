@@ -1,8 +1,8 @@
-# CZ Tax Wizard
+# msft-czk
 
-A command-line tool for Czech expats that computes the values needed for the
-DPFDP7 personal income tax return from Morgan Stanley and Fidelity broker PDF
-statements.
+A command-line tool for Microsoft CZ employees that computes the values needed
+for the DPFDP7 personal income tax return from Morgan Stanley and Fidelity
+broker PDF statements.
 
 > **Disclaimer**: This tool produces informational values only. Verify all
 > computed values with a qualified Czech tax advisor before filing. Row
@@ -19,33 +19,45 @@ statements.
 | ESPP discount income (per period) | §6 additional row |
 | Foreign dividend income (USD → CZK) | Příloha č. 3, Row 321 |
 | US withholding tax paid (USD → CZK) | Příloha č. 3, Row 323 |
-| Double-taxation credit coefficient | Příloha č. 3, Row 324 |
-| Credit cap and actual credit | Příloha č. 3, Rows 325–326 |
-| Non-credited foreign tax | Příloha č. 3, Row 327 |
-| Czech tax after credit | Příloha č. 3, Row 330 |
 
 ---
 
 ## Prerequisites
 
-- Python 3.11 or later
 - Morgan Stanley quarterly equity plan PDF statements (Q1–Q4)
 - Fidelity Stock Plan Services year-end investment report PDF
-- Base salary (CZK) from your Potvrzení o zdanitelných příjmech, row 1
-  ("Úhrn zúčtovaných příjmů ze závislé činnosti")
+- (Optional) Base salary (CZK) from your Potvrzení o zdanitelných příjmech, row 1
+  ("Úhrn zúčtovaných příjmů ze závislé činnosti") — required only if you want
+  the §6 total income row
 
 ---
 
 ## Installation
 
+Download the pre-built binary for your platform from the [latest GitHub Release](https://github.com/bsunderhus/msft-czk/releases/latest):
+
+**Linux (x86-64)**
 ```bash
-pip install -e .
+curl -L https://github.com/bsunderhus/msft-czk/releases/latest/download/msft-czk-linux-x86_64 -o msft-czk && chmod +x msft-czk
 ```
 
-Verify the entry point resolves:
+**macOS (Apple Silicon / arm64)**
+```bash
+curl -L https://github.com/bsunderhus/msft-czk/releases/latest/download/msft-czk-macos-arm64 -o msft-czk && chmod +x msft-czk
+```
+
+**macOS (Intel / x86-64)**
+```bash
+curl -L https://github.com/bsunderhus/msft-czk/releases/latest/download/msft-czk-macos-x86_64 -o msft-czk && chmod +x msft-czk
+```
+
+No Python runtime required. Run `./msft-czk --help` after download.
+
+### Development setup
 
 ```bash
-cz-tax-wizard --help
+uv pip install -e ".[dev]"
+msft-czk --help
 ```
 
 ---
@@ -55,22 +67,7 @@ cz-tax-wizard --help
 ### Basic run — §6 and §8 output, automatic CNB rate fetch
 
 ```bash
-cz-tax-wizard --year 2024 --base-salary 2246694 \
-    "Quarterly Statement 03_31_2024.pdf" \
-    "Quarterly Statement 06_30_2024.pdf" \
-    "Quarterly Statement 09_30_2024.pdf" \
-    "Quarterly Statement 12_31_2024.pdf" \
-    "8a76ad8e-806f-4e1e-8627-376d5dbe1647.pdf"
-```
-
-### Full run — including Příloha č. 3 credit computation
-
-Supply your DPFDP7 Row 42 (total tax base) and Row 57 (tax per §16) from a
-preliminary tax computation:
-
-```bash
-cz-tax-wizard --year 2024 --base-salary 2246694 \
-    --row42 2942244 --row57 542836 \
+msft-czk --year 2024 --base-salary 2246694 \
     "Quarterly Statement 03_31_2024.pdf" \
     "Quarterly Statement 06_30_2024.pdf" \
     "Quarterly Statement 09_30_2024.pdf" \
@@ -84,7 +81,7 @@ Use `--cnb-rate` when the automatic CNB fetch is unavailable or when you want
 to use a specific confirmed rate:
 
 ```bash
-cz-tax-wizard --year 2024 --base-salary 2246694 --cnb-rate 23.28 \
+msft-czk --year 2024 --base-salary 2246694 --cnb-rate 23.28 \
     "Quarterly Statement 03_31_2024.pdf" \
     "Quarterly Statement 12_31_2024.pdf"
 ```
@@ -99,10 +96,8 @@ The CNB annual average USD/CZK rate is fetched automatically from:
 | Flag | Required | Description |
 |------|----------|-------------|
 | `--year INTEGER` | Yes | Tax year to process (e.g. `2024`) |
-| `--base-salary INTEGER` | Yes | Base salary in whole CZK from Potvrzení row 1 |
+| `--base-salary INTEGER` | No | Base salary in whole CZK from Potvrzení row 1 (omit to skip §6 total income) |
 | `--cnb-rate FLOAT` | No | Override CNB annual average CZK/USD rate |
-| `--row42 INTEGER` | No | Total tax base CZK (DPFDP7 row 42). Requires `--row57`. |
-| `--row57 INTEGER` | No | Tax per §16 CZK (DPFDP7 row 57). Requires `--row42`. |
 | `PDF [PDF ...]` | Yes | One or more broker PDF files (auto-detected) |
 
 ---
@@ -147,7 +142,7 @@ incomplete. Supply all four Q1–Q4 statements for an accurate annual total.
 
 ```bash
 # Install with dev dependencies
-pip install -e ".[dev]"
+uv pip install -e ".[dev]"
 
 # Run unit tests
 pytest tests/unit/
