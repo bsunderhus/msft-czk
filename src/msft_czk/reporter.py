@@ -38,7 +38,7 @@ def format_header(tax_year: int) -> str:
     """
     return (
         f"{_SEP_WIDE}\n"
-        f"CZ TAX WIZARD — Tax Year {tax_year}\n"
+        f"MSFT-CZK — Tax Year {tax_year}\n"
         f"{_SEP_WIDE}"
     )
 
