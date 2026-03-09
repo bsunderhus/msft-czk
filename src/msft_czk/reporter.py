@@ -289,7 +289,7 @@ def format_dual_rate_section(report: DualRateReport) -> str:
 
     # --- Footnotes ---
     if footnotes:
-        seen = set()
+        seen: set[str] = set()
         for note in footnotes:
             if note not in seen:
                 lines.append(note)
@@ -429,8 +429,3 @@ def _broker_label(broker: str) -> str:
         "fidelity_rsu_periodic":        "Fidelity (RSU / Periodic)",
     }
     return labels.get(broker, broker)
-
-
-def _czk_from_usd(amount_usd: Decimal, rate: Decimal) -> int:
-    from msft_czk.currency import to_czk
-    return to_czk(amount_usd, rate)

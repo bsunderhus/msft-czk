@@ -307,10 +307,10 @@ class FidelityESPPPeriodicAdapter:
         # Net withholding = Σ(negative Non-Resident Tax) − Σ(positive Adj entries)
         # §8 ZDP: sum all entries across the PDF; per-event matching not required.
         total_withholding = sum(
-            Decimal(m.group(1)) for m in _RE_WITHHOLDING.finditer(text)
+            (Decimal(m.group(1)) for m in _RE_WITHHOLDING.finditer(text)), Decimal(0)
         )
         total_adj = sum(
-            Decimal(m.group(1)) for m in _RE_WITHHOLDING_ADJ.finditer(text)
+            (Decimal(m.group(1)) for m in _RE_WITHHOLDING_ADJ.finditer(text)), Decimal(0)
         )
         net_withholding = max(Decimal("0"), total_withholding - total_adj)
 

@@ -37,4 +37,12 @@ dev = [
     "pytest-cov>=7.0.0",
     "pyinstaller>=6",
     "ruff>=0.9",
+    "pyright>=1.1",
 ]
+
+[tool.pyright]
+pythonVersion = "3.11"
+venvPath = "."
+venv = ".venv"
+include = ["src"]
+typeCheckingMode = "strict"

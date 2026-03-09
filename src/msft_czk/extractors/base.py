@@ -9,8 +9,6 @@ extraction logic, and the CLI iterates over a registered adapter list calling
 ``can_handle()`` to route each PDF.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
@@ -39,9 +37,9 @@ class ExtractionResult:
     """
 
     statement: BrokerStatement
-    dividends: list[DividendEvent] = field(default_factory=list)
-    rsu_events: list[RSUVestingEvent] = field(default_factory=list)
-    espp_events: list[ESPPPurchaseEvent] = field(default_factory=list)
+    dividends: list[DividendEvent] = field(default_factory=list[DividendEvent])
+    rsu_events: list[RSUVestingEvent] = field(default_factory=list[RSUVestingEvent])
+    espp_events: list[ESPPPurchaseEvent] = field(default_factory=list[ESPPPurchaseEvent])
 
 
 class BrokerAdapter(Protocol):
