@@ -2,7 +2,7 @@
 
 **Feature Branch**: `010-rename-project-cli`
 **Created**: 2026-03-09
-**Status**: Draft
+**Status**: Approved
 **Input**: User description: "let's rename the project and provide a proper executable"
 
 ## Clarifications
