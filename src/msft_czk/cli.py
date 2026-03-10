@@ -21,6 +21,7 @@ Regulatory references:
 
 from __future__ import annotations
 
+import locale
 import sys
 from datetime import date, timedelta
 from decimal import Decimal
@@ -38,10 +39,9 @@ from msft_czk.extractors.fidelity_rsu import FidelityRSUAdapter
 from msft_czk.extractors.morgan_stanley import MorganStanleyExtractor
 from msft_czk.extractors.base import ExtractionResult
 from msft_czk.models import DailyRateEntry, DividendEvent, EmployerCertificate, ESPPPurchaseEvent
-from msft_czk.reporter import (
-    format_dual_rate_section,
-    format_header,
-)
+from rich.console import Console
+
+from msft_czk.reporter import render_report
 
 
 def _find_coverage_gaps(
@@ -141,9 +141,14 @@ def main(
     employment income totals from stock income only.  A prominent notice is
     printed reminding the user to add the §6 base salary before filing.
     """
+    try:
+        locale.setlocale(locale.LC_TIME, "")
+    except locale.Error:
+        pass  # fall back to C locale (ISO 8601 dates)
     # Normalise --base-salary: None (omitted) and 0 are both treated as "absent".
     base_salary_provided: bool = base_salary is not None and base_salary != 0
     base_salary = base_salary or 0
+    err_console = Console(stderr=True)
     # --- Adapter registry (FR-002) ---
     ADAPTERS = [
         MorganStanleyExtractor(),
@@ -160,14 +165,14 @@ def main(
         pdf_path = Path(pdf_path_str)
 
         if not pdf_path.exists():
-            click.echo(f"ERROR: {pdf_path.name} — file not found.", err=True)
+            err_console.print(f"[bold red]ERROR:[/bold red] {pdf_path.name} — file not found.")
             sys.exit(2)
 
         try:
             with pdfplumber.open(pdf_path) as pdf:
                 pages_text = [page.extract_text() or "" for page in pdf.pages]
         except Exception as exc:
-            click.echo(f"ERROR: {pdf_path.name} — could not open PDF: {exc}", err=True)
+            err_console.print(f"[bold red]ERROR:[/bold red] {pdf_path.name} — could not open PDF: {exc}")
             sys.exit(2)
 
         full_text = "\n\n".join(pages_text)
@@ -177,16 +182,13 @@ def main(
                 try:
                     result = adapter.extract(full_text, pdf_path)
                 except ValueError as exc:
-                    click.echo(
-                        f"ERROR: {pdf_path.name} — parse error: {exc}", err=True
-                    )
+                    err_console.print(f"[bold red]ERROR:[/bold red] {pdf_path.name} — parse error: {exc}")
                     sys.exit(2)
                 break
         else:
-            click.echo(
-                f"ERROR: {pdf_path.name} — unrecognized document type. "
-                "No registered adapter matched.",
-                err=True,
+            err_console.print(
+                f"[bold red]ERROR:[/bold red] {pdf_path.name} — unrecognized document type. "
+                "No registered adapter matched."
             )
             sys.exit(3)
 
@@ -195,39 +197,30 @@ def main(
 
         if broker == "morgan_stanley_rsu_quarterly":
             ms_quarter_count += 1
-            click.echo(
-                f"  ✓ [Morgan Stanley (RSU / Quarterly) {period.period_end.strftime('%b %Y')}] "
-                f"{pdf_path.name}",
-                err=True,
-            )
+            broker_label = "Morgan Stanley (RSU / Quarterly)"
+            period_label = period.period_end.strftime("%b %Y")
         elif broker == "fidelity_espp_annual":
-            click.echo(
-                f"  ✓ [Fidelity (ESPP / Annual) {period.period_end.year}] {pdf_path.name}",
-                err=True,
-            )
+            broker_label = "Fidelity (ESPP / Annual)"
+            period_label = str(period.period_end.year)
         elif broker == "fidelity_espp_periodic":
+            broker_label = "Fidelity (ESPP / Periodic)"
             period_label = (
                 f"{period.period_start.strftime('%b')}–"
                 f"{period.period_end.strftime('%b %Y')}"
-            )
-            click.echo(
-                f"  ✓ [Fidelity (ESPP / Periodic) {period_label}] {pdf_path.name}",
-                err=True,
             )
         elif broker == "fidelity_rsu_periodic":
+            broker_label = "Fidelity (RSU / Periodic)"
             period_label = (
                 f"{period.period_start.strftime('%b')}–"
                 f"{period.period_end.strftime('%b %Y')}"
             )
-            click.echo(
-                f"  ✓ [Fidelity (RSU / Periodic) {period_label}] {pdf_path.name}",
-                err=True,
-            )
         else:
-            click.echo(
-                f"  ✓ [{broker} {period.period_end.year}] {pdf_path.name}",
-                err=True,
-            )
+            broker_label = broker
+            period_label = str(period.period_end.year)
+        err_console.print(
+            f"  [green]\u2713[/green] [bold]{broker_label}[/bold] "
+            f"[dim]{period_label}[/dim]  [dim]\u00b7  {pdf_path.name}[/dim]"
+        )
 
         # Warn if statement period year does not match --year
         if period.period_end.year != year:
@@ -243,21 +236,19 @@ def main(
     # FR-006: Reject combined use of annual and periodic ESPP reports
     # (would double-count §6 ESPP income and §8 dividend income)
     if "fidelity_espp_annual" in brokers_present and "fidelity_espp_periodic" in brokers_present:
-        click.echo(
-            "ERROR: Fidelity ESPP annual and Fidelity ESPP periodic reports cannot be "
+        err_console.print(
+            "[bold red]ERROR:[/bold red] Fidelity ESPP annual and Fidelity ESPP periodic reports cannot be "
             "combined in the same run — this would double-count §6 ESPP income and "
-            "§8 dividend income.",
-            err=True,
+            "§8 dividend income."
         )
         sys.exit(1)
 
     # FR-012: Reject multi-RSU-broker invocations
     if "morgan_stanley_rsu_quarterly" in brokers_present and "fidelity_rsu_periodic" in brokers_present:
-        click.echo(
-            "ERROR: RSU income from multiple brokers detected. "
+        err_console.print(
+            "[bold red]ERROR:[/bold red] RSU income from multiple brokers detected. "
             "Morgan Stanley (RSU / Quarterly) and Fidelity (RSU / Periodic) results cannot be combined "
-            "in the same run — this would double-count §6 RSU income.",
-            err=True,
+            "in the same run — this would double-count §6 RSU income."
         )
         sys.exit(1)
 
@@ -269,11 +260,10 @@ def main(
         # FR-011: All period reports must belong to the same calendar year as --year
         for r in rsu_results_sorted:
             if r.statement.period_end.year != year:
-                click.echo(
-                    f"ERROR: {r.statement.source_file.name} covers "
-                    f"{r.statement.period_start}–{r.statement.period_end} "
-                    f"which does not belong to tax year {year}.",
-                    err=True,
+                err_console.print(
+                    f"[bold red]ERROR:[/bold red] {r.statement.source_file.name} covers "
+                    f"{r.statement.period_start.strftime('%x')}–{r.statement.period_end.strftime('%x')} "
+                    f"which does not belong to tax year {year}."
                 )
                 sys.exit(1)
 
@@ -282,11 +272,10 @@ def main(
             current = rsu_results_sorted[i].statement
             nxt = rsu_results_sorted[i + 1].statement
             if current.period_end >= nxt.period_start:
-                click.echo(
-                    f"ERROR: Overlapping Fidelity RSU period reports detected. "
-                    f"{current.source_file.name} ends {current.period_end} "
-                    f"and {nxt.source_file.name} starts {nxt.period_start}.",
-                    err=True,
+                err_console.print(
+                    f"[bold red]ERROR:[/bold red] Overlapping Fidelity RSU period reports detected. "
+                    f"{current.source_file.name} ends {current.period_end.strftime('%x')} "
+                    f"and {nxt.source_file.name} starts {nxt.period_start.strftime('%x')}."
                 )
                 sys.exit(1)
 
@@ -305,7 +294,7 @@ def main(
         for gap_start, gap_end in gaps:
             warnings.append(
                 f"⚠ WARNING: Fidelity ESPP periodic reports do not cover "
-                f"{gap_start}–{gap_end}. Events in this range may be missing."
+                f"{gap_start.strftime('%x')}–{gap_end.strftime('%x')}. Events in this range may be missing."
             )
 
     # --- Fetch or use CNB rate ---
@@ -314,26 +303,39 @@ def main(
         cnb_rate_source = "user-supplied via --cnb-rate"
     else:
         try:
-            cnb_rate = fetch_cnb_usd_annual(year)
+            with err_console.status(
+                f"[bold]Fetching CNB annual average rate for {year}\u2026[/bold]"
+            ):
+                cnb_rate = fetch_cnb_usd_annual(year)
             cnb_rate_source = CNB_URL
         except Exception:
-            click.echo(
-                f"ERROR: Could not fetch CNB annual average rate for {year}. "
-                f"Re-run with --cnb-rate <value> (e.g. --cnb-rate 23.28).",
-                err=True,
+            err_console.print(
+                f"[bold red]ERROR:[/bold red] Could not fetch CNB annual average rate for {year}. "
+                f"Re-run with --cnb-rate <value> (e.g. --cnb-rate 23.28)."
             )
             sys.exit(4)
 
-    click.echo(f"\nCNB Annual Rate: {cnb_rate} CZK/USD  (source: {cnb_rate_source})", err=True)
-    click.echo(
-        f"CNB Daily Rates: fetched per transaction date  "
-        f"(source: {CNB_DAILY_URL_TEMPLATE.format(date='DD.MM.YYYY')})\n",
-        err=True,
+    annual_source = (
+        f"[link={cnb_rate_source}]cnb.cz[/link]"
+        if cnb_rate_source.startswith("http")
+        else cnb_rate_source
     )
+    daily_url = CNB_DAILY_URL_TEMPLATE.format(date="DD.MM.YYYY")
+    err_console.print()
+    err_console.print(
+        f"[bold]CNB Annual Rate:[/bold]  [cyan]{cnb_rate:.4f}[/cyan] CZK/USD  "
+        f"[dim](source: {annual_source})[/dim]"
+    )
+    err_console.print(
+        f"[bold]CNB Daily Rates:[/bold]  per transaction date  "
+        f"[dim](source: [link={daily_url}]cnb.cz[/link])[/dim]"
+    )
+    err_console.print()
 
     # Emit accumulated warnings to stderr
     for warning in warnings:
-        click.echo(warning, err=True)
+        styled = warning.replace("⚠ WARNING:", "[bold yellow]⚠ WARNING:[/bold yellow]", 1)
+        err_console.print(styled)
 
     # --- Aggregate events from all results ---
     all_dividends = [d for r in all_results for d in r.dividends]
@@ -369,19 +371,17 @@ def main(
     out_of_year_espp = [e for e in all_espp if e.purchase_date.year != year]
     all_espp = [e for e in all_espp if e.purchase_date.year == year]
     for e in out_of_year_espp:
-        click.echo(
-            f"⚠ WARNING: ESPP purchase {e.purchase_date} (offering "
-            f"{e.offering_period_start}–{e.offering_period_end}) is outside "
-            f"tax year {year} — excluded.",
-            err=True,
+        err_console.print(
+            f"[bold yellow]⚠ WARNING:[/bold yellow] ESPP purchase {e.purchase_date.strftime('%x')} (offering "
+            f"{e.offering_period_start.strftime('%x')}–{e.offering_period_end.strftime('%x')}) is outside "
+            f"tax year {year} — excluded."
         )
     out_of_year_divs = [d for d in all_dividends if d.date.year != year]
     all_dividends = [d for d in all_dividends if d.date.year == year]
     for d in out_of_year_divs:
-        click.echo(
-            f"⚠ WARNING: Dividend {d.date} (${d.gross_usd}) is outside "
-            f"tax year {year} — excluded.",
-            err=True,
+        err_console.print(
+            f"[bold yellow]⚠ WARNING:[/bold yellow] Dividend {d.date.strftime('%x')} (${d.gross_usd}) is outside "
+            f"tax year {year} — excluded."
         )
 
     # --- §6 Computation ---
@@ -401,17 +401,23 @@ def main(
         *[e.purchase_date for e in all_espp],
         *[d.date for d in all_dividends],
     }
-    for event_date in sorted(unique_dates):
-        try:
-            fetch_cnb_usd_daily(event_date, daily_rate_cache)
-        except Exception:
-            click.echo(
-                f"ERROR: Could not fetch CNB daily rate for "
-                f"{event_date.strftime('%d.%m.%Y')}. "
-                "Check network connectivity or use --cnb-rate to skip daily-rate section.",
-                err=True,
+    sorted_dates = sorted(unique_dates)
+    n = len(sorted_dates)
+    with err_console.status("") as status:
+        for i, event_date in enumerate(sorted_dates, 1):
+            status.update(
+                f"[bold]Fetching CNB daily rates\u2026[/bold]"
+                f" [dim]{event_date.strftime('%x')}  ({i}/{n})[/dim]"
             )
-            sys.exit(4)
+            try:
+                fetch_cnb_usd_daily(event_date, daily_rate_cache)
+            except Exception:
+                err_console.print(
+                    f"[bold red]ERROR:[/bold red] Could not fetch CNB daily rate for "
+                    f"{event_date.strftime('%x')}. "
+                    "Check network connectivity or use --cnb-rate to skip daily-rate section."
+                )
+                sys.exit(4)
 
     # --- Dual-rate comparison report ---
     dual_report = compute_dual_rate_report(
@@ -425,9 +431,8 @@ def main(
     )
 
     # --- Print report to stdout ---
-    click.echo(format_header(year))
-    click.echo("")
-    click.echo(format_dual_rate_section(dual_report))
+    console = Console()
+    render_report(dual_report, console)
 
 
 if __name__ == "__main__":
