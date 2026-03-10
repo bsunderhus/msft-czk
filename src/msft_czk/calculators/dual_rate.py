@@ -47,11 +47,9 @@ def compute_dual_rate_report(
     Mixing methods within the same tax year is not permitted.
 
     ESPP description format: each ESPP event row carries a ``description``
-    string of the form ``"{shares} sh × (${fmv} − ${price}) = {pct}%"`` so the
-    taxpayer can verify the §6 taxable income (discount only) without opening
-    the broker PDF. The discount percentage is
-    ``(fmv_usd − purchase_price_usd) / fmv_usd × 100``, rounded to 1 decimal
-    at render time using ``Decimal`` arithmetic.
+    string of the form ``"{shares} shares"`` (e.g. ``"5.235 shares"``).
+    The reporter renders this via ``_qty_from_description()`` in the Qty column,
+    matching the RSU table layout.
 
     Args:
         stock: RSU and ESPP events with annual-avg CZK totals (from
@@ -112,14 +110,7 @@ def compute_dual_rate_report(
         annual_czk = to_czk(event.discount_usd, annual_rate) if is_annual_avg_available else 0
         daily_czk = to_czk(event.discount_usd, entry.rate)
         # §6 ZDP — ESPP taxable income = discount only (FMV − purchase price) × shares
-        discount_pct = (
-            (event.fmv_usd - event.purchase_price_usd) / event.fmv_usd * 100
-        )
-        description = (
-            f"{event.shares_purchased} sh"
-            f" × (${event.fmv_usd:.2f} − ${event.purchase_price_usd:.2f})"
-            f" = {discount_pct:.1f}%"
-        )
+        description = f"{event.shares_purchased} shares"
         espp_rows.append(
             DualRateEventRow(
                 event_date=event.purchase_date,
