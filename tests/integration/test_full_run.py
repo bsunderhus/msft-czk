@@ -1,0 +1,355 @@
+"""Integration tests for the full msft-czk pipeline.
+
+Tests run the CLI end-to-end using click's CliRunner (no subprocess).
+Tests requiring real PDF fixtures are marked with pytest.mark.integration
+and skipped automatically if the PDFs are absent (CI-safe).
+
+Expected 2024 known values (from research.md and sample PDF analysis):
+  Foreign income total:   ~10,748 CZK
+  Foreign tax paid total:  ~1,612 CZK
+  Employment income total:  2,931,496 CZK  (at rate 23.28 and specific RSU events)
+"""
+
+from pathlib import Path
+from unittest.mock import patch
+
+import pytest
+from click.testing import CliRunner
+
+from msft_czk.cli import main
+
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures" / "pdfs"
+
+MS_Q1 = FIXTURES_DIR / "Quarterly Statement 03_31_2024.pdf"
+MS_Q2 = FIXTURES_DIR / "Quarterly Statement 06_30_2024.pdf"
+MS_Q3 = FIXTURES_DIR / "Quarterly Statement 09_30_2024.pdf"
+MS_Q4 = FIXTURES_DIR / "Quarterly Statement 12_31_2024.pdf"
+FIDELITY = FIXTURES_DIR / "8a76ad8e-806f-4e1e-8627-376d5dbe1647.pdf"
+
+ALL_PDFS = [MS_Q1, MS_Q2, MS_Q3, MS_Q4, FIDELITY]
+PDFS_PRESENT = all(p.exists() for p in ALL_PDFS)
+
+skip_if_no_pdfs = pytest.mark.skipif(
+    not PDFS_PRESENT,
+    reason="Integration PDF fixtures not present in tests/fixtures/pdfs/",
+)
+
+
+@pytest.mark.integration
+@skip_if_no_pdfs
+class TestHappyPath:
+    """Full run with all 2024 sample PDFs — validates rows 321, 323, and 31."""
+
+    def test_exit_code_zero(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert result.exit_code == 0, f"Unexpected exit {result.exit_code}:\n{result.output}"
+
+    def test_foreign_income_total_in_output(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "Foreign income total" in result.output
+
+    def test_foreign_tax_paid_total_in_output(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "Foreign tax paid total" in result.output
+
+    def test_employment_income_total_in_output(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "Employment income total" in result.output
+
+    def test_no_section8_in_output(self):
+        """FR-007/FR-008: §8 / PŘÍLOHA Č. 3 section must be absent."""
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "PŘÍLOHA Č. 3" not in result.output
+        assert "ROW 321" not in result.output
+        assert "ROW 323" not in result.output
+
+    def test_both_events_sections_present(self):
+        """SC-001: Both RSU EVENTS and ESPP EVENTS sections always appear."""
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "RSU EVENTS" in result.output
+        assert "ESPP EVENTS" in result.output
+
+    def test_disclaimer_present(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "DISCLAIMER" in result.output
+
+    def test_dual_rate_section_present(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "DUAL RATE COMPARISON" in result.output
+        assert "TOTALS SUMMARY" in result.output
+
+    def test_paragraph38_zdp_reference_present(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "§38 ZDP" in result.output
+
+    def test_no_recommendation_disclaimer_present(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                *(str(p) for p in ALL_PDFS),
+            ],
+        )
+        assert "No recommendation is made" in result.output
+
+
+# ---------------------------------------------------------------------------
+# Error handling tests (no real PDFs required)
+# ---------------------------------------------------------------------------
+
+
+class TestUnrecognizedBrokerExitCode3:
+    """Supplying a non-broker PDF should exit with code 3."""
+
+    def test_unrecognized_broker_exit_3(self, tmp_path):
+
+        # Create a minimal dummy text file (pdfplumber can't open it, but we
+        # can test via a PDF that has no broker text by mocking pdfplumber)
+        fake_pdf = tmp_path / "unknown_file.pdf"
+        # Write a minimal file so Path.exists() returns True
+        fake_pdf.write_bytes(b"%PDF-1.4\n")
+
+        runner = CliRunner()
+
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
+            mock_pdf.open.return_value.__enter__.return_value.pages = [
+                type("Page", (), {"extract_text": lambda self: "No broker content here"})()
+            ]
+            result = runner.invoke(
+                main,
+                [
+                    "--year", "2024",
+                    "--base-salary", "2246694",
+                    "--cnb-rate", "23.28",
+                    str(fake_pdf),
+                ],
+            )
+
+        assert result.exit_code == 3
+        assert "unrecognized document type" in result.output or \
+               "unrecognized document type" in (result.exception and str(result.exception) or "")
+
+
+class TestCnbNetworkFailureExitCode4:
+    """When CNB fetch fails and --cnb-rate not provided, exit code 4."""
+
+    def test_cnb_fetch_failure_exit_4(self, tmp_path):
+        fake_pdf = tmp_path / "ms.pdf"
+        fake_pdf.write_bytes(b"%PDF-1.4\n")
+
+        runner = CliRunner()
+
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf, \
+             patch("msft_czk.cli.fetch_cnb_usd_annual", side_effect=Exception("network error")):
+            mock_pdf.open.return_value.__enter__.return_value.pages = [
+                type("Page", (), {
+                    "extract_text": lambda self: "Morgan Stanley Smith Barney LLC\nAccount Number: MS00000001\nFor the Period January 1 (cid:151) March 31, 2024"
+                })()
+            ]
+            result = runner.invoke(
+                main,
+                [
+                    "--year", "2024",
+                    "--base-salary", "2246694",
+                    str(fake_pdf),
+                ],
+            )
+
+        assert result.exit_code == 4
+        assert "Could not fetch CNB" in (result.output + (result.exception and str(result.exception) or ""))
+
+
+class TestMissingQuarterWarning:
+    """Fewer than 4 MS quarters triggers a warning on stderr."""
+
+    @pytest.mark.integration
+    @pytest.mark.skipif(not MS_Q1.exists(), reason="MS Q1 fixture not present")
+    def test_only_two_ms_quarters_warning(self):
+        runner = CliRunner(mix_stderr=False)
+        result = runner.invoke(
+            main,
+            [
+                "--year", "2024",
+                "--base-salary", "2246694",
+                "--cnb-rate", "23.28",
+                str(MS_Q1),
+                str(MS_Q2),
+            ],
+        )
+        assert "Only 2 Morgan Stanley quarter(s) detected" in result.stderr
+
+
+# ---------------------------------------------------------------------------
+# Optional base salary tests (feature 009)
+# ---------------------------------------------------------------------------
+
+_MS_MINIMAL_TEXT = (
+    "Morgan Stanley Smith Barney LLC\n"
+    "Account Number: MS00000001\n"
+    "For the Period January 1 (cid:151) March 31, 2024"
+)
+
+
+def _invoke_no_base_salary(tmp_path, extra_args=None):
+    """Helper: invoke CLI with a minimal MS PDF and no --base-salary."""
+    fake_pdf = tmp_path / "ms.pdf"
+    fake_pdf.write_bytes(b"%PDF-1.4\n")
+    runner = CliRunner()
+    args = ["--year", "2024", "--cnb-rate", "23.28", str(fake_pdf)]
+    if extra_args:
+        args = extra_args + [str(fake_pdf)]
+    with patch("msft_czk.cli.pdfplumber") as mock_pdf:
+        mock_pdf.open.return_value.__enter__.return_value.pages = [
+            type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
+        ]
+        return runner.invoke(main, args)
+
+
+class TestNoBaseSalary:
+    """FR-001/FR-002/FR-004: omitting or zero-ing --base-salary produces exit 0."""
+
+    def test_exit_code_zero_when_base_salary_omitted(self, tmp_path):
+        result = _invoke_no_base_salary(tmp_path)
+        assert result.exit_code == 0, f"Expected 0, got {result.exit_code}:\n{result.output}"
+
+    def test_exit_code_zero_when_base_salary_is_zero(self, tmp_path):
+        fake_pdf = tmp_path / "ms.pdf"
+        fake_pdf.write_bytes(b"%PDF-1.4\n")
+        runner = CliRunner()
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
+            mock_pdf.open.return_value.__enter__.return_value.pages = [
+                type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
+            ]
+            result = runner.invoke(
+                main,
+                ["--year", "2024", "--cnb-rate", "23.28", "--base-salary", "0", str(fake_pdf)],
+            )
+        assert result.exit_code == 0, f"Expected 0, got {result.exit_code}:\n{result.output}"
+
+    def test_output_contains_employment_income_total(self, tmp_path):
+        result = _invoke_no_base_salary(tmp_path)
+        assert "Employment income total" in result.output
+
+    def test_output_contains_totals_summary(self, tmp_path):
+        result = _invoke_no_base_salary(tmp_path)
+        assert "TOTALS SUMMARY" in result.output
+
+
+class TestBaseSalaryNotice:
+    """FR-003/FR-006: notice appears when base salary is absent; absent when provided."""
+
+    def test_notice_present_when_base_salary_omitted(self, tmp_path):
+        result = _invoke_no_base_salary(tmp_path)
+        assert "base salary not provided" in result.output
+
+    def test_notice_present_when_base_salary_zero(self, tmp_path):
+        fake_pdf = tmp_path / "ms.pdf"
+        fake_pdf.write_bytes(b"%PDF-1.4\n")
+        runner = CliRunner()
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
+            mock_pdf.open.return_value.__enter__.return_value.pages = [
+                type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
+            ]
+            result = runner.invoke(
+                main,
+                ["--year", "2024", "--cnb-rate", "23.28", "--base-salary", "0", str(fake_pdf)],
+            )
+        assert "base salary not provided" in result.output
+
+    def test_notice_absent_when_base_salary_provided(self, tmp_path):
+        fake_pdf = tmp_path / "ms.pdf"
+        fake_pdf.write_bytes(b"%PDF-1.4\n")
+        runner = CliRunner()
+        with patch("msft_czk.cli.pdfplumber") as mock_pdf:
+            mock_pdf.open.return_value.__enter__.return_value.pages = [
+                type("Page", (), {"extract_text": lambda self: _MS_MINIMAL_TEXT})()
+            ]
+            result = runner.invoke(
+                main,
+                ["--year", "2024", "--cnb-rate", "23.28", "--base-salary", "2246694", str(fake_pdf)],
+            )
+        assert "base salary not provided" not in result.output

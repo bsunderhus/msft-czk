@@ -1,0 +1,317 @@
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Envelope # BQCTDHBBCDDTX
+ANON TESTUSER
+TESTOVACI 1
+PRAGUE
+100 00
+CZECH REPUBLIC
+1 of 10
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+ANON TESTUSER
+Participant Number: I00000001
+Your Stock Plan Account Value: $24,755.99
+Change from Last Period: $451.87
+This Period Year-to-Date
+Beg. Stock Plan Account Value $24,304.12 $19,745.89
+Subtractions -6.66 -6.79
+Change in Investment Value * 458.53 5,016.89
+Ending Stock Plan Account Value $24,755.99 $24,755.99
+Accrued Interest (AI) 0.00
+Ending Account Value Incl. AI $24,755.99
+Stock Plans 0.00
+* Reflects appreciation or depreciation of your holdings due to price changes, transactions
+Contact Information
+from Other Activity In or Out and Multi-currency transactions, plus any distribution and
+income earned during the statement period.
+Online www.netbenefits.com
+** Excludes unpriced securities.
+Stock Plan Services (800) 544-0275
+Sun 5pm - Sat 12am ET
+Save on your tax preparation services; Fidelity is pleased to offer special
+discounts to help you prepare your tax return. Learn more at
+Fidelity.com/taxprep. 1064976.1.0
+H02475409420240331
+
+2 of 10
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Account Summary
+Accounts Included in This Report
+Participant
+Page Account Type/Name Number Beginning Value Ending Value
+STOCK PLAN ACCOUNT
+3 ANON TESTUSER I00000001 $24,304.12 $24,755.99
+Ending Account Value $24,304.12 $24,755.99
+Other Holdings1
+Page Account Type/Name Beginning Value Ending Value
+STOCK PLAN
+Items shown under "Stock Plans" represent your interests under your company's stock plans, for which Fidelity Stock Plan Services LLC provides administrative and record keeping services.
+Items shown under "Stock Plans" are not assets held in your Fidelity brokerage account, and therefore are not carried by NFS and are not covered by SIPC. Fidelity Stock Plan Services LLC
+provides this statement to you as part of administrative and recordkeeping services it provides to the company. See the Participant Agreement for details.
+7 EMPLOYEE STOCK PURCHASE - MICROSOFT ESPP PLAN $0.00 $0.00v
+Total Including Other Holdings $24,304.12 $24,755.99
+1 Other Holdings, including Assets Held Away, are provided for informational purposes only
+and may not be custodied at Fidelity Investments and may not reflect accurate values. See
+individual account listing for additional details.
+v Stock Plan values are an estimate of current value. See the Stock Plan Section below for a
+complete description of the values shown. Values may be unvested and may not reflect
+withdrawable assets. This information is included on your statement solely as a service to
+you. It is derived from information provided by your company and Fidelity is not responsible
+for its accuracy.
+
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Participant Number: I00000001
+Account Summary
+ANON TESTUSER - STOCK PLAN ACCOUNT
+Account Value: $24,755.99 Account Holdings
+1% Core Account ($148)
+Change in Account Value $451.87
+This Period Year-to-Date
+Beginning Account Value $24,304.12 $19,745.89
+Subtractions -6.66 -6.79
+Taxes Withheld -6.66 -6.79
+Change in Investment Value * 458.53 5,016.89
+99% Stocks ($24,607)
+Ending Account Value $24,755.99 $24,755.99
+Accrued Interest (AI) 0.00
+Top Holdings
+Ending Account Value Incl. AI $24,755.99 Percent of
+Description Value Account
+* Reflects appreciation or depreciation of your holdings due to price changes, transactions Microsoft Corp $24,607 99%
+from Other Activity In or Out and Multi-currency transactions, plus any distribution and
+Fidelity Government Cash Reserves 148 1
+income earned during the statement period.
+Total $24,755 100%
+Please note that, due to rounding, percentages may not add to 100%.
+Income Summary
+This Period Year-to-Date
+Taxable $44.43 $45.33
+Dividends 44.43 45.33
+Total $44.43 $45.33
+3 of 10
+
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Participant Number: I00000001
+Holdings
+ANON TESTUSER - STOCK PLAN ACCOUNT
+Core Account
+Beginning Price Ending Unrealized
+Market Value Quantity Per Unit Market Value Total Gain/Loss EAI ($) /
+Description Mar 1, 2024 Mar 31, 2024 Mar 31, 2024 Mar 31, 2024 Cost Basis Mar 31, 2024 EY (%)
+FIDELITY GOVERNMENT CASH $110.61 148.380 $1.0000 $148.38 not applicable not applicable $7.20
+RESERVES (FDRXX) 4.850%
+-- 7-day yield: 5.02%
+Total Core Account (1% of account $110.61 $148.38 $7.20
+holdings)
+Stocks
+Beginning Price Ending Unrealized
+Market Value Quantity Per Unit Market Value Total Gain/Loss EAI ($) /
+Description Mar 1, 2024 Mar 31, 2024 Mar 31, 2024 Mar 31, 2024 Cost Basis Mar 31, 2024 EY (%)
+Common Stock
+MICROSOFT CORP (MSFT) $24,193.51 58.489 $420.7200 $24,607.61 $15,151.08 $9,456.53 $175.47
+0.710%
+Total Common Stock (99% of account $24,193.51 $24,607.61 $15,151.08 $9,456.53 $175.47
+holdings)
+Total Stocks (99% of account holdings) $24,193.51 $24,607.61 $15,151.08 $9,456.53 $175.47
+Total Holdings $24,755.99 $15,151.08 $9,456.53 $182.67
+EAI Estimated Annual Income (EAI) & Estimated Yield (EY ) - EAI is an estimate of annual income for a specific security position over the next rolling 12 months. EAI may be negative on short
+& EY positions. EY is calculated by dividing the current EAI for a security position by its statement closing date market value. EAI and EY are estimates only and may include return of principal
+and/or capital gains, which would render them overstated. Actual income and yield might be lower or higher than the estimated amounts. F o r calculation details, refer to the
+"Additional Information and Endnotes" section.
+All positions held in cash account unless indicated otherwise.
+Total Cost Basis does not include the cost basis on core, money market or other positions where cost basis is unknown or not applicable.
+4 of 10
+
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Participant Number: I00000001
+Activity
+ANON TESTUSER - STOCK PLAN ACCOUNT
+Dividends, Interest & Other Income
+(Includes dividend reinvestment)
+Settlement Symbol/
+Date Security Name CUSIP Description Quantity Price Amount
+03/14 MICROSOFT CORP 594918104 Dividend Received - - $43.87
+03/28 FIDELITY GOVERNMENT CASH 316067107 Dividend Received - - 0.56
+RESERVES
+Total Dividends, Interest & Other Income $44.43
+Taxes Withheld
+Date Security Description Amount
+03/14 MICROSOFT CORP Non-Resident Tax -$6.58
+03/28 FIDELITY GOVERNMENT CASH RESERVES Non-Resident Tax -0.08
+Total Federal Taxes Withheld -6.66
+Total Taxes Withheld -$6.66
+Core Fund Activity
+For more information about the operation of your core account, please refer to your Customer Agreement.
+SettlementAccount
+Date Type Transaction Description Quantity Price Amount Balance
+03/14 CASH You Bought FIDELITY GOVERNMENT CASH RESERVES 37.290 $1.0000 $37.29 $147.90
+MORNING TRADE @ 1
+03/28 CASH Reinvestment FIDELITY GOVERNMENT CASH RESERVES 0.480 1.0000 0.48 148.38
+REINVEST @ $1.000
+Total Core Fund Activity $37.77
+5 of 10
+
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Participant Number: I00000001
+Estimated Cash Flow
+(Rolling as of March 31, 2024) ANON TESTUSER - STOCK PLAN ACCOUNT
+Bond & CD Bond & CD Stock ETP Mutual Fund Other Total Est.
+Month Income Principal Income Income Income Income Cash Flow
+April 2024 -- -- -- -- $1 -- $1
+May -- -- -- -- 1 -- 1
+June -- -- 44 -- 1 -- 45
+July -- -- -- -- 1 -- 1
+August -- -- -- -- 1 -- 1
+September -- -- 44 -- 1 -- 45
+October -- -- -- -- 1 -- 1
+November -- -- -- -- 1 -- 1
+December -- -- 44 -- 1 -- 45
+January 2025 -- -- -- -- 1 -- 1
+February -- -- -- -- 1 -- 1
+March -- -- 44 -- 1 -- 45
+Total -- -- $176 -- $12 -- $188
+This table presents the estimated monthly interest and dividend income and return of principal that your current holdings may generate over the next rolling 12 months.
+The cash flows displayed are estimates provided for informational purposes only and there is no guarantee that you will actually receive any of the amounts displayed.
+These estimates should not be relied upon for making investment, trading or tax decisions. The estimates for fixed income are calculated using the security's coupon
+rate. The estimates for all other securities are calculated using an indicated annual dividend (IAD). The IAD is an estimate of a security's dividend payments for the next
+12 months calculated based on prior and/or declared dividends for that security. IADs are sourced from third party vendors believed to be reliable, but no assurance can
+be made as to accuracy. There are circumstances in which these estimates will not be presented for a specific security you hold. Please refer to Help/Glossary on
+Fidelity.com for additional information on these calculations.
+Bond & CD Income includes interest payments for fixed and variable rate bonds, international bonds that pay in USD, and Certificates of Deposit (CDs).
+Bond & CD Principal includes maturing principal payments for fixed and variable rate bonds, international bonds that pay in USD, and Certificates of Deposit (CDs).
+Stock Income includes estimated dividend payments for common stocks, preferred stocks, ADRs, closed-end mutual funds, and MLPs.
+ETP Income includes estimated dividend payments for Exchange Traded Funds (ETFs) and Exchange Traded Notes (ETNs).
+Mutual Fund Income includes estimated dividend payments for Fidelity and non-Fidelity mutual funds.
+Other Income includes, but is not limited to estimated dividend payments for Unit Investment Trusts (UITs), REITs, and LPs.
+This table does not include cash flow from foreign denominated fixed income.
+-- not available
+6 of 10
+
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Participant Number: I00000001
+Stock Plans
+ANON TESTUSER - STOCK PLAN ACCOUNT
+Items shown under "Stock Plans" represent your interests under your company's stock plans, for which Fidelity Stock Plan Services LLC provides administrative and record keeping services. Items
+shown under "Stock Plans" are not assets held in your Fidelity brokerage account, and therefore are not carried by NFS and are not covered by SIPC. Fidelity Stock Plan Services LLC provides this
+statement to you as part of administrative and recordkeeping services it provides to the company. See the Participant Agreement for details.
+Employee Stock Purchase - MICROSOFT ESPP PLAN
+Employee Stock Purchase Contribution Summary
+Employee
+Contributions
+(less withdrawals
+Offering Period Plan Type Payroll Deduction And adjustments) Total Withdrawals Total Adjustments
+01/01/2024-03/31/2024 Section 423 10.000% $0.00 $0.00 $0.00
+Qualified
+Future Offering Periods 10.000%
+Total for all Offering Periods $0.00 7 $0.00 8 $0.0011
+7 Employee Contribution balance reflects accumulated cash amount of payroll deductions in Employee Stock Purchase.
+8 Total withdrawal values include cumulative withdrawals taken during the offering period.
+11 Adjustment reflects a correction to or change in the outstanding contribution balance.
+Additional Information and Endnotes
+In June 2024, Fidelity will implement a new service fee for some ETF and mutual fund purchases. This service fee will apply to a limited number of ETFs and mutual
+funds offered by providers that do not pay Fidelity a direct, asset-based fee to support their ETFs' and/or mutual funds availability on our brokerage platform, including
+support for shareholder support services, the provision of calculation and analytical tools, and general investment research and education materials regarding ETFs
+and mutual funds. Customers purchasing these ETFs and mutual funds will be charged a service fee of up to $100. The applicable service fee will be shown on the
+trade verification page when placing an order for one of these ETFs or mutual funds. Please note that ETFs that are supported by their provider through an
+asset-based fee (and exempt from the service fee) will not be marginable for 30-days after purchase. 1125154.4.0
+Important information about your telephone conversations with Fidelity. Telephone conversations made with/to Fidelity may be monitored and/or recorded without
+further notice or disclosure. 570303.1.0
+7 of 10
+
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Participant Number: I00000001
+Additional Information and Endnotes
+ANON TESTUSER - STOCK PLAN ACCOUNT
+Electronic Funds Transfer Notice: The following notice is required by the Bureau of Consumer Financial Protection's Regulation E and applies to electronic funds
+transfers (EFTs) made by consumers. However, it doesn't apply to all EFTs. Generally, EFTs in nonretirement accounts, aside from those made for the purchase or
+sale of securities, are subject to Regulation E (each a "Covered Transfer").
+Error Resolution: In the case of errors or questions about a Covered Transfer, promptly call or write Fidelity using the contact information listed below. You must call or
+write Fidelity if you think that your statement is wrong or if you need more information about a Covered Transfer on the statement. Fidelity must hear from you no later
+than 60 days after Fidelity sent the FIRST statement on which the problem or error appeared. You will need to tell Fidelity your name and account number, describe
+the error or Covered Transfer that you are unsure about, explain as clearly as you can why you believe that it is an error or why you need more information, and tell
+Fidelity the dollar amount of the suspected error.
+If you notify Fidelity orally, Fidelity may require that you send your complaint or question in writing within 10 business days. Fidelity will tell you the results of its
+investigation within 10 business days of hearing from you and will correct any error promptly. If Fidelity needs more time, however, it may take up to 45 days to
+investigate your complaint or question. If Fidelity decides to do this, it will credit your account within 10 business days for the amount you think is in error, so that you
+will have the use of the money during the time it takes Fidelity to complete its investigation. If Fidelity asks you to put your request or question in writing and doesn't
+receive it within 10 business days, or if your account is a brokerage account subject to Regulation T of the Board of Governors of the Federal Reserve System (Credit
+by Brokers and Dealers, 12 CFR 220), Fidelity may not credit your account.
+For questions involving new accounts, or point-of-sale or foreign-initiated transactions, Fidelity may take up to 90 days to investigate your complaint or question. For
+new accounts, Fidelity may take up to 20 days to credit your account for the amount you think is in error. Fidelity will inform you of the results of its investigation within
+three business days of its completion. If Fidelity decides that there was no error, Fidelity will send you a written explanation. You may ask for copies of the documents
+that Fidelity used in the investigation.
+Contact Information: You can contact Fidelity by mail at Fidelity Investments, PO Box 770001, Cincinnati, OH, 45277-0002, or by phone at 800-544-6666.
+707063.2.0
+Estimated Annual Income (EAI) & Estimated Yield (EY) - EAI for fixed income is calculated using the coupon rate. For all other securities, EAI is calculated using an
+indicated annual dividend (IAD). The IAD is an estimate of a security's dividend payments for the next 12 months calculated based on prior and/or declared dividends for
+that security. EY reflects only the income generated by an investment and not changes in its price which may fluctuate. Interest and dividend rates are subject to change at
+any time and may be affected by current and future economic, political and business conditions. EAI and EY are provided for informational purposes only and should not
+be used or relied on for making investment, trading or tax decisions. EAI and EY are based on data obtained from information providers believed to be reliable, but no
+assurance can be made as to accuracy, timeliness or completeness. Please refer to the Help/Glossary on Fidelity.com for additional information regarding these
+calculations.
+8 of 10
+
+S
+82304202
+BBBBB_XTDDCBBHDTCQB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+March 1, 2024 - March 31, 2024
+Participant Number: I00000001
+Additional Information and Endnotes
+ANON TESTUSER - STOCK PLAN ACCOUNT
+Copyright 2022, S&P Global Market Intelligence. Reproduction of any information, data or material, including ratings ("Content") in any form is prohibited except with the
+prior written permission of the relevant party. Such party, its affiliates and suppliers ("Content Providers") do not guarantee the accuracy, adequacy, completeness,
+timeliness or availability of any Content and are not responsible for any errors or omissions (negligent or otherwise), regardless of the cause, or for the results obtained
+from the use of such Content. In no event shall Content Providers be liable for any damages, costs, expenses, legal fees, or losses (including lost income or lost profit and
+opportunity costs) in connection with any use of the Content. A reference to a particular investment or security, a rating or any observation concerning an investment that is
+part of the Content is not a recommendation to buy, sell or hold such investment or security, does not address the suitability of an investment or security and should not be
+relied on as investment advice. Credit ratings are statements of opinions and are not statements of fact.
+Moody's© Copyright 2022, Moody's Investors Service, Inc. ("Moody's"). Moody's ratings ("Ratings") are proprietary to Moody's or its affiliates and are protected by
+copyright and other intellectual property laws. Ratings are licensed to Licensee by Moody's. RATINGS MAY NOT BE COPIED OR OTHERWISE REPRODUCED,
+REPACKAGED, FURTHER TRANSMITTED, TRANSFERRED, DISSEMINATED, REDISTRIBUTED OR RESOLD, OR STORED FOR SUBSEQUENT USE FOR ANY
+SUCH PURPOSE, IN WHOLE OR IN PART, IN ANY FORM OR MANNER OR BY ANY MEANS WHATSOEVER, BY ANY PERSON WITHOUT MOODY'S PRIOR
+WRITTEN CONSENT. Moody's® is a registered trademark.
+Please go to Fidelity.com/disclosures to review important legal and regulatory disclosures. Historical statements, confirms and other regulatory documents are available to
+access and download at Fidelity.com/statements.
+For more information about your statement, please refer to our Frequently Asked Questions document at Fidelity.com/statements.
+9 of 10
+

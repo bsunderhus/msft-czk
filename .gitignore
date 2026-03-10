@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PyInstaller binary output — built artifacts go to GitHub Releases, not git
+msft-czk
+msft-czk-*
+
+# Personal financial data — never commit PDFs containing personal tax data
+# (sample PDFs are referenced via tests/fixtures/pdfs/ symlinks only)
+pdfs/**/*.pdf

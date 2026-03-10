@@ -1,0 +1,186 @@
+STOCK PLAN SERVICES REPORT
+September 24, 2025 - October 31, 2025
+Envelope # BSKCNZBBBJNZX
+ANON SECONDUSER
+TESTOVACI 2
+PRAGUE
+100 00
+CZECH REPUBLIC
+1 of 6
+S
+13015202
+BBBBB_XZNJBBBZNCKSB_
+EC_RM
+ANON SECONDUSER
+Participant Number: I00000002
+Your Account Value: $21,748.02
+Change from Last Period: $21,748.02
+This Period Year-to-Date
+Beginning Account Value - -
+Change in Investment Value * 21,748.02 21,748.02
+Ending Account Value ** $21,748.02 $21,748.02
+Accrued Interest (AI) 0.00
+Ending Account Value Incl. AI $21,748.02
+* Reflects appreciation or depreciation of your holdings due to price changes, transactions
+from Other Activity In or Out and Multi-currency transactions, plus any distribution and
+income earned during the statement period.
+** Excludes unpriced securities.
+Contact Information
+Online www.netbenefits.com
+Stock Plan Services (800) 544-0275
+Sun 5pm - Sat 12am ET
+H06162798920251031
+
+S
+13015202
+BBBBB_XZNJBBBZNCKSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+September 24, 2025 - October 31, 2025
+Account # Z81-202254
+Account Summary
+ANON SECONDUSER - TRUST: UNDER AGREEMENT
+Account Value: $21,748.02 Account Holdings
+Change in Account Value $21,748.02
+This Period Year-to-Date
+Beginning Account Value - -
+Change in Investment Value * 21,748.02 21,748.02
+Ending Account Value $21,748.02 $21,748.02
+Accrued Interest (AI) 0.00
+100% Stocks ($21,748)
+Ending Account Value Incl. AI $21,748.02
+Top Holdings
+* Reflects appreciation or depreciation of your holdings due to price changes, transactions
+Percent of
+from Other Activity In or Out and Multi-currency transactions, plus any distribution and
+Description Value Account
+income earned during the statement period.
+Microsoft Corp $21,748 100%
+Total $21,748 100%
+Please note that, due to rounding, percentages may not add to 100%.
+Holdings
+Stocks
+Beginning Price Ending Unrealized
+Market Value Quantity Per Unit Market Value Total Gain/Loss EAI ($) /
+Description Sep 24, 2025 Oct 31, 2025 Oct 31, 2025 Oct 31, 2025 Cost Basis Oct 31, 2025 EY (%)
+Common Stock
+MICROSOFT CORP (MSFT) unavailable 42.000 $517.8100 $21,748.02 $21,569.94t $178.08 $152.88
+0.700%
+Total Common Stock (100% of account unavailable $21,748.02 $21,569.94 $178.08 $152.88
+holdings)
+2 of 6
+
+S
+13015202
+BBBBB_XZNJBBBZNCKSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+September 24, 2025 - October 31, 2025
+Account # Z81-202254
+Holdings
+ANON SECONDUSER - TRUST: UNDER AGREEMENT
+Stocks (continued)
+Beginning Price Ending Unrealized
+Market Value Quantity Per Unit Market Value Total Gain/Loss EAI ($) /
+Description Sep 24, 2025 Oct 31, 2025 Oct 31, 2025 Oct 31, 2025 Cost Basis Oct 31, 2025 EY (%)
+Total Stocks (100% of account holdings) unavailable $21,748.02 $21,569.94 $178.08 $152.88
+Total Holdings $21,748.02 $21,569.94 $178.08 $152.88
+All positions held in cash account unless indicated otherwise.
+EAI Estimated Annual Income (EAI) & Estimated Yield (EY ) - EAI is an estimate of annual income for a specific security position over the next rolling 12 months. EAI may be negative on short
+& EY positions. EY is calculated by dividing the current EAI for a security position by its statement closing date market value. EAI and EY are estimates only and may include return of principal
+and/or capital gains, which would render them overstated. Actual income and yield might be lower or higher than the estimated amounts. F o r calculation details, refer to the
+"Additional Information and Endnotes" section.
+Total Cost Basis does not include the cost basis on core, money market or other positions where cost basis is unknown or not applicable.
+t Third-party provided
+Activity
+Other Activity In
+Settlement Symbol/ Total Transaction
+Date Security Name CUSIP Description Quantity Price Cost Basis Cost Amount
+t10/15 MICROSOFT CORP SHARES DEPOSITED 594918104 Conversion 42.000 $513.5700 $21,569.94 - -
+Total Other Activity In - -
+Cost basis and gain/loss information is provided as a service to our customers and is based on standards for filing US Federal Tax Returns as determined by Fidelity. This information is not
+intended to address tax law or reporting requirements applicable in your country of tax residence.
+t Third-party provided
+3 of 6
+
+S
+13015202
+BBBBB_XZNJBBBZNCKSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+September 24, 2025 - October 31, 2025
+Account # Z81-202254
+Estimated Cash Flow
+(Rolling as of October 31, 2025) ANON SECONDUSER - TRUST: UNDER AGREEMENT
+Bond & CD Bond & CD Stock ETP Mutual Fund Other Total Est.
+Month Income Principal Income Income Income Income Cash Flow
+November 2025 -- -- -- -- -- -- --
+December -- -- 38 -- -- -- 38
+January 2026 -- -- -- -- -- -- --
+February -- -- -- -- -- -- --
+March -- -- 38 -- -- -- 38
+April -- -- -- -- -- -- --
+May -- -- -- -- -- -- --
+June -- -- 38 -- -- -- 38
+July -- -- -- -- -- -- --
+August -- -- -- -- -- -- --
+September -- -- 38 -- -- -- 38
+October -- -- -- -- -- -- --
+Total -- -- $152 -- -- -- $152
+This table presents the estimated monthly interest and dividend income and return of principal that your current holdings may generate over the next rolling 12 months.
+The cash flows displayed are estimates provided for informational purposes only and there is no guarantee that you will actually receive any of the amounts displayed.
+These estimates should not be relied upon for making investment, trading or tax decisions. The estimates for fixed income are calculated using the security's coupon
+rate. The estimates for all other securities are calculated using an indicated annual dividend (IAD). The IAD is an estimate of a security's dividend payments for the next
+12 months calculated based on prior and/or declared dividends for that security. IADs are sourced from third party vendors believed to be reliable, but no assurance can
+be made as to accuracy. There are circumstances in which these estimates will not be presented for a specific security you hold. Please refer to Help/Glossary on
+Fidelity.com for additional information on these calculations.
+Bond & CD Income includes interest payments for fixed and variable rate bonds, international bonds that pay in USD, certificates of deposit (CDs), and credit union
+share certificates (CUSCs).
+Bond & CD Principal includes maturing principal payments for fixed and variable rate bonds, international bonds that pay in USD, CDs, and CUSCs.
+Stock Income includes estimated dividend payments for common stocks, preferred stocks, ADRs, closed-end mutual funds, and MLPs.
+ETP Income includes estimated dividend payments for Exchange Traded Funds (ETFs) and Exchange Traded Notes (ETNs).
+Mutual Fund Income includes estimated dividend payments for Fidelity and non-Fidelity mutual funds.
+Other Income includes, but is not limited to estimated dividend payments for Unit Investment Trusts (UITs), REITs, and LPs.
+This table does not include cash flow from foreign denominated fixed income.
+-- not available
+4 of 6
+
+S
+13015202
+BBBBB_XZNJBBBZNCKSB_
+EC_RM
+STOCK PLAN SERVICES REPORT
+September 24, 2025 - October 31, 2025
+Account # Z81-202254
+Additional Information and Endnotes
+ANON SECONDUSER - TRUST: UNDER AGREEMENT
+Estimated Annual Income (EAI) & Estimated Yield (EY) - EAI for fixed income is calculated using the coupon rate. For all other securities, EAI is calculated using an
+indicated annual dividend (IAD). The IAD is an estimate of a security's dividend payments for the next 12 months calculated based on prior and/or declared dividends for
+that security. EY reflects only the income generated by an investment and not changes in its price which may fluctuate. Interest and dividend rates are subject to change at
+any time and may be affected by current and future economic, political and business conditions. EAI and EY are provided for informational purposes only and should not
+be used or relied on for making investment, trading or tax decisions. EAI and EY are based on data obtained from information providers believed to be reliable, but no
+assurance can be made as to accuracy, timeliness or completeness. Please refer to the Help/Glossary on Fidelity.com for additional information regarding these
+calculations.
+Copyright 2022, S&P Global Market Intelligence. Reproduction of any information, data or material, including ratings ("Content") in any form is prohibited except with the
+prior written permission of the relevant party. Such party, its affiliates and suppliers ("Content Providers") do not guarantee the accuracy, adequacy, completeness,
+timeliness or availability of any Content and are not responsible for any errors or omissions (negligent or otherwise), regardless of the cause, or for the results obtained
+from the use of such Content. In no event shall Content Providers be liable for any damages, costs, expenses, legal fees, or losses (including lost income or lost profit and
+opportunity costs) in connection with any use of the Content. A reference to a particular investment or security, a rating or any observation concerning an investment that is
+part of the Content is not a recommendation to buy, sell or hold such investment or security, does not address the suitability of an investment or security and should not be
+relied on as investment advice. Credit ratings are statements of opinions and are not statements of fact.
+Moody's© Copyright 2022, Moody's Investors Service, Inc. ("Moody's"). Moody's ratings ("Ratings") are proprietary to Moody's or its affiliates and are protected by
+copyright and other intellectual property laws. Ratings are licensed to Licensee by Moody's. RATINGS MAY NOT BE COPIED OR OTHERWISE REPRODUCED,
+REPACKAGED, FURTHER TRANSMITTED, TRANSFERRED, DISSEMINATED, REDISTRIBUTED OR RESOLD, OR STORED FOR SUBSEQUENT USE FOR ANY
+SUCH PURPOSE, IN WHOLE OR IN PART, IN ANY FORM OR MANNER OR BY ANY MEANS WHATSOEVER, BY ANY PERSON WITHOUT MOODY'S PRIOR
+WRITTEN CONSENT. Moody's® is a registered trademark.
+Fractional Share Trading: With the exception of managed accounts, National Financial Services ("NFS"), an affiliate broker-dealer, will execute the fractional component
+of a customer order in a principal or riskless principal capacity. FBS will act as agent. This includes fractional shares liquidations as a result of an ACATS transfer of whole
+shares or a dividend reinvestment that created a residual fractional position in a customer account.
+Payment for Order Flow: Fidelity Brokerage Services LLC ("FBS") receives remuneration, compensation, or consideration for directing orders particular broker/dealers or
+market centers for execution. The source and nature of any compensation received in connection with your particular transaction, the name of the other party, and the time
+of execution will be disclosed upon written request.
+Please go to Fidelity.com/disclosures to review important legal and regulatory disclosures. Historical statements, confirms and other regulatory documents are available to
+access and download at Fidelity.com/statements.
+For more information about your statement, please refer to our Frequently Asked Questions document at Fidelity.com/statements.
+5 of 6
+

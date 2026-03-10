@@ -1,0 +1,108 @@
+# Release workflow for msft-czk
+#
+# Trigger: manually via GitHub UI → Actions → Release → Run workflow
+# No inputs required — version is read from pyproject.toml at runtime.
+#
+# What it does:
+#   1. Builds self-contained binaries for Linux x86-64 and macOS arm64
+#   2. Creates a GitHub Release tagged v<version> with both binaries attached
+#
+# Prerequisites:
+#   - Repository has write permissions for GITHUB_TOKEN (default on Actions)
+#   - pyproject.toml [project] version field follows semver (e.g. 1.0.0, no leading v)
+
+name: Release
+
+on:
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  build:
+    name: Build binary (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x86_64
+            asset_name: msft-czk-linux-x86_64
+          - os: macos-latest
+            target: macos-arm64
+            asset_name: msft-czk-macos-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Build binary
+        run: |
+          pyinstaller msft-czk.spec --distpath dist --workpath /tmp/pyinstaller-build -y
+          mv dist/msft-czk dist/${{ matrix.asset_name }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: dist/${{ matrix.asset_name }}
+          if-no-files-found: error
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version from pyproject.toml
+        id: version
+        run: |
+          VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Guard against existing tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          if git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
+            echo "ERROR: tag $TAG already exists on remote. Bump the version in pyproject.toml before releasing."
+            exit 1
+          fi
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          chmod +x artifacts/msft-czk-linux-x86_64/msft-czk-linux-x86_64
+          chmod +x artifacts/msft-czk-macos-arm64/msft-czk-macos-arm64
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --generate-notes \
+            artifacts/msft-czk-linux-x86_64/msft-czk-linux-x86_64 \
+            artifacts/msft-czk-macos-arm64/msft-czk-macos-arm64
