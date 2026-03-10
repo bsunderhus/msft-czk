@@ -7,7 +7,7 @@ Expected values from real 2024 Fidelity ESPP period reports:
 
   July 2024 (fidelity_espp_periodic_purchase.txt):
     Period: July 1, 2024 – July 31, 2024
-    Participant: I03102146
+    Participant: I00000001
     ESPP purchase:
       offering_period: 04/01/2024–06/30/2024, purchase_date=06/28/2024
       purchase_price=$402.26000, fmv=$446.950, shares=4.889, gain=$218.52
@@ -17,7 +17,7 @@ Expected values from real 2024 Fidelity ESPP period reports:
 
   March 2024 (fidelity_espp_periodic_dividends.txt):
     Period: March 1, 2024 – March 31, 2024
-    Participant: I03102146
+    Participant: I00000001
     ESPP purchases: none
     Dividends: 03/14 $43.87, 03/28 $0.56
     Withholding: $6.58 + $0.08 = $6.66 net
@@ -74,7 +74,7 @@ class TestCanHandle:
         assert not FidelityESPPPeriodicAdapter().can_handle(espp_text)
 
     def test_false_for_morgan_stanley_text(self):
-        ms_text = "Morgan Stanley Smith Barney LLC\nAccount Number: MS05003017"
+        ms_text = "Morgan Stanley Smith Barney LLC\nAccount Number: MS00000001"
         assert not FidelityESPPPeriodicAdapter().can_handle(ms_text)
 
     def test_false_for_unrecognised_text(self):

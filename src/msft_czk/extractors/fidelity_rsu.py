@@ -44,7 +44,7 @@ _RE_PERIOD_DATES = re.compile(
 # Account number: "Account # Z81-202254"
 _RE_ACCOUNT = re.compile(r"Account #\s+([\w-]+)")
 
-# Participant number: "Participant Number: I08869652"
+# Participant number: "Participant Number: I00000002"
 _RE_PARTICIPANT = re.compile(r"Participant Number:\s+(I\d+)")
 
 # Ticker: requires 2+ consecutive all-caps word groups before the parenthesised

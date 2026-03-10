@@ -60,7 +60,7 @@ class TestCanHandle:
         assert FidelityRSUAdapter().can_handle(load(NOV_DEC_FIXTURE))
 
     def test_false_for_morgan_stanley_text(self):
-        ms_text = "Morgan Stanley Smith Barney LLC\nAccount Number: MS05003017"
+        ms_text = "Morgan Stanley Smith Barney LLC\nAccount Number: MS00000001"
         assert not FidelityRSUAdapter().can_handle(ms_text)
 
     def test_false_for_fidelity_espp_text(self):

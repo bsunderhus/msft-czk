@@ -31,7 +31,7 @@ from msft_czk.models import BrokerStatement, DividendEvent, ESPPPurchaseEvent
 
 # --- Regex patterns derived from research.md Finding 7 ---
 
-# Participant number: "Participant Number: I03102146"
+# Participant number: "Participant Number: I00000001"
 _RE_PARTICIPANT = re.compile(r"Participant Number:\s+(I\d+)")
 
 # Statement year from "2024 YEAR-END INVESTMENT REPORT"

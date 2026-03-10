@@ -31,7 +31,7 @@ CNB_RATE = Decimal("23.28")
 def _ms_statement() -> BrokerStatement:
     return BrokerStatement(
         broker="morgan_stanley_rsu_quarterly",
-        account_number="MS05003017",
+        account_number="MS00000001",
         period_start=date(2024, 1, 1),
         period_end=date(2024, 12, 31),
         source_file=Path("/tmp/ms_fake.pdf"),
@@ -42,7 +42,7 @@ def _ms_statement() -> BrokerStatement:
 def _fidelity_statement() -> BrokerStatement:
     return BrokerStatement(
         broker="fidelity_espp_annual",
-        account_number="I03102146",
+        account_number="I00000001",
         period_start=date(2024, 1, 1),
         period_end=date(2024, 12, 31),
         source_file=Path("/tmp/fidelity_fake.pdf"),

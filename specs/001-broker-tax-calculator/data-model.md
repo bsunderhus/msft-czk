@@ -37,7 +37,7 @@ Metadata for a single broker PDF file. One instance per file provided on the com
 @dataclass(frozen=True)
 class BrokerStatement:
     broker: str                  # "morgan_stanley" | "fidelity"
-    account_number: str          # e.g. "MS05003017" | "I03102146"
+    account_number: str          # e.g. "MS00000001" | "I00000001"
     period_start: date           # statement period start date
     period_end: date             # statement period end date
     source_file: Path            # absolute path to the source PDF

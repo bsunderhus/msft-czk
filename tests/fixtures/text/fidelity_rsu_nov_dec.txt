@@ -1,18 +1,18 @@
 STOCK PLAN SERVICES REPORT
 November 1, 2025 - December 31, 2025
 Envelope # BSPMTZBBCCCGX
-VENDULA KUDEJOVA
-U LESA 367
-STRUHA@OV
-251 64
+ANON SECONDUSER
+TESTOVACI 2
+PRAGUE
+100 00
 CZECH REPUBLIC
 1 of 6
 S
 13215202
 BBBBB_XGCCCBBZTMPSB_
 EC_RM
-VENDULA KUDEJOVA
-Participant Number: I08869652
+ANON SECONDUSER
+Participant Number: I00000002
 Your Account Value: $20,344.60
 Change from Last Period: $1,403.42
 This Period Year-to-Date
@@ -42,7 +42,7 @@ STOCK PLAN SERVICES REPORT
 November 1, 2025 - December 31, 2025
 Account # Z81-202254
 Account Summary
-VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+ANON SECONDUSER - TRUST: UNDER AGREEMENT
 Account Value: $20,344.60 Account Holdings
 Change in Account Value $1,403.42
 This Period Year-to-Date
@@ -79,7 +79,7 @@ STOCK PLAN SERVICES REPORT
 November 1, 2025 - December 31, 2025
 Account # Z81-202254
 Holdings
-VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+ANON SECONDUSER - TRUST: UNDER AGREEMENT
 Core Account
 Beginning Price Ending Unrealized
 Market Value Quantity Per Unit Market Value Total Gain/Loss EAI ($) /
@@ -116,7 +116,7 @@ STOCK PLAN SERVICES REPORT
 November 1, 2025 - December 31, 2025
 Account # Z81-202254
 Activity
-VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+ANON SECONDUSER - TRUST: UNDER AGREEMENT
 Dividends, Interest & Other Income
 (Includes dividend reinvestment)
 Settlement Symbol/
@@ -149,7 +149,7 @@ STOCK PLAN SERVICES REPORT
 November 1, 2025 - December 31, 2025
 Account # Z81-202254
 Estimated Cash Flow
-(Rolling as of December 31, 2025) VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+(Rolling as of December 31, 2025) ANON SECONDUSER - TRUST: UNDER AGREEMENT
 Bond & CD Bond & CD Stock ETP Mutual Fund Other Total Est.
 Month Income Principal Income Income Income Income Cash Flow
 January 2026 -- -- -- -- -- -- --
@@ -191,7 +191,7 @@ STOCK PLAN SERVICES REPORT
 November 1, 2025 - December 31, 2025
 Account # Z81-202254
 Additional Information and Endnotes
-VENDULA KUDEJOVA - TRUST: UNDER AGREEMENT
+ANON SECONDUSER - TRUST: UNDER AGREEMENT
 Important information about your telephone conversations with Fidelity. Telephone conversations made with/to Fidelity may be monitored and/or recorded without
 further notice or disclosure. 570303.1.0
 Estimated Annual Income (EAI) & Estimated Yield (EY) - EAI for fixed income is calculated using the coupon rate. For all other securities, EAI is calculated using an

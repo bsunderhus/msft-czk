@@ -31,7 +31,7 @@ from msft_czk.models import BrokerStatement, DividendEvent, RSUVestingEvent
 
 # --- Regex patterns derived from research.md Finding 6 ---
 
-# Account number: "Account Number: MS05003017"
+# Account number: "Account Number: MS00000001"
 _RE_ACCOUNT = re.compile(r"Account Number:\s+(MS\d+)")
 
 # Statement period: "For the Period January 1 (cid:151) March 31, 2024"

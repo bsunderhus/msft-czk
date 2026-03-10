@@ -138,7 +138,7 @@ enhancement to keep the tool dependency-light.
 ## Finding 6: Morgan Stanley PDF Text Patterns
 
 **Broker identifier**: `Morgan Stanley Smith Barney LLC` (footer text extracted by pdfplumber)
-**Account number regex**: `Account Number:\s+(MS\d+)` → `MS05003017`
+**Account number regex**: `Account Number:\s+(MS\d+)` → `MS00000001`
 **Statement period regex**: `For the Period (.+?) \(cid:151\) (.+?), (\d{4})`
   (the en-dash renders as `(cid:151)` in pdfminer output)
 
@@ -192,7 +192,7 @@ Total RSU income USD ≈ $28,590.21; at 23.28 CZK/USD ≈ 665,940 CZK (close to 
 ## Finding 7: Fidelity PDF Text Patterns
 
 **Broker identifier**: `Fidelity Stock Plan Services LLC` (page body text)
-**Account identifier regex**: `Participant Number:\s+(I\d+)` → `I03102146`
+**Account identifier regex**: `Participant Number:\s+(I\d+)` → `I00000001`
 **Plan name**: `EMPLOYEE STOCK PURCHASE - MICROSOFT ESPP PLAN`
 
 **Dividend data** (Income Summary section):

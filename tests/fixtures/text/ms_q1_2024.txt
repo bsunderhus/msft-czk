@@ -2,12 +2,12 @@ STATEMENT For the Period January 1 (cid:151) March 31, 2024
 Morgan Stanley Smith Barney LLC. Member SIPC.
 *7542814220TTSPSQ
 00*
-suhrednuS
-odranreB
-81
-avokvalcaV
+resutseT
+nona
+1
+icavotsaT
 00
-061
+001
 eugarP
 cilbupeR
 hcezC
@@ -15,7 +15,7 @@ Plan Details: Contact Us:
 Plan Number: 548 Morgan Stanley Morgan Stanley Participant Services
 Company Name: Microsoft Corporation Global Stock Plan Services www.stockplanconnect.com
 Issuer Description: MICROSOFT CORP P.O. Box 182616 1-800-367-4777; 1-801-617-7414
-Account Number: MS05003017 Columbus OH 43218-2616 24-hour coverage, Monday - Friday. Please check the
+Account Number: MS00000001 Columbus OH 43218-2616 24-hour coverage, Monday - Friday. Please check the
 website for specific coverage details in your region.
 Share Purchase and Holdings Summary
 Opening Value Closing Value
@@ -37,7 +37,7 @@ Depository Trust & Clearing Corporation (DTCC) website at www.dtcc.com/ust1. You
 can also view the full text of the final rules on the SEC website at www.sec.gov.
 
 STATEMENT For the Period January 1 (cid:151) March 31, 2024 Page2 of 4
-Account Number: MS05003017
+Account Number: MS00000001
 Questions? have given control). A financial statement of this organization is SIPC, including an explanatory SIPC brochure, contact SIPC at
 Questions regarding your account may be directed to the Morgan available for your personal inspection at its offices, or a copy will be 1-202-371-8300 or visit www.sipc.org.
 Stanley Participant Services number and website listed on the first mailed to you upon your written request.
@@ -87,7 +87,7 @@ payable to customers on demand (i.e., are free of a lien or right of fluctuation
 set-off in our favor or on behalf of some third party to whom you may not be covered by SIPC protection. To obtain information about
 
 STATEMENT For the Period January 1 (cid:151) March 31, 2024 Page3 of 4
-Account Number: MS05003017
+Account Number: MS00000001
 SHARE PURCHASE AND HOLDINGS
 Gross
 Transaction Date Activity Type Quantity Price Amount Total Taxes and Fees Total Net Amount
@@ -101,5 +101,5 @@ Transaction Date Activity Type Quantity Price Amount Total Taxes and Fees Total 
 Sell Transactions are provided as of trade date.
 
 STATEMENT For the Period January 1 (cid:151) March 31, 2024 Page4 of 4
-Account Number: MS05003017
+Account Number: MS00000001
 This page intentionally left blank

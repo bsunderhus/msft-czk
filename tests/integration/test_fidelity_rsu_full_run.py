@@ -174,14 +174,14 @@ class TestMultiRSUBrokerConflict:
 
         ms_text = (
             "Morgan Stanley Smith Barney LLC\n"
-            "Account Number: MS05003017\n"
+            "Account Number: MS00000001\n"
             "For the Period January 1 (cid:151) March 31, 2024\n"
         )
         rsu_text = (
             "STOCK PLAN SERVICES REPORT\n"
             "September 24, 2025 - October 31, 2025\n"
             "Account # Z81-202254\n"
-            "Participant Number: I08869652\n"
+            "Participant Number: I00000002\n"
             "MICROSOFT CORP (MSFT) unavailable\n"
         )
 

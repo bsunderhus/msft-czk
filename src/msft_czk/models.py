@@ -63,7 +63,7 @@ class BrokerStatement:
         broker: Canonical broker identifier — ``"morgan_stanley_rsu_quarterly"``,
             ``"fidelity_espp_annual"`` (ESPP annual), ``"fidelity_espp_periodic"``
             (ESPP period reports), or ``"fidelity_rsu_periodic"`` (RSU period reports).
-        account_number: Broker-assigned account number (e.g. ``"MS05003017"``).
+        account_number: Broker-assigned account number (e.g. ``"MS00000001"``).
         period_start: First date of the statement period.
         period_end: Last date of the statement period (quarter-end, year-end,
             or period-end for Fidelity RSU).

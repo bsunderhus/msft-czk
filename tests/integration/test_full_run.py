@@ -227,7 +227,7 @@ class TestCnbNetworkFailureExitCode4:
              patch("msft_czk.cli.fetch_cnb_usd_annual", side_effect=Exception("network error")):
             mock_pdf.open.return_value.__enter__.return_value.pages = [
                 type("Page", (), {
-                    "extract_text": lambda self: "Morgan Stanley Smith Barney LLC\nAccount Number: MS05003017\nFor the Period January 1 (cid:151) March 31, 2024"
+                    "extract_text": lambda self: "Morgan Stanley Smith Barney LLC\nAccount Number: MS00000001\nFor the Period January 1 (cid:151) March 31, 2024"
                 })()
             ]
             result = runner.invoke(
@@ -269,7 +269,7 @@ class TestMissingQuarterWarning:
 
 _MS_MINIMAL_TEXT = (
     "Morgan Stanley Smith Barney LLC\n"
-    "Account Number: MS05003017\n"
+    "Account Number: MS00000001\n"
     "For the Period January 1 (cid:151) March 31, 2024"
 )
 

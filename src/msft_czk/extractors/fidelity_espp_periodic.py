@@ -45,7 +45,7 @@ _RE_PERIOD_DATES = re.compile(
 # Account number: "Account # Z81-202254"
 _RE_ACCOUNT = re.compile(r"Account #\s+([\w-]+)")
 
-# Participant number: "Participant Number: I03102146"
+# Participant number: "Participant Number: I00000001"
 _RE_PARTICIPANT = re.compile(r"Participant Number:\s+(I\d+)")
 
 # ESPP purchase row — same layout as FidelityExtractor (research.md Decision 8):
